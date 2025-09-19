@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
                         .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                finish(); // Exit the app
+                                finish(); // Exit the application
                             }
                         })
                         .setNegativeButton("No", null) // Do nothing, stay on the app
