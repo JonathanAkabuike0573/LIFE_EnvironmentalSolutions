@@ -1,3 +1,5 @@
+//Mohamed Ali  N01440760, Jonathan Akabuike N01510573, Kieran Sharma N01548225, Farhan Habibza N01610299
+//CENG-322-OCC,  Software Project
 package ca.light.indoorair.freshness.energy.it.life.environmental.solution;
 
 import android.os.Bundle;
