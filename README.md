@@ -1,5 +1,5 @@
 # Project Name: 
-LIFE Environmental Solutions
+<img src="app/src/main/res/drawable/image.jpg" alt="Life Logo" width="80" height="80"/> LIFE Environmental Solutions
 
 **Team Members:**
 Mohamed Ali (ID: N01440760)
