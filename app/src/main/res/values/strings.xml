@@ -2,4 +2,5 @@
 CENG-322-OCC,  Software Project -->
 <resources>
     <string name="app_name">LIFE_EnvironmentalSolution</string>
+    <string name="google_app_id">ca.light.indoorair.freshness.energy.it.life.environmental.solution</string>
 </resources>
