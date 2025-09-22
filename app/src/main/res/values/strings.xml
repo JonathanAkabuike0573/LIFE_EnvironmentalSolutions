@@ -5,4 +5,5 @@ CENG-322-OCC,  Software Project -->
     <string name="google_app_id">ca.light.indoorair.freshness.energy.it.life.environmental.solution</string>
     <string name="app_logo">app_logo</string>
     <string name="splash_screen">Splash Screen</string>
+    <string name="button">Button</string>
 </resources>
