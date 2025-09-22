@@ -6,4 +6,6 @@ CENG-322-OCC,  Software Project -->
     <string name="app_logo">app_logo</string>
     <string name="splash_screen">Splash Screen</string>
     <string name="button">Button</string>
+    <string name="navigation_drawer_open">Open</string>
+    <string name="navigation_drawer_close">Close</string>
 </resources>
