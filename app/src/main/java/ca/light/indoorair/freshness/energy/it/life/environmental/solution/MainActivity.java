@@ -79,11 +79,11 @@ public class MainActivity extends AppCompatActivity {
             navigationView.setNavigationItemSelectedListener(item -> {
                 int id = item.getItemId();
                 if (id == R.id.nav_home) {
-                    setTitle("Home");
+                    setTitle(getString(R.string.home));
                 } else if (id == R.id.nav_sensors) {
-                    setTitle("Sensors");
+                    setTitle(getString(R.string.sensors));
                 } else if (id == R.id.nav_settings) {
-                    setTitle("Settings");
+                    setTitle(getString(R.string.settings));
                 }
                 item.setChecked(true);
                 drawerLayout.closeDrawers();
@@ -97,15 +97,15 @@ public class MainActivity extends AppCompatActivity {
             public void handleOnBackPressed() {
                 new AlertDialog.Builder(MainActivity.this)
                         .setIcon(ContextCompat.getDrawable(MainActivity.this, R.drawable.logolife)) // Using a system alert icon
-                        .setTitle("Exit Application")
-                        .setMessage("Are you sure you want to exit?")
-                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        .setTitle(R.string.exit_application)
+                        .setMessage(R.string.are_you_sure_you_want_to_exit)
+                        .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 finish(); // Exit the application
                             }
                         })
-                        .setNegativeButton("No", null) // Do nothing, stay on the app
+                        .setNegativeButton(R.string.no, null) // Do nothing, stay on the app
                         .show();
             }
         });
