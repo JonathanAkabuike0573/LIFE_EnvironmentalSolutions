@@ -9,8 +9,6 @@ CENG-322-OCC,  Software Project -->
 
     <string name="navigation_drawer_open">Open</string>
     <string name="navigation_drawer_close">Close</string>
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="life_environmental_solutions">LIFE Environmental Solutions</string>
     <string name="home">Home</string>
     <string name="sensors">Sensors</string>
