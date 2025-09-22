@@ -2,12 +2,19 @@
 //CENG-322-OCC,  Software Project
 package ca.light.indoorair.freshness.energy.it.life.environmental.solution;
 
-import android.os.Bundle;
+import android.content.Context;
 import android.content.DialogInterface;
-
-import androidx.activity.EdgeToEdge;
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
+// import android.widget.Toolbar; // Remove this line
 import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar; // Add this line
+
+import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
@@ -15,6 +22,11 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 public class MainActivity extends AppCompatActivity {
+
+    ActionBar actionBar;
+    Toolbar toolbar;
+    private static final String PREFS_NAME = "MyPrefsFile";
+    private static final String THEME_KEY = "ThemeKey";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,8 +39,19 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
+
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayShowTitleEnabled(false);
+        }
+
+
+
+
         // Intercept back button press
-        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true /* enabled by default */) {
             @Override
             public void handleOnBackPressed() {
                 new AlertDialog.Builder(MainActivity.this)
@@ -45,5 +68,41 @@ public class MainActivity extends AppCompatActivity {
                         .show();
             }
         });
+    }
+
+    // Options Menu
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.themetoggle) {
+
+            toggleTheme();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+
+    }
+
+
+    private void toggleTheme() {
+        SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        boolean isDarkMode = sharedPreferences.getBoolean(THEME_KEY, false);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        if (isDarkMode) {
+
+            editor.putBoolean(THEME_KEY, false);
+            editor.apply();
+            getDelegate().setLocalNightMode(androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO);
+
+        } else {
+            editor.putBoolean(THEME_KEY, true);
+            editor.apply();
+            getDelegate().setLocalNightMode(androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES);
+        }
     }
 }
