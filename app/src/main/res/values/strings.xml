@@ -3,4 +3,6 @@ CENG-322-OCC,  Software Project -->
 <resources>
     <string name="app_name">LIFE_EnvironmentalSolution</string>
     <string name="google_app_id">ca.light.indoorair.freshness.energy.it.life.environmental.solution</string>
+    <string name="app_logo">app_logo</string>
+    <string name="splash_screen">Splash Screen</string>
 </resources>
