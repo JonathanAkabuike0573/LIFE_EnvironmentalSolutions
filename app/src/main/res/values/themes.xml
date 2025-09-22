@@ -6,4 +6,8 @@
     </style>
 
     <style name="Theme.LIFE_EnvironmentalSolution" parent="Base.Theme.LIFE_EnvironmentalSolution" />
+
+    <style name="SubMenuTextStyle" parent="Widget.AppCompat.PopupMenu.Overflow">
+        <item name="android:textColor">@color/red</item>
+    </style>
 </resources>
