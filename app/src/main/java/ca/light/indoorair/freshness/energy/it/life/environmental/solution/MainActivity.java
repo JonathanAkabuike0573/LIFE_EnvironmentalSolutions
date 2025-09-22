@@ -8,23 +8,29 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-// import android.widget.Toolbar; // Remove this line
 import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.widget.Toolbar; // Add this line
-
+import androidx.appcompat.widget.Toolbar;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+
+import com.google.android.material.navigation.NavigationView;
 
 public class MainActivity extends AppCompatActivity {
 
     ActionBar actionBar;
     Toolbar toolbar;
+    private DrawerLayout drawerLayout;
+    private NavigationView navigationView;
+    private ActionBarDrawerToggle toggle;
     private static final String PREFS_NAME = "MyPrefsFile";
     private static final String THEME_KEY = "ThemeKey";
 
@@ -39,7 +45,6 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         actionBar = getSupportActionBar();
@@ -47,8 +52,33 @@ public class MainActivity extends AppCompatActivity {
             actionBar.setDisplayShowTitleEnabled(false);
         }
 
+        drawerLayout = findViewById(R.id.drawer_layout);
+        navigationView = findViewById(R.id.navigation_view);
+        if (drawerLayout != null && navigationView != null) {
+            toggle = new ActionBarDrawerToggle(
+                    this,
+                    drawerLayout,
+                    toolbar,
+                    R.string.navigation_drawer_open,
+                    R.string.navigation_drawer_close
+            );
+            drawerLayout.addDrawerListener(toggle);
+            toggle.syncState();
 
-
+            navigationView.setNavigationItemSelectedListener(item -> {
+                int id = item.getItemId();
+                if (id == R.id.nav_home) {
+                    setTitle("Home");
+                } else if (id == R.id.nav_sensors) {
+                    setTitle("Sensors");
+                } else if (id == R.id.nav_settings) {
+                    setTitle("Settings");
+                }
+                item.setChecked(true);
+                drawerLayout.closeDrawers();
+                return true;
+            });
+        }
 
         // Intercept back button press
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true /* enabled by default */) {
@@ -78,31 +108,28 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {
+        if (toggle != null && toggle.onOptionsItemSelected(item)) {
+            return true;
+        }
         if (item.getItemId() == R.id.themetoggle) {
-
             toggleTheme();
             return true;
         }
-
         return super.onOptionsItemSelected(item);
-
     }
-
 
     private void toggleTheme() {
         SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         boolean isDarkMode = sharedPreferences.getBoolean(THEME_KEY, false);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         if (isDarkMode) {
-
             editor.putBoolean(THEME_KEY, false);
             editor.apply();
-            getDelegate().setLocalNightMode(androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO);
-
+            getDelegate().setLocalNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         } else {
             editor.putBoolean(THEME_KEY, true);
             editor.apply();
-            getDelegate().setLocalNightMode(androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES);
+            getDelegate().setLocalNightMode(AppCompatDelegate.MODE_NIGHT_YES);
         }
     }
 }
