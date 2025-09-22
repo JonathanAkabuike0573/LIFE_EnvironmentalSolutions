@@ -19,7 +19,7 @@ public class SplashWorks extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         // Keep the splash for 3 seconds
-        setContentView(R.layout.splashworks);
+        setContentView(R.layout.splashworksdarkmode);
 
         // Start MainActivity after delay
 
