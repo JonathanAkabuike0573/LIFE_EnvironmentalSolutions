@@ -8,9 +8,7 @@
     android:background="@color/white">
 
 
-    <!-- App Logo -->
 
-    <!-- App Name -->
 
     <ImageView
         android:id="@+id/logo"
