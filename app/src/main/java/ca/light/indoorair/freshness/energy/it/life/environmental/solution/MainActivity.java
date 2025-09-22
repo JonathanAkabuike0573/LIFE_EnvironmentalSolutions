@@ -45,11 +45,22 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
+        // Load the saved theme preference
+        SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        boolean isDarkMode = sharedPreferences.getBoolean(THEME_KEY, false);
+
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayShowTitleEnabled(false);
+        }
+
+        // Apply the loaded theme
+        if (isDarkMode) {
+            getDelegate().setLocalNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        } else {
+            getDelegate().setLocalNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         }
 
         drawerLayout = findViewById(R.id.drawer_layout);
