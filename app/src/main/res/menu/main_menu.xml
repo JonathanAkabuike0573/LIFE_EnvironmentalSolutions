@@ -1,0 +1,21 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
+    <item
+        android:id="@+id/jonOptions"
+        android:title="OPTIONS"
+        app:showAsAction="always" >
+
+
+        <menu
+            app:titleTextAppearance="@style/SubMenuTextStyle" >
+            <item
+                android:id="@+id/themetoggle"
+                android:title="Toggle Mode"
+                android:icon="@drawable/toggle_foreground"
+                />
+
+        </menu>
+
+    </item>
+</menu>
