@@ -21,11 +21,15 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 
 public class MainActivity extends AppCompatActivity {
 
+    FragmentManager fragmentManager;
     ActionBar actionBar;
     Toolbar toolbar;
     private DrawerLayout drawerLayout;
@@ -44,6 +48,37 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+
+
+        fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction().replace(R.id.main, new DashBoardFragment()).commit();
+
+
+        Fragment dashBoardFragment = new DashBoardFragment();
+        Fragment notificationFragment = new NotificationFragment();
+        Fragment settingsFragment = new SettingsFragment();
+
+        setCurrentFragment(dashBoardFragment);
+
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
+        bottomNavigationView.setOnItemSelectedListener(item -> {
+            int id = item.getItemId();
+            if (id == R.id.dashboard) {
+                setCurrentFragment(dashBoardFragment);
+                return true;
+            } else if (id == R.id.notification) {
+                setCurrentFragment(notificationFragment);
+                return true;
+            } else if (id == R.id.settings) {
+                setCurrentFragment(settingsFragment);
+                return true;
+            }
+
+
+            return true;
+        });
+
 
         // Load the saved theme preference
         SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
@@ -142,5 +177,11 @@ public class MainActivity extends AppCompatActivity {
             editor.apply();
             getDelegate().setLocalNightMode(AppCompatDelegate.MODE_NIGHT_YES);
         }
+
+
+    }
+
+    private void setCurrentFragment(Fragment homefragment) {
+        getSupportFragmentManager().beginTransaction().replace(R.id.main, homefragment).commit();
     }
 }
