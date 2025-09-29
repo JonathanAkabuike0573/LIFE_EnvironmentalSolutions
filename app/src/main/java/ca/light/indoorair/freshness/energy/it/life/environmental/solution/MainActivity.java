@@ -21,11 +21,15 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 
 public class MainActivity extends AppCompatActivity {
 
+    FragmentManager fragmentManager;
     ActionBar actionBar;
     Toolbar toolbar;
     private DrawerLayout drawerLayout;
@@ -45,11 +49,53 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
+
+
+        fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction().replace(R.id.main, new DashBoardFragment()).commit();
+
+
+        Fragment dashBoardFragment = new DashBoardFragment();
+        Fragment notificationFragment = new NotificationFragment();
+        Fragment settingsFragment = new SettingsFragment();
+
+        setCurrentFragment(dashBoardFragment);
+
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
+        bottomNavigationView.setOnItemSelectedListener(item -> {
+            int id = item.getItemId();
+            if (id == R.id.dashboard) {
+                setCurrentFragment(dashBoardFragment);
+                return true;
+            } else if (id == R.id.notification) {
+                setCurrentFragment(notificationFragment);
+                return true;
+            } else if (id == R.id.settings) {
+                setCurrentFragment(settingsFragment);
+                return true;
+            }
+
+
+            return true;
+        });
+
+
+        // Load the saved theme preference
+        SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        boolean isDarkMode = sharedPreferences.getBoolean(THEME_KEY, false);
+
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayShowTitleEnabled(false);
+        }
+
+        // Apply the loaded theme
+        if (isDarkMode) {
+            getDelegate().setLocalNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        } else {
+            getDelegate().setLocalNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         }
 
         drawerLayout = findViewById(R.id.drawer_layout);
@@ -68,11 +114,11 @@ public class MainActivity extends AppCompatActivity {
             navigationView.setNavigationItemSelectedListener(item -> {
                 int id = item.getItemId();
                 if (id == R.id.nav_home) {
-                    setTitle("Home");
+                    setTitle(getString(R.string.home));
                 } else if (id == R.id.nav_sensors) {
-                    setTitle("Sensors");
+                    setTitle(getString(R.string.sensors));
                 } else if (id == R.id.nav_settings) {
-                    setTitle("Settings");
+                    setTitle(getString(R.string.settings));
                 }
                 item.setChecked(true);
                 drawerLayout.closeDrawers();
@@ -86,15 +132,15 @@ public class MainActivity extends AppCompatActivity {
             public void handleOnBackPressed() {
                 new AlertDialog.Builder(MainActivity.this)
                         .setIcon(ContextCompat.getDrawable(MainActivity.this, R.drawable.logolife)) // Using a system alert icon
-                        .setTitle("Exit Application")
-                        .setMessage("Are you sure you want to exit?")
-                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        .setTitle(R.string.exit_application)
+                        .setMessage(R.string.are_you_sure_you_want_to_exit)
+                        .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 finish(); // Exit the application
                             }
                         })
-                        .setNegativeButton("No", null) // Do nothing, stay on the app
+                        .setNegativeButton(R.string.no, null) // Do nothing, stay on the app
                         .show();
             }
         });
@@ -131,5 +177,11 @@ public class MainActivity extends AppCompatActivity {
             editor.apply();
             getDelegate().setLocalNightMode(AppCompatDelegate.MODE_NIGHT_YES);
         }
+
+
+    }
+
+    private void setCurrentFragment(Fragment homefragment) {
+        getSupportFragmentManager().beginTransaction().replace(R.id.main, homefragment).commit();
     }
 }
