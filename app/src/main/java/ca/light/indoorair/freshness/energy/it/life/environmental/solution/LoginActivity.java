@@ -1,6 +1,7 @@
 package ca.light.indoorair.freshness.energy.it.life.environmental.solution;
 
 import android.os.Bundle;
+import android.content.res.Configuration;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -26,5 +27,12 @@ public class LoginActivity extends AppCompatActivity {
         registerTextView = findViewById(R.id.signup);
         rememberMeCheckBox = findViewById(R.id.checkBox);
 
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        // Re-set the layout when the orientation changes
+        setContentView(R.layout.login_page);
     }
 }
