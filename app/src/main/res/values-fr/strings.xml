@@ -28,5 +28,15 @@ CENG-322-OCC,  Software Project -->
     <string name="by">PAR</string>
     <string name="toggle_mode">Basculer le mode</string>
     <string name="options">OPTIONS</string>
+    <string name="display">Affichage</string>
+    <string name="enable_dark_mode">Activer le Mode Sombre</string>
+    <string name="reduces_screen_glare_for_comfortable_viewing_at_night">Réduit léblouissement de lecran pour une visualisation confortable la nuit.</string>
+    <string name="lock_to_portrait_mode">Verrouiller en Mode Portrait</string>
+    <string name="keeps_the_app_in_a_vertical_orientation">Maintient lapplication en orientation verticale.</string>
+    <string name="notifications_amp_data"><![CDATA[Notifications & Données]]></string>
+    <string name="notification_tone">Tonalité de Notification</string>
+    <string name="listen">Écouter</string>
+    <string name="clear_cache">Vider le Cache</string>
+    <string name="frees_up_storage_space">Libère de lespace de stockage</string>
 
 </resources>
