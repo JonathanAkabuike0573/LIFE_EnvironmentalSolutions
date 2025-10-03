@@ -1,14 +1,157 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/frameLayout3"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="?android:attr/colorBackground"
     tools:context=".SettingsFragment">
 
-    <!-- TODO: Update blank fragment layout -->
+    <!-- Header for Display Settings -->
     <TextView
+
+        android:id="@+id/display_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Display"
+        android:padding="16dp"
+        android:textAppearance="?attr/textAppearanceTitleMedium"
+        android:textSize="21sp"
+        android:textColor="?attr/colorPrimary" />
+
+    <!-- Feature 1: Toggle Dark Mode -->
+    <com.google.android.material.materialswitch.MaterialSwitch
+        android:id="@+id/dark_mode_switch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Enable Dark Mode"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp"
+        android:checked="false"
+        android:textSize="21sp"
+        app:thumbIconTint="?attr/colorOnPrimary"
+        app:trackTint="?attr/colorOnSurfaceVariant"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Reduces screen glare for comfortable viewing at night."
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="16dp"
+        android:textAppearance="?attr/textAppearanceBodySmall"
+        android:textSize="17sp" />
+
+    <!-- Feature 2: Lock to Portrait Mode -->
+    <com.google.android.material.materialswitch.MaterialSwitch
+        android:id="@+id/portrait_lock_switch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Lock to Portrait Mode"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp"
+        android:checked="false"
+        android:textSize="21sp"
+        app:thumbIconTint="?attr/colorOnPrimary"
+        app:trackTint="?attr/colorOnSurfaceVariant"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Keeps the app in a vertical orientation."
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="16dp"
+        android:textAppearance="?attr/textAppearanceBodySmall"
+        android:textSize="17sp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="?android:attr/listDivider"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"/>
+
+    <!-- Header for Notification & Storage -->
+    <TextView
+        android:id="@+id/notification_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Notifications &amp; Data"
+        android:padding="16dp"
+        android:textAppearance="?attr/textAppearanceTitleMedium"
+        android:textSize="21sp"
+        android:textColor="?attr/colorPrimary" />
+
+    <!-- Feature 3: Notification Tone -->
+    <RelativeLayout
+        android:id="@+id/notification_tone_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?android:attr/selectableItemBackground">
+
+        <TextView
+            android:id="@+id/notification_tone_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Notification Tone"
+            android:layout_centerVertical="true"
+            android:textAppearance="?attr/textAppearanceBodyLarge"
+            android:textSize="21sp" />
+
+        <TextView
+            android:id="@+id/notification_tone_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Default"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:textAppearance="?attr/textAppearanceBodyMedium"
+            android:textSize="19sp"
+            android:textColor="?android:attr/textColorSecondary" />
+    </RelativeLayout>
+
+    <!-- Feature 4: Clear Cache -->
+    <RelativeLayout
+        android:id="@+id/clear_cache_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?android:attr/selectableItemBackground">
+
+        <TextView
+            android:id="@+id/clear_cache_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Clear Cache"
+            android:layout_centerVertical="true"
+            android:textAppearance="?attr/textAppearanceBodyLarge"
+            android:textSize="21sp" />
+
+        <TextView
+            android:id="@+id/clear_cache_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Frees up storage space"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:textAppearance="?attr/textAppearanceBodyMedium"
+            android:textColor="?android:attr/textColorSecondary"
+            android:textSize="21sp" />
+    </RelativeLayout>
+
+</LinearLayout>
+
         android:id="@+id/textView8"
         android:layout_width="193dp"
         android:layout_height="94dp"
@@ -21,3 +164,4 @@
         app:layout_constraintVertical_bias="0.394" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+
