@@ -30,7 +30,7 @@
         android:layout_marginStart="66dp"
         android:layout_marginTop="360dp"
 
-        android:text="LIFE Environmental Solutions"
+        android:text="@string/life_environmental_solutions"
         android:textColor="@color/white"
         android:textSize="20sp"
         android:textStyle="bold"
@@ -45,7 +45,7 @@
         android:layout_marginTop="483dp"
         android:textColor="@color/white"
         android:textSize="20dp"
-        android:text="Jonathan Akabuike N01510573"
+        android:text="@string/jonathan_akabuike_n01510573"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -57,7 +57,7 @@
         android:layout_marginTop="516dp"
         android:textColor="@color/white"
         android:textSize="20dp"
-        android:text="Mohamed Ali  N01440760"
+        android:text="@string/mohamed_ali_n01440760"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -69,7 +69,7 @@
         android:layout_marginTop="553dp"
         android:textColor="@color/white"
         android:textSize="20dp"
-        android:text="Kieran Sharma N01548225"
+        android:text="@string/kieran_sharma_n01548225"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -81,7 +81,7 @@
         android:layout_marginTop="589dp"
         android:textColor="@color/white"
         android:textSize="20dp"
-        android:text="Farhan Habibzai N01610299"
+        android:text="@string/farhan_habibzai_n01610299"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -92,7 +92,7 @@
         android:layout_marginStart="66dp"
         android:textColor="@color/white"
         android:layout_marginTop="415dp"
-        android:text="BY"
+        android:text="@string/by"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

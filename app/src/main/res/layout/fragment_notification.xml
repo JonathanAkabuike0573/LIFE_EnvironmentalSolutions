@@ -13,7 +13,7 @@
         android:layout_height="150dp"
         android:layout_marginStart="82dp"
         android:layout_marginTop="257dp"
-        android:text="Notification"
+        android:text="@string/notification"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

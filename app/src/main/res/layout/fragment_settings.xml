@@ -10,6 +10,7 @@
 
     <!-- Header for Display Settings -->
     <TextView
+
         android:id="@+id/display_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -150,3 +151,17 @@
     </RelativeLayout>
 
 </LinearLayout>
+
+        android:id="@+id/textView8"
+        android:layout_width="193dp"
+        android:layout_height="94dp"
+        android:text="@string/settings"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.389"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.394" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+
