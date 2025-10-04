@@ -13,7 +13,7 @@
         android:layout_height="128dp"
         android:layout_marginStart="100dp"
         android:layout_marginTop="204dp"
-        android:text="DashBoard"
+        android:text="@string/dashboard"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

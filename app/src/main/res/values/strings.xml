@@ -19,6 +19,38 @@ CENG-322-OCC,  Software Project -->
     <string name="no">No</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="dashboard">DashBoard</string>
+    <string name="notification">Notification</string>
+    <string name="jonathan_akabuike_n01510573">Jonathan Akabuike N01510573</string>
+    <string name="mohamed_ali_n01440760">Mohamed Ali N01440760</string>
+    <string name="kieran_sharma_n01548225">Kieran Sharma N01548225</string>
+    <string name="farhan_habibzai_n01610299">Farhan Habibzai N01610299</string>
+    <string name="by">BY</string>
+    <string name="toggle_mode">Toggle Mode</string>
+    <string name="options">OPTIONS</string>
+    <string name="display">Display</string>
+    <string name="enable_dark_mode">Enable Dark Mode</string>
+    <string name="reduces_screen_glare_for_comfortable_viewing_at_night">Reduces screen glare for comfortable viewing at night.</string>
+    <string name="lock_to_portrait_mode">Lock to Portrait Mode</string>
+    <string name="keeps_the_app_in_a_vertical_orientation">Keeps the app in a vertical orientation.</string>
+    <string name="notifications_amp_data"><![CDATA[Notifications & Data]]></string>
+    <string name="notification_tone">Notification Tone</string>
+    <string name="listen">Listen</string>
+    <string name="clear_cache">Clear Cache</string>
+    <string name="frees_up_storage_space">Frees up storage space</string>
+
+    <string name="or">OR</string>
+    <string name="login">Login</string>
+    <string name="sign_in_with_google">Sign in with Google</string>
+    <string name="enter_password">Enter password</string>
+    <string name="don_t_have_an_account">Don\'t have an account?</string>
+    <string name="sign_up">Sign up</string>
+    <string name="remember_me">Remember me</string>
+    <string name="enter_username">Enter Username</string>
+    <string name="username_cannot_be_empty">Username cannot be empty</string>
+    <string name="password_cannot_be_empty">Password cannot be empty</string>
+    <string name="invalid_credentials">Invalid Credentials</string>
+    <string name="user_does_not_exist">User does not exist</string>
 
 
 </resources>
