@@ -3,7 +3,7 @@
     >
     <item
         android:id="@+id/jonOptions"
-        android:title="OPTIONS"
+        android:title="@string/options"
         app:showAsAction="always" >
 
 
@@ -11,7 +11,7 @@
             app:titleTextAppearance="@style/SubMenuTextStyle" >
             <item
                 android:id="@+id/themetoggle"
-                android:title="Toggle Mode"
+                android:title="@string/toggle_mode"
                 android:icon="@drawable/toggle_foreground"
                 />
 
