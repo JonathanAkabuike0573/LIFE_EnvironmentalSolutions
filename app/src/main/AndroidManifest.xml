@@ -25,6 +25,15 @@
 
 
         <activity
+            android:name=".LoginActivity"
+            android:exported="false"
+            android:theme="@style/Theme.SplashWorks"/>
+
+        <activity
+            android:name=".SignupActivity"
+            android:exported="false"
+            android:theme="@style/Theme.SplashWorks"/>
+        <activity
             android:name=".MainActivity"
             android:exported="false"
             android:theme="@style/Theme.SplashWorks"/>
