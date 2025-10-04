@@ -39,5 +39,18 @@ CENG-322-OCC,  Software Project -->
     <string name="clear_cache">Clear Cache</string>
     <string name="frees_up_storage_space">Frees up storage space</string>
 
+    <string name="or">OR</string>
+    <string name="login">Login</string>
+    <string name="sign_in_with_google">Sign in with Google</string>
+    <string name="enter_password">Enter password</string>
+    <string name="don_t_have_an_account">Don\'t have an account?</string>
+    <string name="sign_up">Sign up</string>
+    <string name="remember_me">Remember me</string>
+    <string name="enter_username">Enter Username</string>
+    <string name="username_cannot_be_empty">Username cannot be empty</string>
+    <string name="password_cannot_be_empty">Password cannot be empty</string>
+    <string name="invalid_credentials">Invalid Credentials</string>
+    <string name="user_does_not_exist">User does not exist</string>
+
 
 </resources>
