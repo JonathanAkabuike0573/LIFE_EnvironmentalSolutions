@@ -11,6 +11,7 @@
         android:roundIcon="@mipmap/logo_foreground_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.LIFE_EnvironmentalSolution">
+
         <activity
             android:name=".SplashWorks"
             android:exported="true"
@@ -37,6 +38,11 @@
             android:name=".MainActivity"
             android:exported="false"
             android:theme="@style/Theme.SplashWorks"/>
+        <activity
+            android:name=".SensorActivity"
+            android:exported="false"
+            android:theme="@style/Theme.SplashWorks"/>
+
     </application>
 
 </manifest>
