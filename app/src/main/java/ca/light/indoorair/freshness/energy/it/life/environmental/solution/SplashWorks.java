@@ -52,7 +52,7 @@ public class SplashWorks extends AppCompatActivity {
 
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
 
-            Intent intent = new Intent(SplashWorks.this, MainActivity.class);
+            Intent intent = new Intent(SplashWorks.this, LoginActivity.class);
             startActivity(intent);
             finish();
 

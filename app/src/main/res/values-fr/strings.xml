@@ -19,4 +19,24 @@ CENG-322-OCC,  Software Project -->
     <string name="no">No</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="dashboard">Tableau de bord</string>
+    <string name="notification">Notification</string>
+    <string name="jonathan_akabuike_n01510573">Jonathan Akabuike N01510573</string>
+    <string name="mohamed_ali_n01440760">Mohamed Ali N01440760</string>
+    <string name="kieran_sharma_n01548225">Kieran Sharma N01548225</string>
+    <string name="farhan_habibzai_n01610299">Farhan Habibzai N01610299</string>
+    <string name="by">PAR</string>
+    <string name="toggle_mode">Basculer le mode</string>
+    <string name="options">OPTIONS</string>
+    <string name="display">Affichage</string>
+    <string name="enable_dark_mode">Activer le Mode Sombre</string>
+    <string name="reduces_screen_glare_for_comfortable_viewing_at_night">Réduit léblouissement de lecran pour une visualisation confortable la nuit.</string>
+    <string name="lock_to_portrait_mode">Verrouiller en Mode Portrait</string>
+    <string name="keeps_the_app_in_a_vertical_orientation">Maintient lapplication en orientation verticale.</string>
+    <string name="notifications_amp_data"><![CDATA[Notifications & Données]]></string>
+    <string name="notification_tone">Tonalité de Notification</string>
+    <string name="listen">Écouter</string>
+    <string name="clear_cache">Vider le Cache</string>
+    <string name="frees_up_storage_space">Libère de lespace de stockage</string>
+
 </resources>

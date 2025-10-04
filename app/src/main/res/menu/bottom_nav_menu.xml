@@ -4,14 +4,14 @@
     <item
         android:id="@+id/dashboard"
         android:icon="@drawable/home_foreground"
-        android:title="Dashboard" />
+        android:title="@string/dashboard" />
     <item
         android:id="@+id/notification"
         android:icon="@drawable/notification_foreground"
-        android:title="Notofication" />
+        android:title="@string/notification" />
     <item
         android:id="@+id/settings"
         android:icon="@android:drawable/ic_menu_preferences"
-        android:title="Settings" />
+        android:title="@string/settings" />
 
 </menu>
