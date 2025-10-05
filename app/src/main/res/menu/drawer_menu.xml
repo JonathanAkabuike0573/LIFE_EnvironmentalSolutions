@@ -13,5 +13,9 @@
             android:id="@+id/nav_settings"
             android:title="@string/settings"
             android:icon="@drawable/image"/>
+        <item
+            android:id="@+id/nav_equipment"
+            android:title="Equipment"
+            android:icon="@drawable/image"/>
     </group>
 </menu>
