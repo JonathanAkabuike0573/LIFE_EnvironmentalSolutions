@@ -2,41 +2,49 @@
 CENG-322-OCC,  Software Project -->
 <resources>
     <string name="app_name">LIFE_EnvironmentalSolution</string>
-    <string name="google_app_id">ca.light.indoorair.freshness.energy.it.life.environmental.solution</string>
-    <string name="app_logo">app_logo</string>
-    <string name="splash_screen">Splash Screen</string>
-    <string name="button">Button</string>
+    <string name="splash_screen">Écran de démarrage</string>
+    <string name="button">Bouton</string>
 
-    <string name="navigation_drawer_open">Open</string>
-    <string name="navigation_drawer_close">Close</string>
-    <string name="life_environmental_solutions">LIFE Environmental Solutions</string>
-    <string name="home">Home</string>
-    <string name="sensors">Sensors</string>
-    <string name="settings">Settings</string>
-    <string name="exit_application">Exit Application</string>
-    <string name="are_you_sure_you_want_to_exit">Are you sure you want to exit?</string>
-    <string name="yes">Yes</string>
-    <string name="no">No</string>
+    <string name="navigation_drawer_open">Ouvrir</string>
+    <string name="navigation_drawer_close">Fermer</string>
+    <string name="life_environmental_solutions">LIFE Solutions Environnementales</string>
+    <string name="home">Accueil</string>
+    <string name="sensors">Capteurs</string>
+    <string name="settings">Paramètres</string>
+    <string name="exit_application">Quitter l\'application</string>
+    <string name="are_you_sure_you_want_to_exit">Êtes-vous sûr de vouloir quitter?</string>
+    <string name="yes">Oui</string>
+    <string name="no">Non</string>
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="hello_blank_fragment">Bonjour fragment vierge</string>
     <string name="dashboard">Tableau de bord</string>
     <string name="notification">Notification</string>
-    <string name="jonathan_akabuike_n01510573">Jonathan Akabuike N01510573</string>
-    <string name="mohamed_ali_n01440760">Mohamed Ali N01440760</string>
-    <string name="kieran_sharma_n01548225">Kieran Sharma N01548225</string>
-    <string name="farhan_habibzai_n01610299">Farhan Habibzai N01610299</string>
     <string name="by">PAR</string>
     <string name="toggle_mode">Basculer le mode</string>
     <string name="options">OPTIONS</string>
     <string name="display">Affichage</string>
-    <string name="enable_dark_mode">Activer le Mode Sombre</string>
-    <string name="reduces_screen_glare_for_comfortable_viewing_at_night">Réduit léblouissement de lecran pour une visualisation confortable la nuit.</string>
-    <string name="lock_to_portrait_mode">Verrouiller en Mode Portrait</string>
-    <string name="keeps_the_app_in_a_vertical_orientation">Maintient lapplication en orientation verticale.</string>
-    <string name="notifications_amp_data"><![CDATA[Notifications & Données]]></string>
-    <string name="notification_tone">Tonalité de Notification</string>
+    <string name="enable_dark_mode">Activer le mode sombre</string>
+    <string name="reduces_screen_glare_for_comfortable_viewing_at_night">Réduit l\'éblouissement de l\'écran pour une visualisation confortable la nuit.</string>
+    <string name="lock_to_portrait_mode">Verrouiller en mode portrait</string>
+    <string name="keeps_the_app_in_a_vertical_orientation">Maintient l\'application en orientation verticale.</string>
+    <string name="notifications_amp_data"><![CDATA[Notifications et données]]></string>
+    <string name="notification_tone">Tonalité de notification</string>
     <string name="listen">Écouter</string>
-    <string name="clear_cache">Vider le Cache</string>
-    <string name="frees_up_storage_space">Libère de lespace de stockage</string>
+    <string name="clear_cache">Vider le cache</string>
+    <string name="frees_up_storage_space">Libère de l\'espace de stockage</string>
+
+    <string name="or">OU</string>
+    <string name="login">Connexion</string>
+    <string name="sign_in_with_google">Se connecter avec Google</string>
+    <string name="enter_password">Entrez le mot de passe</string>
+    <string name="don_t_have_an_account">Vous n\'avez pas de compte?</string>
+    <string name="sign_up">S\'inscrire</string>
+    <string name="remember_me">Se souvenir de moi</string>
+    <string name="enter_username">Entrez le nom d\'utilisateur</string>
+    <string name="username_cannot_be_empty">Le nom d\'utilisateur ne peut pas être vide</string>
+    <string name="password_cannot_be_empty">Le mot de passe ne peut pas être vide</string>
+    <string name="invalid_credentials">Informations d\'identification non valides</string>
+    <string name="user_does_not_exist">L\'utilisateur n\'existe pas</string>
+
 
 </resources>
