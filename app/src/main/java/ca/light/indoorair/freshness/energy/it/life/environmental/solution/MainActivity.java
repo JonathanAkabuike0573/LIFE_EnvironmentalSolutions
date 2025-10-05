@@ -4,10 +4,13 @@ package ca.light.indoorair.freshness.energy.it.life.environmental.solution;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
+
 import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
@@ -116,7 +119,8 @@ public class MainActivity extends AppCompatActivity {
                 if (id == R.id.nav_home) {
                     setTitle(getString(R.string.home));
                 } else if (id == R.id.nav_sensors) {
-                    setTitle(getString(R.string.sensors));
+                   Intent intent = new Intent(MainActivity.this, SensorActivity.class);
+                   startActivity(intent);
                 } else if (id == R.id.nav_settings) {
                     setTitle(getString(R.string.settings));
                 }
