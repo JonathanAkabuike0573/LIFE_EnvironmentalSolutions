@@ -1,21 +1,81 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.LIFE_EnvironmentalSolution" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- App theme -->
+    <style name="Theme.LIFE_EnvironmentalSolution" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorOnPrimary">@color/on_primary</item>
+        <item name="colorSecondary">@color/secondary</item>
+        <item name="colorOnSecondary">@color/on_secondary</item>
+        <item name="colorSurface">@color/surface</item>
+        <item name="colorOnSurface">@color/on_surface</item>
+        <item name="android:statusBarColor">?attr/colorPrimary</item>
+        <item name="android:navigationBarColor">@color/surface</item>
     </style>
 
-    <style name="Theme.LIFE_EnvironmentalSolution" parent="Base.Theme.LIFE_EnvironmentalSolution" />
-
-    <style name="SubMenuTextStyle" parent="Widget.AppCompat.PopupMenu.Overflow">
-        <item name="android:textColor">@color/red</item>
-    </style>
-    <style name="Theme.SplashWorks" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- SplashScreen background for light mode -->
+    <!-- Splash theme  -->
+    <style name="Theme.SplashWorks" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">@color/white</item>
-        <!-- Animated icon -->
-        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
-        <item name="windowSplashScreenAnimationDuration">1000</item>
-        <item name="postSplashScreenTheme">@style/Theme.SplashWorks</item>
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/logo_foreground</item>
+        <item name="postSplashScreenTheme">@style/Theme.LIFE_EnvironmentalSolution</item>
     </style>
+
+
+    <!-- Login card -->
+    <style name="Widget.App.LoginCard" parent="Widget.Material3.CardView.Elevated">
+        <item name="cardUseCompatPadding">true</item>
+        <item name="cardCornerRadius">@dimen/corner_l</item>
+        <item name="cardElevation">@dimen/elevation_high</item>
+    </style>
+
+    <!-- Text inputs -->
+    <style name="Widget.App.TextInputLayout" parent="Widget.Material3.TextInputLayout.FilledBox">
+        <item name="android:layout_height">@dimen/text_field_height</item>
+        <item name="boxCornerRadiusTopStart">@dimen/corner_m</item>
+        <item name="boxCornerRadiusTopEnd">@dimen/corner_m</item>
+        <item name="boxCornerRadiusBottomStart">@dimen/corner_m</item>
+        <item name="boxCornerRadiusBottomEnd">@dimen/corner_m</item>
+        <item name="boxStrokeColor">@color/text_field_stroke</item>
+        <item name="hintTextColor">@color/text_field_hint</item>
+    </style>
+
+    <style name="Widget.App.TextInputEditText" parent="Widget.Material3.TextInputEditText.FilledBox">
+        <item name="android:textSize">@dimen/text_m</item>
+        <item name="android:textColor">@color/on_surface</item>
+        <item name="android:paddingStart">@dimen/space_m</item>
+        <item name="android:paddingEnd">@dimen/space_m</item>
+    </style>
+
+    <!-- Buttons -->
+    <style name="Widget.App.Button.Primary" parent="Widget.Material3.Button">
+        <item name="android:layout_height">@dimen/btn_height</item>
+        <item name="android:textSize">@dimen/text_l</item>
+        <item name="backgroundTint">@color/btn_primary_bg</item>
+        <item name="android:textColor">@color/btn_primary_text</item>
+        <item name="cornerRadius">@dimen/corner_m</item>
+        <item name="android:insetTop">@dimen/space_xs</item>
+        <item name="android:insetBottom">@dimen/space_xs</item>
+    </style>
+
+    <!-- Secondary/outlined button -->
+    <style name="Widget.App.Button.Secondary" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="android:textColor">@color/secondary</item>
+    </style>
+
+    <!-- Link text -->
+    <style name="Text.Link" parent="TextAppearance.Material3.BodyMedium">
+        <item name="android:textColor">@color/primary</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <!-- Checkbox customization -->
+    <style name="Widget.App.CheckBox" parent="Widget.Material3.CompoundButton.CheckBox">
+        <item name="buttonTint">@color/secondary</item>
+        <item name="android:textSize">@dimen/text_m</item>
+    </style>
+
+    <style name="Text.HighlightTitle" parent="TextAppearance.Material3.TitleLarge">
+        <item name="android:textColor">@color/primary</item>
+    </style>
+
 </resources>
