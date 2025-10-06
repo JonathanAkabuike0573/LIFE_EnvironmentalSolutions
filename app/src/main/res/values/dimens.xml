@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="space_xs">4dp</dimen>
+    <dimen name="space_s">8dp</dimen>
+    <dimen name="space_m">16dp</dimen>
+    <dimen name="space_l">24dp</dimen>
+    <dimen name="space_xl">32dp</dimen>
+
+    <dimen name="corner_s">8dp</dimen>
+    <dimen name="corner_m">16dp</dimen>
+    <dimen name="corner_l">24dp</dimen>
+
+    <dimen name="elevation_low">2dp</dimen>
+    <dimen name="elevation_med">4dp</dimen>
+    <dimen name="elevation_high">8dp</dimen>
+
+    <dimen name="text_s">12sp</dimen>
+    <dimen name="text_m">16sp</dimen>
+    <dimen name="text_l">20sp</dimen>
+    <dimen name="text_xl">24sp</dimen>
+
+    <dimen name="btn_height">56dp</dimen>
+    <dimen name="text_field_height">56dp</dimen>
+    <dimen name="logo_size">120dp</dimen>
+</resources>
