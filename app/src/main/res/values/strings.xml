@@ -1,9 +1,9 @@
 <!-- Mohamed Ali  N01440760, Jonathan Akabuike N01510573, Kieran Sharma N01548225, Farhan Habibza N01610299
 CENG-322-OCC,  Software Project -->
 <resources>
-    <string name="app_name">LIFE_EnvironmentalSolution</string>
-    <string name="google_app_id">ca.light.indoorair.freshness.energy.it.life.environmental.solution</string>
-    <string name="app_logo">app_logo</string>
+    <string name="app_name" translatable="false">LIFE_EnvironmentalSolution</string>
+    <string name="google_app_id" translatable="false">ca.light.indoorair.freshness.energy.it.life.environmental.solution</string>
+    <string name="app_logo" translatable="false">app_logo</string>
     <string name="splash_screen">Splash Screen</string>
     <string name="button">Button</string>
 
@@ -21,10 +21,10 @@ CENG-322-OCC,  Software Project -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="dashboard">DashBoard</string>
     <string name="notification">Notification</string>
-    <string name="jonathan_akabuike_n01510573">Jonathan Akabuike N01510573</string>
-    <string name="mohamed_ali_n01440760">Mohamed Ali N01440760</string>
-    <string name="kieran_sharma_n01548225">Kieran Sharma N01548225</string>
-    <string name="farhan_habibzai_n01610299">Farhan Habibzai N01610299</string>
+    <string name="jonathan_akabuike_n01510573" translatable="false">Jonathan Akabuike N01510573</string>
+    <string name="mohamed_ali_n01440760" translatable="false">Mohamed Ali N01440760</string>
+    <string name="kieran_sharma_n01548225" translatable="false">Kieran Sharma N01548225</string>
+    <string name="farhan_habibzai_n01610299" translatable="false">Farhan Habibzai N01610299</string>
     <string name="by">BY</string>
     <string name="toggle_mode">Toggle Mode</string>
     <string name="options">OPTIONS</string>
@@ -51,6 +51,10 @@ CENG-322-OCC,  Software Project -->
     <string name="password_cannot_be_empty">Password cannot be empty</string>
     <string name="invalid_credentials">Invalid Credentials</string>
     <string name="user_does_not_exist">User does not exist</string>
+    <string name="default_web_client_id" translatable="false">624010139445-e7is3268ksuradhslegahmnv6b25enoo.apps.googleusercontent.com</string>
+    <string name="dark_mode_desc">Reduces screen glare for comfortable viewing at night.</string>
+    <string name="portrait_desc">Keeps the app in a vertical orientation.</string>
+    <string name="clear">Clear</string>
 
 
 </resources>

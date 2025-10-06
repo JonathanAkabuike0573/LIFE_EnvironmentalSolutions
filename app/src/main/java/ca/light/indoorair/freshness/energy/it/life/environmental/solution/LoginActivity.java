@@ -2,16 +2,14 @@ package ca.light.indoorair.freshness.energy.it.life.environmental.solution;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.content.res.Configuration;
-import android.view.View;
-import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.checkbox.MaterialCheckBox;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -21,50 +19,54 @@ import com.google.firebase.database.ValueEventListener;
 
 public class LoginActivity extends AppCompatActivity {
 
-
-    EditText usernameEditText, passwordEditText;
-    Button loginButton;
-    TextView signup;
-    CheckBox rememberMeCheckBox;
+    private TextInputEditText usernameEditText;
+    private TextInputEditText passwordEditText;
+    private MaterialButton loginButton;
+    private TextView signup;
+    private MaterialCheckBox rememberMeCheckBox;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // If themes ever get mixed, uncomment the next line:
+        // setTheme(R.style.Theme_LIFE_EnvironmentalSolution);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_page);
-
-        usernameEditText = findViewById(R.id.username);
-        passwordEditText = findViewById(R.id.editTextTextPassword);
-        loginButton = findViewById(R.id.loginbutton);
-        signup = findViewById(R.id.signup);
-        rememberMeCheckBox = findViewById(R.id.checkBox);
-
-        loginButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!validateUsername() | !validatePassword()) {
-                    return;
-                } else {
-                    checkUser();
-                }
-            }});
-
-
-
-
-
-        signup.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(LoginActivity.this, SignupActivity.class);
-                startActivity(intent);
-            }
-        });
-
+        bindViews();
+        wireClicks();
     }
 
-    public Boolean validateUsername() {
+    private void bindViews() {
+        usernameEditText   = findViewById(R.id.username);
+        passwordEditText   = findViewById(R.id.password);
+        loginButton        = findViewById(R.id.btn_login);
+        signup             = findViewById(R.id.tv_signup);
+        rememberMeCheckBox = findViewById(R.id.remember_me);
 
-        String val = usernameEditText.getText().toString();
+        if (usernameEditText == null || passwordEditText == null ||
+                loginButton == null || signup == null || rememberMeCheckBox == null) {
+            throw new IllegalStateException(
+                    "login_page.xml is missing one or more required views: " +
+                            "username, password, btn_login, tv_signup, remember_me");
+        }
+    }
+
+    private void wireClicks() {
+        loginButton.setOnClickListener(v -> {
+            if (!validateUsername() | !validatePassword()) {
+                return;
+            }
+            checkUser();
+        });
+
+        signup.setOnClickListener(v -> {
+            Intent intent = new Intent(LoginActivity.this, SignupActivity.class);
+            startActivity(intent);
+        });
+    }
+
+    private boolean validateUsername() {
+        String val = usernameEditText.getText() == null ? "" : usernameEditText.getText().toString();
         if (val.isEmpty()) {
             usernameEditText.setError(getString(R.string.username_cannot_be_empty));
             return false;
@@ -72,11 +74,10 @@ public class LoginActivity extends AppCompatActivity {
             usernameEditText.setError(null);
             return true;
         }
-
     }
 
-    public Boolean validatePassword() {
-        String val = passwordEditText.getText().toString();
+    private boolean validatePassword() {
+        String val = passwordEditText.getText() == null ? "" : passwordEditText.getText().toString();
         if (val.isEmpty()) {
             passwordEditText.setError(getString(R.string.password_cannot_be_empty));
             return false;
@@ -84,30 +85,28 @@ public class LoginActivity extends AppCompatActivity {
             passwordEditText.setError(null);
             return true;
         }
-
     }
 
-    public void checkUser(){
-
-        String userUsername = usernameEditText.getText().toString().trim();
-        String userPassword = passwordEditText.getText().toString().trim();
+    private void checkUser() {
+        String userUsername = String.valueOf(usernameEditText.getText()).trim();
+        String userPassword = String.valueOf(passwordEditText.getText()).trim();
 
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("users");
         Query checkUserDatabase = reference.orderByChild("username").equalTo(userUsername);
 
         checkUserDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-
-
+            @Override public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
                     usernameEditText.setError(null);
+
+                    // If your user nodes are keyed by username, this is fine.
+                    // If they are keyed by UID, you should iterate snapshot.getChildren().
                     String passwordFromDB = snapshot.child(userUsername).child("password").getValue(String.class);
 
                     if (passwordFromDB != null && passwordFromDB.equals(userPassword)) {
                         passwordEditText.setError(null);
-                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                      startActivity(intent);
+                        startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                        finish();
                     } else {
                         passwordEditText.setError(getString(R.string.invalid_credentials));
                         passwordEditText.requestFocus();
@@ -118,22 +117,10 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
+            @Override public void onCancelled(@NonNull DatabaseError error) {
+                // Optionally show a toast/log here
             }
         });
-    }
-
-
-
-
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        // Re-set the layout when the orientation changes
-        setContentView(R.layout.login_page);
     }
 
 
