@@ -1,32 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/frameLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/frag_home_bg"
     tools:context=".DashBoardFragment">
 
     <TextView
-        android:id="@+id/textView6"
-        android:layout_width="138dp"
-        android:layout_height="128dp"
-        android:layout_marginStart="100dp"
-        android:layout_marginTop="204dp"
+        android:id="@+id/tv_dashboard_title"
+        style="@style/Text.HighlightTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:text="@string/dashboard"
+        android:layout_marginStart="@dimen/space_l"
+        android:layout_marginTop="@dimen/space_l"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
-        android:id="@+id/imageView3"
-        android:layout_width="538dp"
-        android:layout_height="519dp"
-        android:layout_marginTop="332dp"
-        android:src="@drawable/humandetection"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.244"
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/card_chart"
+        style="@style/Widget.App.LoginCard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_l"
+        android:layout_marginEnd="@dimen/space_l"
+        android:layout_marginTop="@dimen/space_l"
+        app:cardUseCompatPadding="true"
+        app:layout_constraintTop_toBottomOf="@id/tv_dashboard_title"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:id="@+id/imageView3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:contentDescription="@string/dashboard"
+            android:padding="@dimen/space_m"
+            android:src="@drawable/humandetection" />
+    </com.google.android.material.card.MaterialCardView>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
