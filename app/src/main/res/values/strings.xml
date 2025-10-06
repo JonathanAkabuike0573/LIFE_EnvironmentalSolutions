@@ -52,6 +52,13 @@ CENG-322-OCC,  Software Project -->
     <string name="invalid_credentials">Invalid Credentials</string>
     <string name="user_does_not_exist">User does not exist</string>
     <string name="default_web_client_id" translatable="false">624010139445-e7is3268ksuradhslegahmnv6b25enoo.apps.googleusercontent.com</string>
+    <string name="dark_mode_desc">Reduces screen glare for comfortable viewing at night.</string>
+    <string name="portrait_desc">Keeps the app in a vertical orientation.</string>
+    <string name="clear">Clear</string>
+    <string name="sign_out">Sign Out</string>
+    <string name="light_fragment">Light Fragment</string>
+    <string name="good_morning_life">Good Morning LIFE</string>
+    <string name="create_account">Create Account</string>
 
 
 </resources>
