@@ -3,14 +3,22 @@
 package ca.light.indoorair.freshness.energy.it.life.environmental.solution;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.Manifest;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
@@ -18,6 +26,7 @@ import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import android.os.Build;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
@@ -43,6 +52,32 @@ public class MainActivity extends AppCompatActivity {
     private ActionBarDrawerToggle toggle;
     private static final String PREFS_NAME = "MyPrefsFile";
     private static final String THEME_KEY = "ThemeKey";
+
+    // Declare the launcher at the top of your Activity/Fragment:
+    private final ActivityResultLauncher<String> requestPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+                if (isGranted) {
+                    // FCM SDK (and your app) can post notifications.
+                    Toast.makeText(this, R.string.permission_granted, Toast.LENGTH_SHORT).show();
+                } else {
+                    // TODO: Inform user that that your app will not show notifications.
+                    Toast.makeText(this, R.string.permission_denied, Toast.LENGTH_SHORT).show();
+                }
+            });
+
+    private final ActivityResultLauncher<String> requestCameraPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+                if (isGranted) {
+                    // Permission is granted. You can now open the camera.
+                    Toast.makeText(this, R.string.camera_permission_granted , Toast.LENGTH_SHORT).show();
+                    // Intent to open camera can be placed here.
+                } else {
+                    // Explain to the user that the feature is unavailable because the
+                    // features requires a permission that the user has denied.
+                    Toast.makeText(this, R.string.camera_permission_denied, Toast.LENGTH_SHORT).show();
+                }
+            });
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,6 +138,7 @@ public class MainActivity extends AppCompatActivity {
         // Apply the loaded theme
         if (isDarkMode) {
             getDelegate().setLocalNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+
         } else {
             getDelegate().setLocalNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         }
@@ -162,7 +198,48 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
+
+        // Load the saved theme preference
+        SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        boolean isDarkMode = sharedPreferences.getBoolean(THEME_KEY, false);
+
+        // Define the color based on the current theme
+        int color;
+        if (isDarkMode) {
+            color = ContextCompat.getColor(this, android.R.color.white);
+        } else {
+            color = ContextCompat.getColor(this, android.R.color.black);
+        }
+
+        // Iterate through all menu items to apply the color
+        for (int i = 0; i < menu.size(); i++) {
+            MenuItem menuItem = menu.getItem(i);
+            applyMenuItemColor(menuItem, color);
+
+            if (menuItem.hasSubMenu()) {
+                for (int j = 0; j < menuItem.getSubMenu().size(); j++) {
+                    MenuItem subMenuItem = menuItem.getSubMenu().getItem(j);
+                    // Note: You can use a different color for sub-menu items if needed
+                    applyMenuItemColor(subMenuItem, color);
+                }
+                if (menuItem.getItemId() == R.id.notification) {
+                    // This seems to be the parent of the notification settings,
+                    // let's handle the submenu item click in onOptionsItemSelected instead.
+                    // This is just a placeholder to show where you might add logic if needed.
+                }
+            }
+        }
         return true;
+    }
+
+    private void applyMenuItemColor(MenuItem menuItem, int color) {
+        Drawable icon = menuItem.getIcon();
+        if (icon != null) {
+            icon.mutate().setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+        }
+        SpannableString spannableString = new SpannableString(menuItem.getTitle());
+        spannableString.setSpan(new ForegroundColorSpan(color), 0, spannableString.length(), 0);
+        menuItem.setTitle(spannableString);
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -172,6 +249,11 @@ public class MainActivity extends AppCompatActivity {
         if (item.getItemId() == R.id.themetoggle) {
             toggleTheme();
             return true;
+        } else if (item.getItemId() == R.id.action_notification) { // Assuming R.id.notification_settings is your submenu item ID
+            askNotificationPermission();
+            return true;
+        } else if (item.getItemId() == R.id.action_camera) {
+            askCameraPermission();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -182,6 +264,7 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         if (isDarkMode) {
             editor.putBoolean(THEME_KEY, false);
+
             editor.apply();
             getDelegate().setLocalNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         } else {
@@ -209,5 +292,26 @@ public class MainActivity extends AppCompatActivity {
                 finish(); // Finish MainActivity so user can't go back
             }
         });
+    }
+
+    private void askNotificationPermission() {
+        // This is only necessary for API level 33 and above.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) ==
+                    PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, R.string.permission_already_granted, Toast.LENGTH_SHORT).show();
+            } else {
+                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
+            }
+        }
+    }
+
+    private void askCameraPermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(this, R.string.camera_permission_already_granted , Toast.LENGTH_SHORT).show();
+            // Intent to open camera can be placed here.
+        } else {
+            requestCameraPermissionLauncher.launch(Manifest.permission.CAMERA);
+        }
     }
 }
