@@ -84,7 +84,7 @@
             android:layout_width="368dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:text="  Room Occupancy:                                  Ocuppied" />
+            android:text="  Room Occupancy:                                  Ocuppied  12" />
     </androidx.cardview.widget.CardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
