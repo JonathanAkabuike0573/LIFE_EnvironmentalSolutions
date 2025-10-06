@@ -26,7 +26,7 @@
                 android:theme="@style/ThemeOverlay.Material3.Dark.ActionBar" />
         </com.google.android.material.appbar.AppBarLayout>
 
-        <!-- Fragment container (THIS is what you replace) -->
+        <!-- Fragment container -->
         <FrameLayout
             android:id="@+id/main"
             android:layout_width="match_parent"
