@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/frameLayout"
@@ -14,9 +13,35 @@
         style="@style/Text.HighlightTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/dashboard"
         android:layout_marginStart="@dimen/space_l"
         android:layout_marginTop="@dimen/space_l"
+        android:text="@string/dashboard"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="169dp"
+        android:layout_height="131dp"
+        android:layout_marginStart="224dp"
+        android:layout_marginTop="436dp"
+        android:adjustViewBounds="true"
+        android:contentDescription="@string/dashboard"
+        android:padding="@dimen/space_m"
+        android:src="@drawable/humandetection"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="169dp"
+        android:layout_height="131dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="436dp"
+        android:adjustViewBounds="true"
+        android:contentDescription="@string/dashboard"
+        android:padding="@dimen/space_m"
+        android:src="@drawable/humandetection"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -26,12 +51,12 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/space_l"
-        android:layout_marginEnd="@dimen/space_l"
         android:layout_marginTop="@dimen/space_l"
+        android:layout_marginEnd="@dimen/space_l"
         app:cardUseCompatPadding="true"
-        app:layout_constraintTop_toBottomOf="@id/tv_dashboard_title"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintTop_toBottomOf="@id/tv_dashboard_title">
 
         <ImageView
             android:id="@+id/imageView3"
@@ -42,5 +67,24 @@
             android:padding="@dimen/space_m"
             android:src="@drawable/humandetection" />
     </com.google.android.material.card.MaterialCardView>
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="0dp"
+        android:layout_height="75dp"
+        android:layout_marginStart="@dimen/space_l"
+        android:layout_marginEnd="@dimen/space_l"
+        app:cardCornerRadius="12dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageView" >
+
+        <TextView
+            android:id="@+id/textView6"
+            android:layout_width="368dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:text="  Room Occupancy:                                  Ocuppied" />
+    </androidx.cardview.widget.CardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

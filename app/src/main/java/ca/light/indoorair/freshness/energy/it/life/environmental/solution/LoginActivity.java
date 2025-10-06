@@ -2,6 +2,7 @@ package ca.light.indoorair.freshness.energy.it.life.environmental.solution;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -21,7 +22,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private TextInputEditText usernameEditText;
     private TextInputEditText passwordEditText;
-    private MaterialButton loginButton;
+     Button loginButton, googleSignInButton;
     private TextView signup;
     private MaterialCheckBox rememberMeCheckBox;
 
@@ -34,7 +35,13 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.login_page);
         bindViews();
         wireClicks();
+
+        googleSignInButton = findViewById(R.id.googlebutton);
+
+
+
     }
+
 
     private void bindViews() {
         usernameEditText   = findViewById(R.id.username);
@@ -42,6 +49,8 @@ public class LoginActivity extends AppCompatActivity {
         loginButton        = findViewById(R.id.btn_login);
         signup             = findViewById(R.id.tv_signup);
         rememberMeCheckBox = findViewById(R.id.remember_me);
+        googleSignInButton = findViewById(R.id.googlebutton);
+
 
         if (usernameEditText == null || passwordEditText == null ||
                 loginButton == null || signup == null || rememberMeCheckBox == null) {
