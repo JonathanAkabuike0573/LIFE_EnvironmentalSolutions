@@ -14,6 +14,10 @@
             android:title="@string/settings"
             android:icon="@drawable/settings_foreground"/>
         <item
+            android:id="@+id/nav_about"
+            android:title="About"
+            android:icon="@drawable/settings_foreground"/>
+        <item
             android:id="@+id/nav_sign_out"
             android:title="@string/sign_out"
             android:icon="@drawable/logout_foreground" />
