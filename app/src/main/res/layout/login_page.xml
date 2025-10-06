@@ -106,7 +106,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/sign_in_with_google"
                 android:layout_marginTop="@dimen/space_m"
-                app:icon="@drawable/image"
+                app:icon="@drawable/google"
                 app:iconPadding="@dimen/space_s"
                 app:iconGravity="textStart"
                 app:iconTint="@null" />
