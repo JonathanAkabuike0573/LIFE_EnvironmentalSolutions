@@ -4,10 +4,12 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CalendarView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 
 public class PresenceFragment extends Fragment {
@@ -22,7 +24,12 @@ public class PresenceFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_presence, container, false);
+        View view = inflater.inflate(R.layout.fragment_presence, container, false);
+
+        CardView cardView = view.findViewById(R.id.card_presence);
+
+
+        return view;
     }
 
     @Override
@@ -34,6 +41,7 @@ public class PresenceFragment extends Fragment {
 
         // Set the initial text to indicate it's waiting for data
         initializeTextView();
+
     }
 
     /**
@@ -44,4 +52,5 @@ public class PresenceFragment extends Fragment {
         // Set a clear message that no data is available yet.
         presenceStatusTextView.setText("Waiting for sensor data...");
     }
+
 }
