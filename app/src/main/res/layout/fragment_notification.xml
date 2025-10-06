@@ -16,4 +16,18 @@
         android:text="@string/notification"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/imageView4"
+        android:layout_width="272dp"
+        android:layout_height="284dp"
+        android:layout_marginStart="69dp"
+        android:layout_marginTop="367dp"
+        android:layout_marginEnd="70dp"
+        android:layout_marginBottom="80dp"
+        android:src="@drawable/co2"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
