@@ -8,7 +8,16 @@
     android:background="@color/white">
 
 
-
+    <com.airbnb.lottie.LottieAnimationView
+        android:layout_width="181dp"
+        android:layout_height="245dp"
+        android:layout_marginStart="135dp"
+        android:layout_marginTop="32dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:lottie_autoPlay="true"
+        app:lottie_loop="true"
+        app:lottie_rawRes="@raw/loading" />
 
     <ImageView
         android:id="@+id/logo"
@@ -40,8 +49,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="82dp"
         android:layout_marginTop="483dp"
-        android:textSize="20dp"
         android:text="@string/jonathan_akabuike_n01510573"
+        android:textSize="20dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -51,8 +60,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="84dp"
         android:layout_marginTop="516dp"
-        android:textSize="20dp"
         android:text="@string/mohamed_ali_n01440760"
+        android:textSize="20dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -62,8 +71,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="82dp"
         android:layout_marginTop="553dp"
-        android:textSize="20dp"
         android:text="@string/kieran_sharma_n01548225"
+        android:textSize="20dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -73,8 +82,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="84dp"
         android:layout_marginTop="589dp"
-        android:textSize="20dp"
         android:text="@string/farhan_habibzai_n01610299"
+        android:textSize="20dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
