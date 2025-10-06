@@ -17,7 +17,6 @@
     <style name="Theme.SplashWorks" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">@color/white</item>
         <item name="windowSplashScreenAnimatedIcon">@mipmap/logo_foreground</item>
-        <item name="windowSplashScreenAnimationDuration">3000</item>
         <item name="postSplashScreenTheme">@style/Theme.LIFE_EnvironmentalSolution</item>
     </style>
 
