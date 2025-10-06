@@ -1,172 +1,257 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/frameLayout_settings"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="?android:attr/colorBackground"
+    android:background="@color/frag_settings_bg"
     tools:context=".SettingsFragment">
 
-
-    <!-- Header for Display Settings -->
+    <!-- Page title -->
     <TextView
-        android:id="@+id/display_header"
-        android:layout_width="match_parent"
+        android:id="@+id/tv_settings_title"
+        style="@style/Text.HighlightTitle"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/display"
-        android:padding="16dp"
-        android:textAppearance="?attr/textAppearanceTitleMedium"
-        android:textSize="21sp"
-        android:textColor="?attr/colorPrimary" />
+        android:text="@string/settings"
+        android:layout_marginStart="@dimen/space_l"
+        android:layout_marginTop="@dimen/space_l"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-
-    <!-- Feature 1: Toggle Dark Mode -->
-    <com.google.android.material.materialswitch.MaterialSwitch
-        android:id="@+id/dark_mode_switch"
-        android:layout_width="match_parent"
+    <!-- Main card that holds all settings -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/card_settings"
+        style="@style/Widget.App.LoginCard"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="@string/enable_dark_mode"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:paddingTop="12dp"
-        android:paddingBottom="12dp"
-        android:checked="false"
-        android:textSize="21sp"
-        app:thumbIconTint="?attr/colorOnPrimary"
-        app:trackTint="?attr/colorOnSurfaceVariant"/>
+        android:layout_marginStart="@dimen/space_l"
+        android:layout_marginEnd="@dimen/space_l"
+        android:layout_marginTop="@dimen/space_l"
+        app:cardUseCompatPadding="true"
+        app:layout_constraintTop_toBottomOf="@id/tv_settings_title"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/reduces_screen_glare_for_comfortable_viewing_at_night"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:paddingBottom="16dp"
-        android:textAppearance="?attr/textAppearanceBodySmall"
-        android:textSize="17sp" />
-
-
-    <!-- Feature 2: Lock to Portrait Mode -->
-    <com.google.android.material.materialswitch.MaterialSwitch
-        android:id="@+id/portrait_lock_switch"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/lock_to_portrait_mode"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:paddingTop="12dp"
-        android:paddingBottom="12dp"
-        android:checked="false"
-        android:textSize="21sp"
-        app:thumbIconTint="?attr/colorOnPrimary"
-        app:trackTint="?attr/colorOnSurfaceVariant"/>
-
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/keeps_the_app_in_a_vertical_orientation"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:paddingBottom="16dp"
-        android:textAppearance="?attr/textAppearanceBodySmall"
-        android:textSize="17sp" />
-
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="?android:attr/listDivider"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"/>
-
-
-    <!-- Header for Notification & Storage -->
-    <TextView
-        android:id="@+id/notification_header"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/notifications_amp_data"
-        android:padding="16dp"
-        android:textAppearance="?attr/textAppearanceTitleMedium"
-        android:textSize="21sp"
-        android:textColor="?attr/colorPrimary" />
-
-
-    <!-- Feature 3: Notification Tone -->
-    <RelativeLayout
-        android:id="@+id/notification_tone_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="16dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:background="?android:attr/selectableItemBackground">
-
-
-        <TextView
-            android:id="@+id/notification_tone_label"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/notification_tone"
-            android:layout_centerVertical="true"
-            android:textAppearance="?attr/textAppearanceBodyLarge"
-            android:textSize="21sp" />
+            android:orientation="vertical"
+            android:padding="@dimen/space_m">
 
+            <!-- Section: Display -->
+            <TextView
+                android:id="@+id/section_display"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/display"
+                android:paddingTop="@dimen/space_s"
+                android:paddingBottom="@dimen/space_s"
+                android:paddingStart="@dimen/space_s"
+                android:textStyle="bold"
+                android:textColor="@color/primary"/>
 
-        <TextView
-            android:id="@+id/notification_tone_value"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/listen"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:textAppearance="?attr/textAppearanceBodyMedium"
-            android:textSize="19sp"
-            android:textColor="?android:attr/textColorSecondary" />
-    </RelativeLayout>
+            <!-- Row: Enable Dark Mode -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/row_dark_mode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="@dimen/space_s"
+                android:paddingBottom="@dimen/space_s">
 
+                <LinearLayout
+                    android:id="@+id/dark_mode_texts"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/sw_dark_mode"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:paddingEnd="@dimen/space_m">
 
-    <!-- Feature 4: Clear Cache -->
-    <RelativeLayout
-        android:id="@+id/clear_cache_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="16dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:background="?android:attr/selectableItemBackground">
+                    <TextView
+                        android:id="@+id/tv_dark_mode_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/enable_dark_mode"
+                        android:textColor="@color/on_surface"
+                        android:textSize="@dimen/text_m"/>
 
+                    <TextView
+                        android:id="@+id/tv_dark_mode_sub"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/dark_mode_desc"
+                        android:textColor="@color/text_field_hint"
+                        android:textSize="@dimen/text_s"/>
+                </LinearLayout>
 
-        <TextView
-            android:id="@+id/clear_cache_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/clear_cache"
-            android:layout_centerVertical="true"
-            android:textAppearance="?attr/textAppearanceBodyLarge"
-            android:textSize="21sp" />
+                <com.google.android.material.materialswitch.MaterialSwitch
+                    android:id="@+id/sw_dark_mode"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
+            <com.google.android.material.divider.MaterialDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
-        <TextView
-            android:id="@+id/clear_cache_value"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/frees_up_storage_space"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:textAppearance="?attr/textAppearanceBodyMedium"
-            android:textColor="?android:attr/textColorSecondary"
-            android:textSize="21sp" />
-    </RelativeLayout>
+            <!-- Row: Lock to Portrait Mode -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/row_portrait"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="@dimen/space_s"
+                android:paddingBottom="@dimen/space_s">
 
-    <ImageView
-        android:id="@+id/imageView2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:src="@drawable/co2reading" />
+                <LinearLayout
+                    android:id="@+id/portrait_texts"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/sw_portrait"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:paddingEnd="@dimen/space_m">
 
+                    <TextView
+                        android:id="@+id/tv_portrait_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/lock_to_portrait_mode"
+                        android:textColor="@color/on_surface"
+                        android:textSize="@dimen/text_m"/>
 
-</LinearLayout>
+                    <TextView
+                        android:id="@+id/tv_portrait_sub"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/portrait_desc"
+                        android:textColor="@color/text_field_hint"
+                        android:textSize="@dimen/text_s"/>
+                </LinearLayout>
+
+                <com.google.android.material.materialswitch.MaterialSwitch
+                    android:id="@+id/sw_portrait"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!-- Section: Notifications & Data -->
+            <TextView
+                android:id="@+id/section_notifications"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/notifications_amp_data"
+                android:paddingTop="@dimen/space_m"
+                android:paddingBottom="@dimen/space_s"
+                android:paddingStart="@dimen/space_s"
+                android:textStyle="bold"
+                android:textColor="@color/primary"/>
+
+            <!-- Row: Notification Tone (button + "listen") -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/row_tone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="@dimen/space_s"
+                android:paddingBottom="@dimen/space_s">
+
+                <TextView
+                    android:id="@+id/tv_notification_tone"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/notification_tone"
+                    android:textColor="@color/on_surface"
+                    android:textSize="@dimen/text_m"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/btn_listen"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:paddingEnd="@dimen/space_m"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_listen"
+                    style="@style/Widget.App.Button.Secondary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/listen"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <com.google.android.material.divider.MaterialDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <!-- Row: Clear Cache (with helper text + action) -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/row_clear_cache"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="@dimen/space_s"
+                android:paddingBottom="@dimen/space_s">
+
+                <LinearLayout
+                    android:id="@+id/clear_cache_texts"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/btn_clear_cache"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:paddingEnd="@dimen/space_m">
+
+                    <TextView
+                        android:id="@+id/tv_clear_cache_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/clear_cache"
+                        android:textColor="@color/on_surface"
+                        android:textSize="@dimen/text_m"/>
+
+                    <TextView
+                        android:id="@+id/tv_clear_cache_sub"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/frees_up_storage_space"
+                        android:textColor="@color/text_field_hint"
+                        android:textSize="@dimen/text_s"/>
+                </LinearLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_clear_cache"
+                    style="@style/Widget.App.Button.Secondary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/clear"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!-- Preview / illustration at the bottom (kept) -->
+            <ImageView
+                android:id="@+id/image_settings_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_l"
+                android:adjustViewBounds="true"
+                android:contentDescription="@string/settings"
+                android:src="@drawable/co2" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
