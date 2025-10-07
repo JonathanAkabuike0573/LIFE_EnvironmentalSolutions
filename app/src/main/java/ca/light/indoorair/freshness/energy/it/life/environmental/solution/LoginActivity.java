@@ -1,10 +1,12 @@
 package ca.light.indoorair.freshness.energy.it.life.environmental.solution;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,14 +38,21 @@ public class LoginActivity extends AppCompatActivity {
 
     private static final String TAG = "LoginActivity";
 
+    // Constants for SharedPreferences
+    private static final String PREFS_NAME = "LoginPrefs";
+    private static final String PREF_USERNAME = "username";
+    private static final String PREF_PASSWORD = "password";
+
     private TextInputEditText usernameEditText;
     private TextInputEditText passwordEditText;
     Button loginButton, googleSignInButton;
     private TextView signup;
-    private MaterialCheckBox rememberMeCheckBox;
+    private CheckBox rememberMeCheckBox;
 
     private FirebaseAuth mAuth;
     private GoogleSignInClient mGoogleSignInClient;
+
+
 
     private final ActivityResultLauncher<Intent> googleSignInLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(), this::handleGoogleSignInResult);
@@ -73,6 +82,7 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         wireClicks();
+        loadCredentials();
     }
 
     @Override
@@ -130,6 +140,20 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
+    private void saveCredentials(String username, String password) {
+        SharedPreferences.Editor editor = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit();
+        editor.putString(PREF_USERNAME, username);
+        editor.putString(PREF_PASSWORD, password);
+        editor.apply();
+    }
+
+    private void clearCredentials() {
+        SharedPreferences.Editor editor = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit();
+        editor.remove(PREF_USERNAME);
+        editor.remove(PREF_PASSWORD);
+        editor.apply();
+    }
+
     private void wireClicks() {
         loginButton.setOnClickListener(v -> {
             if (!validateUsername()) {
@@ -156,6 +180,16 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
+    private void loadCredentials() {
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        String savedUsername = prefs.getString(PREF_USERNAME, null);
+        String savedPassword = prefs.getString(PREF_PASSWORD, null);
+        if (savedUsername != null && savedPassword != null) {
+            usernameEditText.setText(savedUsername);
+            passwordEditText.setText(savedPassword);
+            rememberMeCheckBox.setChecked(true);
+        }
+    }
     private boolean validateUsername() {
         String val = usernameEditText.getText() == null ? "" : usernameEditText.getText().toString();
         if (val.isEmpty()) {
@@ -197,6 +231,12 @@ public class LoginActivity extends AppCompatActivity {
                             usernameEditText.setError(null);
                             passwordEditText.setError(null);
                             navigateToMainActivity();
+
+                            if (rememberMeCheckBox.isChecked()) {
+                                saveCredentials(userUsername, userPassword);
+                            } else {
+                                clearCredentials();
+                            }
                             return; // Exit after finding the user
                         }
                     }
