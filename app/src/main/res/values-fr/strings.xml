@@ -45,6 +45,14 @@ CENG-322-OCC,  Software Project -->
     <string name="password_cannot_be_empty">Le mot de passe ne peut pas être vide</string>
     <string name="invalid_credentials">Informations d\'identification non valides</string>
     <string name="user_does_not_exist">L\'utilisateur n\'existe pas</string>
+    <string name="dark_mode_desc">Réduit léblouissement de lécran pour une visualisation confortable la nuit.</string>
+    <string name="portrait_desc">Maintient lapplication dans une orientation verticale.</string>
+    <string name="clear">Effacer</string>
+    <string name="sign_out">Se déconnecter</string>
+    <string name="light_fragment">Fragment léger</string>
+    <string name="good_morning_life">Bonjour la VIE</string>
+    <string name="create_account">Créer un compte</string>
+    <string name="camera">Caméra</string>
 
 
 </resources>
