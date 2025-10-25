@@ -46,7 +46,7 @@ public class LoginActivity extends AppCompatActivity {
     private TextInputEditText usernameEditText;
     private TextInputEditText passwordEditText;
     Button loginButton, googleSignInButton;
-    private TextView signup;
+    private TextView signup, navheaderusername, navheaderemail;
     private CheckBox rememberMeCheckBox;
 
     private FirebaseAuth mAuth;
@@ -90,6 +90,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onStart();
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
+        updateNavHeader(currentUser);
         if(currentUser != null){
             navigateToMainActivity();
         }
@@ -113,6 +114,8 @@ public class LoginActivity extends AppCompatActivity {
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
                         // Sign in success, update UI with the signed-in user's information
+                        FirebaseUser user = mAuth.getCurrentUser();
+                        updateNavHeader(user);
                         navigateToMainActivity();
                     } else {
                         // If sign in fails, display a message to the user.
@@ -129,6 +132,10 @@ public class LoginActivity extends AppCompatActivity {
         signup             = findViewById(R.id.tv_signup);
         rememberMeCheckBox = findViewById(R.id.remember_me);
         googleSignInButton = findViewById(R.id.btn_google);
+        navheaderusername = findViewById(R.id.navheaderusername);
+        navheaderemail = findViewById(R.id.navheaderemail);
+
+
 
 
         if (usernameEditText == null || passwordEditText == null ||
@@ -229,6 +236,8 @@ public class LoginActivity extends AppCompatActivity {
 
                         if (passwordFromDB != null && passwordFromDB.equals(userPassword)) {
                             usernameEditText.setError(null);
+                            String nameFromDB = userSnapshot.child("name").getValue(String.class);
+
                             passwordEditText.setError(null);
                             navigateToMainActivity();
 
@@ -254,6 +263,17 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
     }
+
+    private void updateNavHeader(FirebaseUser user) {
+        if (user != null && navheaderusername != null && navheaderemail != null) {
+            String name = user.getDisplayName();
+            String email = user.getEmail();
+            navheaderusername.setText(name);
+            navheaderemail.setText(email);
+        }
+    }
+
+
 
     private void navigateToMainActivity() {
         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
