@@ -5,17 +5,21 @@ package ca.light.indoorair.freshness.energy.it.life.environmental.solution;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.viewpager2.widget.ViewPager2;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
+
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link NotificationFragment#newInstance} factory method to
+ * Use the {@link SensorFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class NotificationFragment extends Fragment {
+public class SensorFragment extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -26,7 +30,7 @@ public class NotificationFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    public NotificationFragment() {
+    public SensorFragment() {
         // Required empty public constructor
     }
 
@@ -39,8 +43,8 @@ public class NotificationFragment extends Fragment {
      * @return A new instance of fragment NotificationFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static NotificationFragment newInstance(String param1, String param2) {
-        NotificationFragment fragment = new NotificationFragment();
+    public static SensorFragment newInstance(String param1, String param2) {
+        SensorFragment fragment = new SensorFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -61,6 +65,34 @@ public class NotificationFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_notification, container, false);
+        View view = inflater.inflate(R.layout.fragment_sensor, container, false);
+
+        // Find views
+        TabLayout tabLayout = view.findViewById(R.id.sensor_tab_layout);
+        ViewPager2 viewPager = view.findViewById(R.id.sensor_view_pager);
+
+
+        // Create and set the adapter
+        SensorTabsAdapter adapter = new SensorTabsAdapter(getActivity());
+        viewPager.setAdapter(adapter);
+
+        // Link the TabLayout and ViewPager2 and set tab names
+        new TabLayoutMediator(tabLayout, viewPager,
+                (tab, position) -> {
+                    if (position == 0) {
+                        tab.setText("Air Quality");
+                        tab.setIcon(R.drawable.notification_foreground); // Optional icon
+                    } else if (position == 1) {
+                        tab.setText("Light");
+                        tab.setIcon(R.drawable.notification_foreground); // Optional icon
+                    } else if (position == 2) {
+                        tab.setText("Presence");
+                        tab.setIcon(R.drawable.notification_foreground); // Optional icon
+                    }
+                }
+        ).attach();
+
+        return view;
+
     }
 }

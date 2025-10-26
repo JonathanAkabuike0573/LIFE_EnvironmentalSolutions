@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         Fragment dashBoardFragment = new DashBoardFragment();
-        Fragment notificationFragment = new NotificationFragment();
+        Fragment notificationFragment = new SensorFragment();
         Fragment settingsFragment = new SettingsFragment();
 
         setCurrentFragment(dashBoardFragment);
@@ -161,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
                 if (id == R.id.nav_home) {
                     setTitle(getString(R.string.home));
                 } else if (id == R.id.nav_sensors) {
-                   Intent intent = new Intent(MainActivity.this, SensorActivity.class);
+                   Intent intent = new Intent(MainActivity.this, NotificationActivity.class);
                    startActivity(intent);
                 } else if (id == R.id.nav_settings) {
                     setTitle(getString(R.string.settings));
