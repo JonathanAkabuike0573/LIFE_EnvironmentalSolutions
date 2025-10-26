@@ -27,13 +27,16 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.activity.EdgeToEdge;
+
+import com.google.android.gms.auth.api.identity.Identity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
-import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.auth.FirebaseAuth;
+
 public class MainActivity extends AppCompatActivity {
 
     FragmentManager fragmentManager;
+    private FirebaseAuth auth;
     ActionBar actionBar;
     Toolbar toolbar;
     private DrawerLayout drawerLayout;
@@ -50,6 +53,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
+
+        // Initialize Firebase Auth
+        auth = FirebaseAuth.getInstance();
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -134,6 +140,8 @@ public class MainActivity extends AppCompatActivity {
                     startActivity(intent);
                 } else if (id == R.id.nav_settings) {
                     setTitle(getString(R.string.settings));
+                } else if (id == R.id.nav_sign_out) {
+                    signOut();
                 }
                 item.setChecked(true);
                 drawerLayout.closeDrawers();
@@ -212,9 +220,21 @@ public class MainActivity extends AppCompatActivity {
         editor.apply();
     }
 
-    // Replaces the current fragment in the main container
-    private void setCurrentFragment(Fragment fragment) {
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.main, fragment)
-                .commit();
-    } }
+    private void setCurrentFragment(Fragment homefragment) {
+        getSupportFragmentManager().beginTransaction().replace(R.id.main, homefragment).commit();
+    }
+
+    private void signOut() {
+        // Firebase sign out
+        auth.signOut();
+
+        // When a user signs out, clear the current user credential state from all credential providers.
+        Identity.getSignInClient(this).signOut().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                // After successful sign out, navigate to the LoginActivity
+                startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                finish(); // Finish MainActivity so user can't go back
+            }
+        });
+    }
+}
