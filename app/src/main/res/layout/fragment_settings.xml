@@ -201,56 +201,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingTop="@dimen/space_s"
-                android:paddingBottom="@dimen/space_s">
-
-                <LinearLayout
-                    android:id="@+id/clear_cache_texts"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/btn_clear_cache"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    android:paddingEnd="@dimen/space_m">
-
-                    <TextView
-                        android:id="@+id/tv_clear_cache_title"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/clear_cache"
-                        android:textColor="@color/on_surface"
-                        android:textSize="@dimen/text_m"/>
-
-                    <TextView
-                        android:id="@+id/tv_clear_cache_sub"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/frees_up_storage_space"
-                        android:textColor="@color/text_field_hint"
-                        android:textSize="@dimen/text_s"/>
-                </LinearLayout>
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn_clear_cache"
-                    style="@style/Widget.App.Button.Secondary"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/clear"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"/>
-            </androidx.constraintlayout.widget.ConstraintLayout>
+                android:paddingBottom="@dimen/space_s"/>
 
             <!-- Preview / illustration at the bottom (kept) -->
-            <ImageView
-                android:id="@+id/image_settings_info"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/space_l"
-                android:adjustViewBounds="true"
-                android:contentDescription="@string/settings"
-                android:src="@drawable/co2" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
