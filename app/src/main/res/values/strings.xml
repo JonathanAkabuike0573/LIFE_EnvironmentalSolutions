@@ -59,12 +59,7 @@ CENG-322-OCC,  Software Project -->
     <string name="light_fragment">Light Fragment</string>
     <string name="good_morning_life">Good Morning LIFE</string>
     <string name="create_account">Create Account</string>
-    <string name="permission_denied">permission denied</string>
-    <string name="permission_granted">Permission granted</string>
-    <string name="permission_already_granted">Permission already granted</string>
-    <string name="camera_permission_already_granted">Camera permission already granted</string>
-    <string name="camera_permission_denied">Camera permission denied</string>
-    <string name="camera_permission_granted">Camera permission granted</string>
+    <string name="waiting_for_sensor_data">Waiting for sensor data...</string>
 
 
 </resources>

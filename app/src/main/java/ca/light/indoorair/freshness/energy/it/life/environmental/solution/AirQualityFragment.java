@@ -42,6 +42,6 @@ public class AirQualityFragment extends Fragment {
      */
     private void initializeTextView() {
         // Set a clear message that no data is available yet.
-        airQualityReadingTextView.setText("Waiting for sensor data...");
+        airQualityReadingTextView.setText(R.string.waiting_for_sensor_data);
     }
 }
