@@ -54,6 +54,11 @@ CENG-322-OCC,  Software Project -->
     <string name="create_account">Créer un compte</string>
     <string name="camera">Caméra</string>
     <string name="waiting_for_sensor_data">En attente des données du capteur...</string>
-
+    <string name="permission_granted">Autorisation accordée</string>
+    <string name="permission_denied">Autorisation refusée</string>
+    <string name="camera_permission_granted">Autorisation de la caméra accordée</string>
+    <string name="camera_permission_denied">Autorisation de la caméra refusée</string>
+    <string name="permission_already_granted">Autorisation déjà accordée</string>
+    <string name="camera_permission_already_granted">Autorisation de la caméra déjà accordée</string>
 
 </resources>
