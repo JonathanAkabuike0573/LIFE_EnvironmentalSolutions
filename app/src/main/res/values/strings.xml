@@ -60,6 +60,11 @@ CENG-322-OCC,  Software Project -->
     <string name="good_morning_life">Good Morning LIFE</string>
     <string name="create_account">Create Account</string>
     <string name="waiting_for_sensor_data">Waiting for sensor data...</string>
-
+    <string name="permission_granted">permission_granted</string>
+    <string name="permission_denied">permission_denied</string>
+    <string name="camera_permission_granted">camera_permission_granted</string>
+    <string name="camera_permission_denied">camera_permission_denied</string>
+    <string name="permission_already_granted">permission_already_granted</string>
+    <string name="camera_permission_already_granted">camera_permission_already_granted</string>
 
 </resources>

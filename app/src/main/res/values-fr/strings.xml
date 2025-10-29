@@ -53,6 +53,7 @@ CENG-322-OCC,  Software Project -->
     <string name="good_morning_life">Bonjour la VIE</string>
     <string name="create_account">Créer un compte</string>
     <string name="camera">Caméra</string>
+    <string name="waiting_for_sensor_data">En attente des données du capteur...</string>
 
 
 </resources>
