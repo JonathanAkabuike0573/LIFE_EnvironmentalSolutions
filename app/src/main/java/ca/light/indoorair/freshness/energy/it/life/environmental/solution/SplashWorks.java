@@ -18,6 +18,7 @@ public class SplashWorks extends AppCompatActivity {
     private static final String THEME_KEY = "ThemeKey";
     private Toolbar toolbar;
     private ActionBar actionBar;
+    Runnable runnable;
     private static final int SPLASH_DELAY = 3000; // 3 seconds
 
     @Override
@@ -25,6 +26,8 @@ public class SplashWorks extends AppCompatActivity {
         // Install SplashScreen API
         SplashScreen splashScreen = SplashScreen.installSplashScreen(this);
         super.onCreate(savedInstanceState);
+
+
 
         // Load the saved theme preference
         SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);

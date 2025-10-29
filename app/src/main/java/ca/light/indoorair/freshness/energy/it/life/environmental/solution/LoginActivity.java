@@ -1,10 +1,12 @@
 package ca.light.indoorair.freshness.energy.it.life.environmental.solution;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,14 +38,21 @@ public class LoginActivity extends AppCompatActivity {
 
     private static final String TAG = "LoginActivity";
 
+    // Constants for SharedPreferences
+    private static final String PREFS_NAME = "LoginPrefs";
+    private static final String PREF_USERNAME = "username";
+    private static final String PREF_PASSWORD = "password";
+
     private TextInputEditText usernameEditText;
     private TextInputEditText passwordEditText;
     Button loginButton, googleSignInButton;
-    private TextView signup;
-    private MaterialCheckBox rememberMeCheckBox;
+    private TextView signup, navheaderusername, navheaderemail;
+    private CheckBox rememberMeCheckBox;
 
     private FirebaseAuth mAuth;
     private GoogleSignInClient mGoogleSignInClient;
+
+
 
     private final ActivityResultLauncher<Intent> googleSignInLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(), this::handleGoogleSignInResult);
@@ -73,6 +82,7 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         wireClicks();
+        loadCredentials();
     }
 
     @Override
@@ -80,6 +90,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onStart();
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
+        updateNavHeader(currentUser);
         if(currentUser != null){
             navigateToMainActivity();
         }
@@ -103,6 +114,8 @@ public class LoginActivity extends AppCompatActivity {
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
                         // Sign in success, update UI with the signed-in user's information
+                        FirebaseUser user = mAuth.getCurrentUser();
+                        updateNavHeader(user);
                         navigateToMainActivity();
                     } else {
                         // If sign in fails, display a message to the user.
@@ -119,6 +132,10 @@ public class LoginActivity extends AppCompatActivity {
         signup             = findViewById(R.id.tv_signup);
         rememberMeCheckBox = findViewById(R.id.remember_me);
         googleSignInButton = findViewById(R.id.btn_google);
+        navheaderusername = findViewById(R.id.navheaderusername);
+        navheaderemail = findViewById(R.id.navheaderemail);
+
+
 
 
         if (usernameEditText == null || passwordEditText == null ||
@@ -128,6 +145,20 @@ public class LoginActivity extends AppCompatActivity {
                     "login_page.xml is missing one or more required views: " +
                             "username, password, btn_login, tv_signup, remember_me, or googlebutton");
         }
+    }
+
+    private void saveCredentials(String username, String password) {
+        SharedPreferences.Editor editor = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit();
+        editor.putString(PREF_USERNAME, username);
+        editor.putString(PREF_PASSWORD, password);
+        editor.apply();
+    }
+
+    private void clearCredentials() {
+        SharedPreferences.Editor editor = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit();
+        editor.remove(PREF_USERNAME);
+        editor.remove(PREF_PASSWORD);
+        editor.apply();
     }
 
     private void wireClicks() {
@@ -156,6 +187,16 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
+    private void loadCredentials() {
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        String savedUsername = prefs.getString(PREF_USERNAME, null);
+        String savedPassword = prefs.getString(PREF_PASSWORD, null);
+        if (savedUsername != null && savedPassword != null) {
+            usernameEditText.setText(savedUsername);
+            passwordEditText.setText(savedPassword);
+            rememberMeCheckBox.setChecked(true);
+        }
+    }
     private boolean validateUsername() {
         String val = usernameEditText.getText() == null ? "" : usernameEditText.getText().toString();
         if (val.isEmpty()) {
@@ -195,8 +236,16 @@ public class LoginActivity extends AppCompatActivity {
 
                         if (passwordFromDB != null && passwordFromDB.equals(userPassword)) {
                             usernameEditText.setError(null);
+                            String nameFromDB = userSnapshot.child("name").getValue(String.class);
+
                             passwordEditText.setError(null);
                             navigateToMainActivity();
+
+                            if (rememberMeCheckBox.isChecked()) {
+                                saveCredentials(userUsername, userPassword);
+                            } else {
+                                clearCredentials();
+                            }
                             return; // Exit after finding the user
                         }
                     }
@@ -214,6 +263,17 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
     }
+
+    private void updateNavHeader(FirebaseUser user) {
+        if (user != null && navheaderusername != null && navheaderemail != null) {
+            String name = user.getDisplayName();
+            String email = user.getEmail();
+            navheaderusername.setText(name);
+            navheaderemail.setText(email);
+        }
+    }
+
+
 
     private void navigateToMainActivity() {
         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
