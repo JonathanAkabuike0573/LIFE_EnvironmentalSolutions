@@ -42,6 +42,6 @@ public class PresenceFragment extends Fragment {
      */
     private void initializeTextView() {
         // Set a clear message that no data is available yet.
-        presenceStatusTextView.setText("Waiting for sensor data...");
+        presenceStatusTextView.setText(R.string.waiting_for_sensor_datasz);
     }
 }

@@ -59,13 +59,13 @@ public class SensorActivity extends AppCompatActivity {
         new TabLayoutMediator(tabLayout, viewPager,
                 (tab, position) -> {
                     if (position == 0) {
-                        tab.setText("Air Quality");
+                        tab.setText(R.string.air_quality);
                         tab.setIcon(R.drawable.notification_foreground); // Optional icon
                     } else if (position == 1) {
-                        tab.setText("Light");
+                        tab.setText(R.string.light);
                         tab.setIcon(R.drawable.notification_foreground); // Optional icon
                     } else if (position == 2) {
-                        tab.setText("Presence");
+                        tab.setText(R.string.presence);
                         tab.setIcon(R.drawable.notification_foreground); // Optional icon
                     }
                 }
