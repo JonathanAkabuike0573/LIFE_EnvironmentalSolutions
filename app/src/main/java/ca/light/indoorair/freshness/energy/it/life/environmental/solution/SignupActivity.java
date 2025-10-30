@@ -32,7 +32,7 @@ public class SignupActivity extends AppCompatActivity {
 
 
             database = FirebaseDatabase.getInstance();
-            myRef = database.getReference("users");
+            myRef = database.getReference(getString(R.string.users));
             String name1 = name.getText().toString();
             String username1 = username.getText().toString();
             String email1 = email.getText().toString();
@@ -41,7 +41,7 @@ public class SignupActivity extends AppCompatActivity {
             HelperClass helperClass = new HelperClass(name1, email1, username1, password1);
             myRef.child(username1).setValue(helperClass);
 
-            Toast.makeText(SignupActivity.this, "User has been registered successfully", Toast.LENGTH_SHORT).show();
+            Toast.makeText(SignupActivity.this, R.string.user_has_been_registered_successfully, Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(SignupActivity.this, LoginActivity.class);
             startActivity(intent);
         });
