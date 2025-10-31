@@ -40,10 +40,10 @@ public class LoginActivity extends AppCompatActivity {
 
     // Constants for SharedPreferences
     private static final String PREFS_NAME = "LoginPrefs";
-    private static final String PREF_USERNAME = "username";
+    private static final String PREF_EMAIL = "email";
     private static final String PREF_PASSWORD = "password";
 
-    private TextInputEditText usernameEditText;
+    private TextInputEditText emailEditText;
     private TextInputEditText passwordEditText;
     Button loginButton, googleSignInButton;
     private TextView signup, navheaderusername, navheaderemail;
@@ -126,7 +126,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void bindViews() {
-        usernameEditText   = findViewById(R.id.username);
+        emailEditText   = findViewById(R.id.username);
         passwordEditText   = findViewById(R.id.password);
         loginButton        = findViewById(R.id.btn_login);
         signup             = findViewById(R.id.tv_signup);
@@ -138,7 +138,7 @@ public class LoginActivity extends AppCompatActivity {
 
 
 
-        if (usernameEditText == null || passwordEditText == null ||
+        if (emailEditText == null || passwordEditText == null ||
                 loginButton == null || signup == null || rememberMeCheckBox == null ||
                 googleSignInButton == null) {
             throw new IllegalStateException(
@@ -147,23 +147,23 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    private void saveCredentials(String username, String password) {
+    private void saveCredentials(String email, String password) {
         SharedPreferences.Editor editor = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit();
-        editor.putString(PREF_USERNAME, username);
+    editor.putString(PREF_EMAIL, email);
         editor.putString(PREF_PASSWORD, password);
         editor.apply();
     }
 
     private void clearCredentials() {
         SharedPreferences.Editor editor = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit();
-        editor.remove(PREF_USERNAME);
+        editor.remove(PREF_EMAIL);
         editor.remove(PREF_PASSWORD);
         editor.apply();
     }
 
     private void wireClicks() {
         loginButton.setOnClickListener(v -> {
-            if (!validateUsername()) {
+            if (!validateEmail()) {
                 return;
             }
             if (!validatePassword()) {
@@ -189,21 +189,21 @@ public class LoginActivity extends AppCompatActivity {
 
     private void loadCredentials() {
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-        String savedUsername = prefs.getString(PREF_USERNAME, null);
+        String savedEmail = prefs.getString(PREF_EMAIL, null);
         String savedPassword = prefs.getString(PREF_PASSWORD, null);
-        if (savedUsername != null && savedPassword != null) {
-            usernameEditText.setText(savedUsername);
+        if (savedEmail != null && savedPassword != null) {
+            emailEditText.setText(savedEmail);
             passwordEditText.setText(savedPassword);
             rememberMeCheckBox.setChecked(true);
         }
     }
-    private boolean validateUsername() {
-        String val = usernameEditText.getText() == null ? "" : usernameEditText.getText().toString();
+    private boolean validateEmail() {
+        String val = emailEditText.getText() == null ? "" : emailEditText.getText().toString();
         if (val.isEmpty()) {
-            usernameEditText.setError(getString(R.string.username_cannot_be_empty));
+            emailEditText.setError(getString(R.string.username_cannot_be_empty));
             return false;
         } else {
-            usernameEditText.setError(null);
+            emailEditText.setError(null);
             return true;
         }
     }
@@ -220,11 +220,11 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void checkUser() {
-        String userUsername = String.valueOf(usernameEditText.getText()).trim();
+        String userEmail = String.valueOf(emailEditText.getText()).trim();
         String userPassword = String.valueOf(passwordEditText.getText()).trim();
 
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("users");
-        Query checkUserDatabase = reference.orderByChild("username").equalTo(userUsername);
+        Query checkUserDatabase = reference.orderByChild("email").equalTo(userEmail);
 
         checkUserDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -235,14 +235,14 @@ public class LoginActivity extends AppCompatActivity {
                         String passwordFromDB = userSnapshot.child("password").getValue(String.class);
 
                         if (passwordFromDB != null && passwordFromDB.equals(userPassword)) {
-                            usernameEditText.setError(null);
-                            String nameFromDB = userSnapshot.child("name").getValue(String.class);
+                            emailEditText.setError(null);
+                            String nameFromDB = userSnapshot.child("email").getValue(String.class);
 
                             passwordEditText.setError(null);
                             navigateToMainActivity();
 
                             if (rememberMeCheckBox.isChecked()) {
-                                saveCredentials(userUsername, userPassword);
+                                saveCredentials(userEmail, userPassword);
                             } else {
                                 clearCredentials();
                             }
@@ -253,8 +253,8 @@ public class LoginActivity extends AppCompatActivity {
                     passwordEditText.setError(getString(R.string.invalid_credentials));
                     passwordEditText.requestFocus();
                 } else {
-                    usernameEditText.setError(getString(R.string.user_does_not_exist));
-                    usernameEditText.requestFocus();
+                    emailEditText.setError(getString(R.string.user_does_not_exist));
+                    emailEditText.requestFocus();
                 }
             }
 
