@@ -7,6 +7,7 @@ import android.text.TextUtils;
 import android.widget.Button;
 import android.util.Patterns;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -24,6 +25,8 @@ public class SignupActivity extends AppCompatActivity {
 
     EditText name, phoneNumber, email, password, confirmPassword;
     Button signup;
+    TextView alreadyHaveAccount;
+
     FirebaseDatabase database;
     DatabaseReference myRef;
 
@@ -37,6 +40,7 @@ public class SignupActivity extends AppCompatActivity {
         password = findViewById(R.id.signUpPassword);
         confirmPassword = findViewById(R.id.signUpConfirmPassword);
         signup = findViewById(R.id.buttonSignUp);
+        alreadyHaveAccount = findViewById(R.id.signUploginredirect);
 
         signup.setOnClickListener(view -> {
             database = FirebaseDatabase.getInstance();
@@ -48,6 +52,7 @@ public class SignupActivity extends AppCompatActivity {
             String emailStr = email.getText().toString();
             String passwordStr = password.getText().toString();
             String confirmPasswordStr = confirmPassword.getText().toString();
+
 
             // --- Input Validation ---
             if (TextUtils.isEmpty(nameStr) || TextUtils.isEmpty(phoneStr) || TextUtils.isEmpty(emailStr) || TextUtils.isEmpty(passwordStr)) {
@@ -87,9 +92,9 @@ public class SignupActivity extends AppCompatActivity {
                     } else {
                         // Email is not registered, create new user
                         HelperClass helperClass = new HelperClass(nameStr, emailStr, phoneStr, passwordStr, confirmPasswordStr);
-                        myRef.child(phoneStr).setValue(helperClass); // Using phone number as the unique key
+                        myRef.child(emailStr).setValue(helperClass);
 
-                        Toast.makeText(SignupActivity.this, "User has been registered successfully", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(SignupActivity.this, "Sign Up Successful", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(SignupActivity.this, LoginActivity.class);
                         startActivity(intent);
                         finish();
@@ -98,9 +103,15 @@ public class SignupActivity extends AppCompatActivity {
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {
-                    Toast.makeText(SignupActivity.this, "Database error. Please try again later.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SignupActivity.this, R.string.database_error_please_try_again_later, Toast.LENGTH_SHORT).show();
                 }
             });
+        });
+
+        alreadyHaveAccount.setOnClickListener(view -> {
+            Intent intent = new Intent(SignupActivity.this, LoginActivity.class);
+            startActivity(intent);
+            finish();
         });
     }
 
