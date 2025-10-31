@@ -90,7 +90,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onStart();
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
-        updateNavHeader(currentUser);
+
         if(currentUser != null){
             navigateToMainActivity();
         }
@@ -115,7 +115,7 @@ public class LoginActivity extends AppCompatActivity {
                     if (task.isSuccessful()) {
                         // Sign in success, update UI with the signed-in user's information
                         FirebaseUser user = mAuth.getCurrentUser();
-                        updateNavHeader(user);
+
                         navigateToMainActivity();
                     } else {
                         // If sign in fails, display a message to the user.
@@ -229,8 +229,6 @@ public class LoginActivity extends AppCompatActivity {
         checkUserDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-                    // Loop through the results, even if we only expect one.
-                    // This is safer than assuming the username is the key.
                     for (DataSnapshot userSnapshot : snapshot.getChildren()) {
                         String passwordFromDB = userSnapshot.child("password").getValue(String.class);
 
@@ -264,14 +262,7 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    private void updateNavHeader(FirebaseUser user) {
-        if (user != null && navheaderusername != null && navheaderemail != null) {
-            String name = user.getDisplayName();
-            String email = user.getEmail();
-            navheaderusername.setText(name);
-            navheaderemail.setText(email);
-        }
-    }
+
 
 
 
