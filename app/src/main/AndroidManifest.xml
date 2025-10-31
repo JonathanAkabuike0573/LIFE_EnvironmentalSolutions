@@ -41,5 +41,7 @@
         <activity android:name=".SignupActivity" android:exported="false" />
         <activity android:name=".MainActivity"   android:exported="false" />
         <activity android:name=".NotificationActivity" android:exported="false" />
+        <activity android:name=".FeedBackPage" android:exported="false" />
+
     </application>
 </manifest>

@@ -19,6 +19,9 @@
             android:id="@+id/nav_about"
             android:title="About"
             android:icon="@drawable/settings_foreground" />
+        <item
+            android:id="@+id/nav_feedback"
+            android:title="Feedback" />
     </group>
     <group android:id="@+id/group_bottom">
         <item
