@@ -71,5 +71,8 @@ CENG-322-OCC,  Software Project -->
     <string name="presence">Présence</string>
     <string name="user_has_been_registered_successfully">L’utilisateur a été enregistré avec succès</string>
     <string name="users">utilisateurs</string>
+    <string name="permission_granted">permission_granted</string>
+    <string name="permission_denied">permission_denied</string>
+    <string name="camera_permission_granted">camera_permission_granted</string>
 </resources>
 
