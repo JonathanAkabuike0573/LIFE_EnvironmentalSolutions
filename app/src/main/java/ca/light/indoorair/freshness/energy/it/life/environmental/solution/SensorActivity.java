@@ -43,10 +43,6 @@ public class SensorActivity extends AppCompatActivity {
 
 
 
-
-
-        setContentView(R.layout.sensor_activity);
-
         // Find views
         TabLayout tabLayout = findViewById(R.id.sensor_tab_layout);
         ViewPager2 viewPager = findViewById(R.id.sensor_view_pager);
