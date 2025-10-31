@@ -2,7 +2,7 @@ package ca.light.indoorair.freshness.energy.it.life.environmental.solution;
 
 public class HelperClass {
 
-    String name, email, username, password;
+    String name, email, phoneNumber, password, confirmPassword;
 
     public String getName() {
         return name;
@@ -20,12 +20,12 @@ public class HelperClass {
         this.email = email;
     }
 
-    public String getUsername() {
-        return username;
+    public String getPhoneNumber() {
+        return phoneNumber;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
     public String getPassword() {
@@ -36,11 +36,20 @@ public class HelperClass {
         this.password = password;
     }
 
-    public HelperClass(String name, String email, String username, String password) {
+    public String getConfirmPassword() {
+        return confirmPassword;
+    }
+
+    public void setConfirmPassword(String password) {
+        this.confirmPassword = confirmPassword;
+    }
+
+    public HelperClass(String name, String email, String phoneNumber, String password, String confirmPassword) {
         this.name = name;
         this.email = email;
-        this.username = username;
+        this.phoneNumber = phoneNumber;
         this.password = password;
+        this.confirmPassword = confirmPassword;
     }
 
     public HelperClass() {
