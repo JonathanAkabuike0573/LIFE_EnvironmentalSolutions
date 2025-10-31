@@ -42,6 +42,6 @@ public class LightFragment extends Fragment {
      */
     private void initializeTextView() {
         // Set a clear message that no data is available yet.
-        lightLevelReadingTextView.setText("Waiting for sensor data...");
+        lightLevelReadingTextView.setText(R.string.waiting_for_sensor_datas);
     }
 }
