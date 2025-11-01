@@ -1,0 +1,71 @@
+<!-- Mohamed Ali  N01440760, Jonathan Akabuike N01510573, Kieran Sharma N01548225, Farhan Habibza N01610299
+CENG-322-OCC,  Software Project -->
+<resources>
+    <string name="app_name" translatable="false">LIFE_EnvironmentalSolution</string>
+    <string name="google_app_id" translatable="false">ca.light.indoorair.freshness.energy.it.life.environmental.solution</string>
+    <string name="app_logo" translatable="false">app_logo</string>
+    <string name="splash_screen">Splash Screen</string>
+    <string name="button">Button</string>
+
+    <string name="navigation_drawer_open">Open</string>
+    <string name="navigation_drawer_close">Close</string>
+    <string name="life_environmental_solutions">LIFE Environmental Solutions</string>
+    <string name="home">Home</string>
+    <string name="sensors">Sensors</string>
+    <string name="settings">Settings</string>
+    <string name="exit_application">Exit Application</string>
+    <string name="are_you_sure_you_want_to_exit">Are you sure you want to exit?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="dashboard">DashBoard</string>
+    <string name="notification">Notification</string>
+    <string name="jonathan_akabuike_n01510573" translatable="false">Jonathan Akabuike N01510573</string>
+    <string name="mohamed_ali_n01440760" translatable="false">Mohamed Ali N01440760</string>
+    <string name="kieran_sharma_n01548225" translatable="false">Kieran Sharma N01548225</string>
+    <string name="farhan_habibzai_n01610299" translatable="false">Farhan Habibzai N01610299</string>
+    <string name="by">BY</string>
+    <string name="toggle_mode">Toggle Mode</string>
+    <string name="options">OPTIONS</string>
+    <string name="display">Display</string>
+    <string name="enable_dark_mode">Enable Dark Mode</string>
+    <string name="reduces_screen_glare_for_comfortable_viewing_at_night">Reduces screen glare for comfortable viewing at night.</string>
+    <string name="lock_to_portrait_mode">Lock to Portrait Mode</string>
+    <string name="keeps_the_app_in_a_vertical_orientation">Keeps the app in a vertical orientation.</string>
+    <string name="notifications_amp_data"><![CDATA[Notifications & Data]]></string>
+    <string name="notification_tone">Notification Tone</string>
+    <string name="listen">Listen</string>
+    <string name="clear_cache">Clear Cache</string>
+    <string name="frees_up_storage_space">Frees up storage space</string>
+
+    <string name="or">OR</string>
+    <string name="login">Login</string>
+    <string name="sign_in_with_google">Sign in with Google</string>
+    <string name="enter_password">Enter password</string>
+    <string name="don_t_have_an_account">Don\'t have an account?</string>
+    <string name="sign_up">Sign up</string>
+    <string name="remember_me">Remember me</string>
+    <string name="enter_username">Enter Email</string>
+    <string name="username_cannot_be_empty">Username cannot be empty</string>
+    <string name="password_cannot_be_empty">Password cannot be empty</string>
+    <string name="invalid_credentials">Invalid Credentials</string>
+    <string name="user_does_not_exist">User does not exist</string>
+    <string name="default_web_client_id" translatable="false">624010139445-e7is3268ksuradhslegahmnv6b25enoo.apps.googleusercontent.com</string>
+    <string name="dark_mode_desc">Reduces screen glare for comfortable viewing at night.</string>
+    <string name="portrait_desc">Keeps the app in a vertical orientation.</string>
+    <string name="clear">Clear</string>
+    <string name="sign_out">Sign Out</string>
+    <string name="light_fragment">Light Fragment</string>
+    <string name="good_morning_life">Good Morning LIFE</string>
+    <string name="create_account">Create a new account</string>
+    <string name="permission_denied">permission denied</string>
+    <string name="permission_granted">Permission granted</string>
+    <string name="permission_already_granted">Permission already granted</string>
+    <string name="camera_permission_already_granted">Camera permission already granted</string>
+    <string name="camera_permission_denied">Camera permission denied</string>
+    <string name="camera_permission_granted">Camera permission granted</string>
+    <string name="database_error_please_try_again_later">Database error. Please try again later.</string>
+
+
+</resources>
