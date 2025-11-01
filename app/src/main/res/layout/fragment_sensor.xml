@@ -10,7 +10,7 @@
         android:id="@+id/sensor_tab_layout"
         android:layout_width="match_parent"
         android:layout_height="75dp"
-        android:background="@android:color/holo_green_dark"
+        android:background="@android:color/holo_red_dark"
         app:tabIndicatorColor="@android:color/white"
         app:tabTextColor="@android:color/white"
         tools:layout_editor_absoluteX="-16dp"
