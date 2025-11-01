@@ -24,11 +24,13 @@
             <item
                 android:id="@+id/action_camera"
                 android:title="Camera"
+                android:icon="@drawable/ic_camera_foreground"
                 app:showAsAction="never" />
 
             <item
                 android:id="@+id/action_notification"
                 android:title="@string/notification"
+                android:icon="@drawable/notification_foreground"
                 app:showAsAction="never" />
         </menu>
     </item>
