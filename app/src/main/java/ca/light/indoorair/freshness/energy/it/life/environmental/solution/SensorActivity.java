@@ -19,8 +19,13 @@ public class SensorActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //setContentView(R.layout.sensor_activity);
+
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         if(getSupportActionBar() != null){
+            getSupportActionBar().setTitle(R.string.sensor_activity);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowHomeEnabled(true);
         }
@@ -37,15 +42,6 @@ public class SensorActivity extends AppCompatActivity {
 
 
         });
-
-        toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-
-
-
-
-        setContentView(R.layout.sensor_activity);
 
         // Find views
         TabLayout tabLayout = findViewById(R.id.sensor_tab_layout);
@@ -72,5 +68,3 @@ public class SensorActivity extends AppCompatActivity {
         ).attach();
     }
 }
-
-

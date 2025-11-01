@@ -68,6 +68,13 @@ CENG-322-OCC,  Software Project -->
     <string name="presence">Presence</string>
     <string name="user_has_been_registered_successfully">User has been registered successfully</string>
     <string name="users">users</string>
+    <string name="camera_permission_denied">Camera permission denied.</string>
+    <string name="permission_already_granted">Permission already granted.</string>
+    <string name="camera_permission_already_granted">Camera permission already granted.</string>
+    <string name="permission_granted">Permission granted.</string>
+    <string name="permission_denied">Permission denied.</string>
+    <string name="camera_permission_granted">Camera permission granted.</string>
+    <string name="sensor_activity">Sensor Activity</string>
 
 
 </resources>
