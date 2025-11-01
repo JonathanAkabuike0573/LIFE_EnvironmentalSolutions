@@ -9,20 +9,18 @@
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/sensor_tab_layout"
         android:layout_width="match_parent"
-        android:layout_height="75dp"
+        android:layout_height="wrap_content"
         android:background="@android:color/holo_red_dark"
+        app:layout_constraintTop_toTopOf="parent"
         app:tabIndicatorColor="@android:color/white"
-        app:tabTextColor="@android:color/white"
-        tools:layout_editor_absoluteX="-16dp"
-        tools:layout_editor_absoluteY="2dp" />
+        app:tabTextColor="@android:color/white" />
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/sensor_view_pager"
         android:layout_width="match_parent"
-        android:layout_height="653dp"
-        android:layout_marginTop="79dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/sensor_tab_layout" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
