@@ -19,65 +19,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
-        android:id="@+id/imageView2"
-        android:layout_width="169dp"
-        android:layout_height="131dp"
-        android:layout_marginStart="224dp"
-        android:layout_marginTop="436dp"
-        android:adjustViewBounds="true"
-        android:contentDescription="@string/dashboard"
-        android:padding="@dimen/space_m"
-        android:src="@drawable/humandetection"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="169dp"
-        android:layout_height="131dp"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="436dp"
-        android:adjustViewBounds="true"
-        android:contentDescription="@string/dashboard"
-        android:padding="@dimen/space_m"
-        android:src="@drawable/humandetection"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/card_chart"
-        style="@style/Widget.App.LoginCard"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/space_l"
-        android:layout_marginTop="@dimen/space_l"
-        android:layout_marginEnd="@dimen/space_l"
-        app:cardUseCompatPadding="true"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_dashboard_title">
-
-        <ImageView
-            android:id="@+id/imageView3"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:adjustViewBounds="true"
-            android:contentDescription="@string/dashboard"
-            android:padding="@dimen/space_m"
-            android:src="@drawable/humandetection" />
-    </com.google.android.material.card.MaterialCardView>
-
     <androidx.cardview.widget.CardView
         android:layout_width="0dp"
         android:layout_height="75dp"
         android:layout_marginStart="@dimen/space_l"
         android:layout_marginEnd="@dimen/space_l"
+        android:layout_marginBottom="92dp"
         app:cardCornerRadius="12dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView" >
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent">
 
         <TextView
             android:id="@+id/textView6"
