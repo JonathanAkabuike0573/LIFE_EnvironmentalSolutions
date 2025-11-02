@@ -1,0 +1,75 @@
+<!-- Mohamed Ali  N01440760, Jonathan Akabuike N01510573, Kieran Sharma N01548225, Farhan Habibza N01610299
+CENG-322-OCC,  Software Project -->
+<resources>
+    <string name="app_name" translatable="false">LIFE_EnvironmentalSolution</string>
+    <string name="google_app_id" translatable="false">ca.light.indoorair.freshness.energy.it.life.environmental.solution</string>
+    <string name="app_logo" translatable="false">app_logo</string>
+    <string name="splash_screen">Écran daccueil</string>
+    <string name="button">Bouton</string>
+
+    <string name="navigation_drawer_open">Ouvrir</string>
+    <string name="navigation_drawer_close">Fermer</string>
+    <string name="life_environmental_solutions">LIFE Solutions Environnementales</string>
+    <string name="home">Accueil</string>
+    <string name="sensors">Capteurs</string>
+    <string name="settings">Paramètres</string>
+    <string name="exit_application">Quitter l’application</string>
+    <string name="are_you_sure_you_want_to_exit">Êtes-vous sûr de vouloir quitter ?</string>
+    <string name="yes">Oui</string>
+    <string name="no">Non</string>
+
+    <string name="hello_blank_fragment">Bonjour fragment vide</string>
+    <string name="dashboard">Tableau de bord</string>
+    <string name="notification">Notification</string>
+
+    <string name="jonathan_akabuike_n01510573" translatable="false">Jonathan Akabuike N01510573</string>
+    <string name="mohamed_ali_n01440760" translatable="false">Mohamed Ali N01440760</string>
+    <string name="kieran_sharma_n01548225" translatable="false">Kieran Sharma N01548225</string>
+    <string name="farhan_habibzai_n01610299" translatable="false">Farhan Habibzai N01610299</string>
+
+    <string name="by">PAR</string>
+    <string name="toggle_mode">Changer de mode</string>
+    <string name="options">OPTIONS</string>
+    <string name="display">Affichage</string>
+    <string name="enable_dark_mode">Activer le mode sombre</string>
+    <string name="reduces_screen_glare_for_comfortable_viewing_at_night">Réduit l’éblouissement de l’écran pour un confort visuel la nuit.</string>
+    <string name="lock_to_portrait_mode">Verrouiller en mode portrait</string>
+    <string name="keeps_the_app_in_a_vertical_orientation">Maintient l’application en orientation verticale.</string>
+    <string name="notifications_amp_data"><![CDATA[Notifications et Données]]></string>
+    <string name="notification_tone">Son de notification</string>
+    <string name="listen">Écouter</string>
+    <string name="clear_cache">Vider le cache</string>
+    <string name="frees_up_storage_space">Libère de l’espace de stockage</string>
+
+    <string name="or">OU</string>
+    <string name="login">Connexion</string>
+    <string name="sign_in_with_google">Se connecter avec Google</string>
+    <string name="enter_password">Entrer le mot de passe</string>
+    <string name="don_t_have_an_account">Vous n’avez pas de compte ?</string>
+    <string name="sign_up">S’inscrire</string>
+    <string name="remember_me">Se souvenir de moi</string>
+    <string name="enter_username">Entrer le nom d’utilisateur</string>
+    <string name="username_cannot_be_empty">Le nom d’utilisateur ne peut pas être vide</string>
+    <string name="password_cannot_be_empty">Le mot de passe ne peut pas être vide</string>
+    <string name="invalid_credentials">Identifiants invalides</string>
+    <string name="user_does_not_exist">L’utilisateur n’existe pas</string>
+    <string name="default_web_client_id" translatable="false">624010139445-e7is3268ksuradhslegahmnv6b25enoo.apps.googleusercontent.com</string>
+
+    <string name="dark_mode_desc">Réduit l’éblouissement de l’écran pour un confort visuel la nuit.</string>
+    <string name="portrait_desc">Maintient l’application en orientation verticale.</string>
+    <string name="clear">Effacer</string>
+    <string name="sign_out">Déconnexion</string>
+    <string name="light_fragment">Fragment Lumière</string>
+    <string name="good_morning_life">Bonjour LIFE</string>
+    <string name="create_account">Créer un compte</string>
+    <string name="waiting_for_sensor_data">En attente des donnees du capteur</string>
+    <string name="waiting_for_sensor_datas">En attente des donnees du capteur</string>
+    <string name="username">nom d’utilisateur</string>
+    <string name="waiting_for_sensor_datasz">En attente des donnees du capteur</string>
+    <string name="air_quality">Qualité de l’air</string>
+    <string name="light">Lumière</string>
+    <string name="presence">Présence</string>
+    <string name="user_has_been_registered_successfully">L’utilisateur a été enregistré avec succès</string>
+    <string name="users">utilisateurs</string>
+</resources>
+
