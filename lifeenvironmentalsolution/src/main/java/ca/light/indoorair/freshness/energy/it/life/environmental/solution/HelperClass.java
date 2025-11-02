@@ -28,28 +28,13 @@ public class HelperClass {
         this.phoneNumber = phoneNumber;
     }
 
-    public String getPassword() {
-        return password;
-    }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
 
-    public String getConfirmPassword() {
-        return confirmPassword;
-    }
-
-    public void setConfirmPassword(String password) {
-        this.confirmPassword = confirmPassword;
-    }
-
-    public HelperClass(String name, String email, String phoneNumber, String password, String confirmPassword) {
+    public HelperClass(String name, String email, String phoneNumber) {
         this.name = name;
         this.email = email;
         this.phoneNumber = phoneNumber;
-        this.password = password;
-        this.confirmPassword = confirmPassword;
+
     }
 
     public HelperClass() {
