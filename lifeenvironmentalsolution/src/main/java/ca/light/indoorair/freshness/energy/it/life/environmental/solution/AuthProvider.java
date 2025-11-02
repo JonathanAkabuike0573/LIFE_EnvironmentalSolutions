@@ -20,6 +20,7 @@ public interface AuthProvider {
 
     // Method to handle the result from the Google sign-in activity.
     void handleGoogleSignInResult(Intent data, AuthCallback callback);
+        void signUpWithEmail(String email, String password, String name, String phone, AuthCallback callback);
 
     // Method to sign the user out.
     void signOut(Runnable onComplete);
