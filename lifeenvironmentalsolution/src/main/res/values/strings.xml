@@ -65,6 +65,7 @@ CENG-322-OCC,  Software Project -->
     <string name="camera_permission_already_granted">Camera permission already granted</string>
     <string name="camera_permission_denied">Camera permission denied</string>
     <string name="camera_permission_granted">Camera permission granted</string>
+    <string name="enter_email">Enter email</string>
 
 
 </resources>

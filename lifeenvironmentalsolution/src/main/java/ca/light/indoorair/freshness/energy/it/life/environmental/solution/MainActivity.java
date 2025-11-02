@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String PREFS_NAME = "MyPrefsFile";
     private static final String THEME_KEY = "ThemeKey";
 
-    // Declare the launcher at the top of your Activity/Fragment:
+
     private final ActivityResultLauncher<String> requestPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
                 if (isGranted) {
@@ -162,7 +162,7 @@ public class MainActivity extends AppCompatActivity {
             drawerLayout.addDrawerListener(toggle);
             toggle.syncState();
 
-            // *** NEW CODE: Load user's name and email into the navigation header ***
+            //  Load user's name and email into the navigation header
             updateNavHeader();
 
             navigationView.setNavigationItemSelectedListener(item -> {
@@ -282,13 +282,11 @@ public class MainActivity extends AppCompatActivity {
             if (menuItem.hasSubMenu()) {
                 for (int j = 0; j < menuItem.getSubMenu().size(); j++) {
                     MenuItem subMenuItem = menuItem.getSubMenu().getItem(j);
-                    // Note: You can use a different color for sub-menu items if needed
+
                     applyMenuItemColor(subMenuItem, color);
                 }
                 if (menuItem.getItemId() == R.id.notification) {
-                    // This seems to be the parent of the notification settings,
-                    // let's handle the submenu item click in onOptionsItemSelected instead.
-                    // This is just a placeholder to show where you might add logic if needed.
+
                 }
             }
         }
