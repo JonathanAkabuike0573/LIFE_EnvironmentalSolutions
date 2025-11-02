@@ -1,43 +1,53 @@
-//Mohamed Ali  N01440760, Jonathan Akabuike N01510573, Kieran Sharma N01548225, Farhan Habibza N01610299
-//CENG-322-OCC,  Software Project
 package ca.light.indoorair.freshness.energy.it.life.environmental.solution;
+
+import android.Manifest;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.Manifest;
+import android.content.pm.PackageManager;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.activity.OnBackPressedCallback;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.widget.Toolbar;
-import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import android.os.Build;
-import android.widget.Toast;
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+
 import com.google.android.gms.auth.api.identity.Identity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 public class MainActivity extends AppCompatActivity {
 
     FragmentManager fragmentManager;
@@ -66,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
                 if (isGranted) {
                     // Permission is granted. You can now open the camera.
-                    Toast.makeText(this, R.string.camera_permission_granted , Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.camera_permission_granted, Toast.LENGTH_SHORT).show();
                     // Intent to open camera can be placed here.
                 } else {
                     // Explain to the user that the feature is unavailable because the
@@ -79,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
+//        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
 
         // Initialize Firebase Auth
@@ -89,7 +99,6 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-
 
 
         fragmentManager = getSupportFragmentManager();
@@ -153,19 +162,21 @@ public class MainActivity extends AppCompatActivity {
             drawerLayout.addDrawerListener(toggle);
             toggle.syncState();
 
+            // *** NEW CODE: Load user's name and email into the navigation header ***
+            updateNavHeader();
+
             navigationView.setNavigationItemSelectedListener(item -> {
                 int id = item.getItemId();
                 if (id == R.id.nav_home) {
                     setTitle(getString(R.string.home));
                 } else if (id == R.id.nav_sensors) {
-                   Intent intent = new Intent(MainActivity.this, NotificationActivity.class);
-                   startActivity(intent);
+                    Intent intent = new Intent(MainActivity.this, NotificationActivity.class);
+                    startActivity(intent);
                 } else if (id == R.id.nav_settings) {
                     setTitle(getString(R.string.settings));
                 } else if (id == R.id.nav_sign_out) {
                     signOut();
-                }
-                else if (id == R.id.nav_feedback) {
+                } else if (id == R.id.nav_feedback) {
                     Intent intent = new Intent(MainActivity.this, FeedBackPage.class);
                     startActivity(intent);
                 }
@@ -194,6 +205,57 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+    /**
+     * Finds the current user and updates the navigation header with their name and email.
+     */
+    private void updateNavHeader() {
+        // Ensure navigationView is not null
+        if (navigationView == null) return;
+
+        View headerView = navigationView.getHeaderView(0);
+
+        // Use your specific IDs from nav_header.xml
+        TextView navUserName = headerView.findViewById(R.id.navheaderusername);
+        TextView navUserEmail = headerView.findViewById(R.id.navheaderemail);
+
+        FirebaseUser currentUser = auth.getCurrentUser();
+
+        if (currentUser != null) {
+            // Set the email directly from the FirebaseUser object
+            String email = currentUser.getEmail();
+            if (email != null) {
+                navUserEmail.setText(email);
+            }
+
+            // To get the user's name, read it from the Realtime Database
+            String uid = currentUser.getUid();
+            DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("users").child(uid);
+
+            userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if (snapshot.exists()) {
+                        HelperClass userProfile = snapshot.getValue(HelperClass.class);
+                        if (userProfile != null) {
+                            String name = userProfile.getName();
+                            navUserName.setText(name);
+                        }
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                    Toast.makeText(MainActivity.this, "Failed to load user name.", Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else {
+            // Handle case where there is no signed-in user
+            navUserName.setText("Guest User");
+            navUserEmail.setText("");
+        }
+    }
+
 
     // Options Menu
     @Override
@@ -247,18 +309,29 @@ public class MainActivity extends AppCompatActivity {
         if (toggle != null && toggle.onOptionsItemSelected(item)) {
             return true;
         }
-        if (item.getItemId() == R.id.themetoggle) {
+        int itemId = item.getItemId();
+        if (itemId == R.id.themetoggle) {
             toggleTheme();
             return true;
-        } else if (item.getItemId() == R.id.action_notification) { // Assuming R.id.notification_settings is your submenu item ID
+        } else if (itemId == R.id.action_notification) {
             askNotificationPermission();
             return true;
-        } else if (item.getItemId() == R.id.action_camera) {
+        } else if (itemId == R.id.action_camera) {
             askCameraPermission();
+            return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
+
+    private void askCameraPermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(this, "Camera permission already granted.", Toast.LENGTH_SHORT).show();
+            // You can open camera here
+        } else {
+            requestCameraPermissionLauncher.launch(Manifest.permission.CAMERA);
+        }
+    }
+
 
     private void toggleTheme() {
         SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
@@ -305,15 +378,8 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
             }
-        }
-    }
-
-    private void askCameraPermission() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-            Toast.makeText(this, R.string.camera_permission_already_granted , Toast.LENGTH_SHORT).show();
-            // Intent to open camera can be placed here.
         } else {
-            requestCameraPermissionLauncher.launch(Manifest.permission.CAMERA);
+            Toast.makeText(this, "Notification permission not required on this Android version.", Toast.LENGTH_SHORT).show();
         }
     }
 }
