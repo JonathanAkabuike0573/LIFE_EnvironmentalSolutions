@@ -9,13 +9,13 @@
     tools:context=".DashBoardFragment">
 
     <TextView
-        android:id="@+id/tv_dashboard_title"
+        android:id="@+id/usergreeting"
         style="@style/Text.HighlightTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/space_l"
         android:layout_marginTop="@dimen/space_l"
-        android:text="@string/dashboard"
+        android:text="Loading..."
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
