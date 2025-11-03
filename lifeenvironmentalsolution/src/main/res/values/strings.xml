@@ -46,7 +46,7 @@ CENG-322-OCC,  Software Project -->
     <string name="don_t_have_an_account">Don\'t have an account?</string>
     <string name="sign_up">Sign up</string>
     <string name="remember_me">Remember me</string>
-    <string name="enter_username">Enter Email</string>
+    <string name="enter_username">Enter Username</string>
     <string name="username_cannot_be_empty">Username cannot be empty</string>
     <string name="password_cannot_be_empty">Password cannot be empty</string>
     <string name="invalid_credentials">Invalid Credentials</string>
@@ -58,14 +58,14 @@ CENG-322-OCC,  Software Project -->
     <string name="sign_out">Sign Out</string>
     <string name="light_fragment">Light Fragment</string>
     <string name="good_morning_life">Good Morning LIFE</string>
-    <string name="create_account">Create a new account</string>
+    <string name="create_account">Create Account</string>
     <string name="permission_denied">permission denied</string>
     <string name="permission_granted">Permission granted</string>
     <string name="permission_already_granted">Permission already granted</string>
     <string name="camera_permission_already_granted">Camera permission already granted</string>
     <string name="camera_permission_denied">Camera permission denied</string>
     <string name="camera_permission_granted">Camera permission granted</string>
-    <string name="database_error_please_try_again_later">Database error. Please try again later.</string>
+    <string name="enter_email">Enter email</string>
 
 
 </resources>
