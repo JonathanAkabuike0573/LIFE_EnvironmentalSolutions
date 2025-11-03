@@ -66,6 +66,15 @@ CENG-322-OCC,  Software Project -->
     <string name="camera_permission_denied">Camera permission denied</string>
     <string name="camera_permission_granted">Camera permission granted</string>
     <string name="enter_email">Enter email</string>
+    <string name="air_quality">Air Quality</string>
+    <string name="light">Light</string>
+    <string name="presence">Presence</string>
+    <string name="user_has_been_registered_successfully">User has been registered successfully</string>
+    <string name="username">Username</string>
+    <string name="users">Users</string>
+    <string name="waiting_for_sensor_data">Waiting for sensor data</string>
+    <string name="waiting_for_sensor_datas">Waiting for sensor data</string>
+    <string name="waiting_for_sensor_datasz">Waiting for sensor data</string>
 
 
 </resources>
