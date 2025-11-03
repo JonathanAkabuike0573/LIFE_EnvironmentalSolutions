@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#DDE3FF"
+    android:padding="24dp">
+
+    <!-- Title -->
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Rate your experience"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="#000000"
+        android:gravity="center"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="30dp" />
+
+    <!-- Description -->
+    <TextView
+        android:id="@+id/tvDesc"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="We highly value your feedback! Kindly take a moment to rate your experience and provide us with your valuable feedback."
+        android:textSize="14sp"
+        android:textColor="#444444"
+        android:gravity="center"
+        app:layout_constraintTop_toBottomOf="@id/tvTitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="12dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp" />
+
+    <!-- Rating Bar -->
+    <RatingBar
+        android:id="@+id/ratingBar"
+        style="?android:attr/ratingBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:numStars="5"
+        android:stepSize="1.0"
+        android:rating="0"
+        app:layout_constraintTop_toBottomOf="@id/tvDesc"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp" />
+
+    <!-- Name -->
+    <EditText
+        android:id="@+id/etName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="Name"
+        android:inputType="textPersonName"
+        android:padding="12dp"
+        android:textColor="#000000"
+        android:textColorHint="#888888"
+        android:background="#FFFFFF"
+        app:layout_constraintTop_toBottomOf="@id/ratingBar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp" />
+
+    <!-- Email -->
+    <EditText
+        android:id="@+id/etEmail"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="Email"
+        android:inputType="textEmailAddress"
+        android:padding="12dp"
+        android:textColor="#000000"
+        android:textColorHint="#888888"
+        android:background="#FFFFFF"
+        app:layout_constraintTop_toBottomOf="@id/etName"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp" />
+
+    <!-- Phone -->
+    <EditText
+        android:id="@+id/etPhone"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="Phone"
+        android:inputType="phone"
+        android:padding="12dp"
+        android:textColor="#000000"
+        android:textColorHint="#888888"
+        android:background="#FFFFFF"
+        app:layout_constraintTop_toBottomOf="@id/etEmail"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp" />
+
+    <!-- Device Model -->
+    <EditText
+        android:id="@+id/etDeviceModel"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="Device Model"
+        android:inputType="text"
+        android:padding="12dp"
+        android:textColor="#000000"
+        android:textColorHint="#888888"
+        android:background="#FFFFFF"
+        app:layout_constraintTop_toBottomOf="@id/etPhone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp" />
+
+    <!-- Feedback Text Box -->
+    <EditText
+        android:id="@+id/etFeedback"
+        android:layout_width="0dp"
+        android:layout_height="100dp"
+        android:hint="Tell us about your experience!"
+        android:gravity="top|start"
+        android:padding="12dp"
+        android:textColor="#000000"
+        android:textColorHint="#888888"
+        android:background="#FFFFFF"
+        android:inputType="textMultiLine"
+        app:layout_constraintTop_toBottomOf="@id/etDeviceModel"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp" />
+
+    <!-- Send Button -->
+    <Button
+        android:id="@+id/btnSend"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Send"
+        android:backgroundTint="#FFD700"
+        android:textColor="#000000"
+        app:layout_constraintTop_toBottomOf="@id/etFeedback"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
