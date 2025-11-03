@@ -48,7 +48,7 @@
                 android:layout_width="90dp"
                 android:layout_height="90dp"
                 android:layout_marginTop="32dp"
-                android:src="@drawable/ic_room_empty" 
+                android:src="@drawable/ic_room_occupied" 
                 app:layout_constraintTop_toBottomOf="@+id/presence_title"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"/>
