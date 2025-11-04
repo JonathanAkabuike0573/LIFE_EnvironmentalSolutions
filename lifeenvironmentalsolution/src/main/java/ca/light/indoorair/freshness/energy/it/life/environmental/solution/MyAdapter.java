@@ -60,12 +60,43 @@ public class MyAdapter extends RecyclerView.Adapter<MyViewHolder> {
                     holder.device_icon.setImageResource(R.drawable.lightofficon);
                 }
             });
-        } else {
-            // For other items, just display the status
-            holder.device_status.setText(currentItem.getStatus());
+        } else if ("Smart TV".equals(currentItem.getName())) {
+            // Update status based on toggle state
+            holder.device_status.setText(currentItem.isDeviceOn() ? "On" : "Off");
             holder.device_toggle.setOnCheckedChangeListener(null);
             holder.device_toggle.setChecked(currentItem.isDeviceOn());
+
+            holder.device_toggle.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                currentItem.setDeviceOn(isChecked);
+                holder.device_status.setText(isChecked ? "On" : "Off");
+                currentItem.setStatus(isChecked ? "On" : "Off");
+
+                // Switch between tvonicon and tvofficon
+                if (isChecked) {
+                    holder.device_icon.setImageResource(R.drawable.tv_onicon);
+                } else {
+                    holder.device_icon.setImageResource(R.drawable.tv_officon);
+                }
+            });
+        } else if ("Occupancy Sensor".equals(currentItem.getName())) {
+            // Update status based on toggle state
+            holder.device_status.setText(currentItem.isDeviceOn() ? "Occupied" : "Empty");
+            holder.device_toggle.setOnCheckedChangeListener(null);
+            holder.device_toggle.setChecked(currentItem.isDeviceOn());
+            holder.device_toggle.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                currentItem.setDeviceOn(isChecked);
+                holder.device_status.setText(isChecked ? "Occupied" : "Empty");
+                currentItem.setStatus(isChecked ? "Occupied" : "Empty");
+
+                // Switch between detection_on and detection_off icons
+                if (isChecked) {
+                    holder.device_icon.setImageResource(R.drawable.detection_on);
+                } else {
+                    holder.device_icon.setImageResource(R.drawable.detectionoff);
+                }
+            });
         }
+
     }
 
     @Override

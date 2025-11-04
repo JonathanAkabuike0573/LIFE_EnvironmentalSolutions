@@ -13,7 +13,7 @@
         android:title="@string/sensors" />
     <item
         android:id="@+id/settings"
-        android:icon="@android:drawable/ic_menu_preferences"
+        android:icon="@drawable/settings_icon"
         android:title="@string/settings" />
 
 </menu>
