@@ -12,8 +12,10 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
+import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -59,6 +61,8 @@ public class MainActivity extends AppCompatActivity {
     private ActionBarDrawerToggle toggle;
     private static final String PREFS_NAME = "MyPrefsFile";
     private static final String THEME_KEY = "ThemeKey";
+    private GestureDetector gestureDetector;
+    private BottomNavigationView bottomNavigationView;
 
 
     private final ActivityResultLauncher<String> requestPermissionLauncher =
@@ -95,12 +99,29 @@ public class MainActivity extends AppCompatActivity {
         // Initialize Firebase Auth
         auth = FirebaseAuth.getInstance();
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            // Toggling navigation bar visibility will change insets, so we need to handle it.
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            // We apply padding for status bar and navigation bar, but for the bottom part
+            // we let the bottom navigation view handle its own padding.
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0);
+            bottomNavigationView.setPadding(0, 0, 0, systemBars.bottom);
             return insets;
         });
 
+        // Setup gesture detector to listen for screen taps
+        gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public boolean onSingleTapUp(MotionEvent e) {
+                toggleBottomNavigationView();
+                return true;
+            }
+        });
 
+        View mainContent = findViewById(R.id.main);
+        mainContent.setOnTouchListener((v, event) -> {
+            gestureDetector.onTouchEvent(event);
+            return true; // Consume the event
+        });
         fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction().replace(R.id.main, new DashBoardFragment()).commit();
 
@@ -111,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
 
         setCurrentFragment(dashBoardFragment);
 
-        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
+        bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
             if (id == R.id.dashboard) {
@@ -319,6 +340,16 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void toggleBottomNavigationView() {
+        if (bottomNavigationView.getVisibility() == View.VISIBLE) {
+            bottomNavigationView.animate().translationY(bottomNavigationView.getHeight()).withEndAction(() -> bottomNavigationView.setVisibility(View.GONE));
+
+        } else {
+            bottomNavigationView.setVisibility(View.VISIBLE);
+            bottomNavigationView.animate().translationY(1);
+        }
     }
 
     private void askCameraPermission() {
