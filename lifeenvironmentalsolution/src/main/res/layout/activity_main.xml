@@ -7,45 +7,54 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
 
-    <!-- CONTENT -->
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
+    <!-- Main content area that separates the fragment container and bottom nav -->
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <!-- App bar + Toolbar -->
-        <com.google.android.material.appbar.AppBarLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:fitsSystemWindows="true">
-
-            <com.google.android.material.appbar.MaterialToolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:background="?attr/colorPrimary"
-                android:theme="@style/ThemeOverlay.Material3.Dark.ActionBar" />
-        </com.google.android.material.appbar.AppBarLayout>
-
-        <!-- Fragment container -->
-        <FrameLayout
-            android:id="@+id/main"
+        <!-- CoordinatorLayout to manage AppBar and scrolling content -->
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+            android:layout_above="@+id/bottom_navigation">
 
-        <!-- Bottom nav -->
+            <!-- App bar + Toolbar -->
+            <com.google.android.material.appbar.AppBarLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fitsSystemWindows="true">
+
+                <com.google.android.material.appbar.MaterialToolbar
+                    android:id="@+id/toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
+                    android:background="?attr/colorPrimary"
+                    android:theme="@style/ThemeOverlay.Material3.Dark.ActionBar" />
+            </com.google.android.material.appbar.AppBarLayout>
+
+            <!-- Fragment container -->
+            <FrameLayout
+                android:id="@+id/main"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+        </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+        <!-- Bottom nav, aligned to the bottom of the RelativeLayout -->
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/bottom_navigation"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
+            android:layout_alignParentBottom="true"
             android:background="@color/btn_primary_bg"
             app:itemIconTint="@color/bottom_nav_item_tint"
             app:itemTextColor="@color/bottom_nav_item_tint"
             app:itemBackground="@drawable/bottom_nav_item_background"
             app:menu="@menu/bottom_nav_menu"
             app:labelVisibilityMode="labeled" />
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+    </RelativeLayout>
 
     <!-- DRAWER -->
     <com.google.android.material.navigation.NavigationView
