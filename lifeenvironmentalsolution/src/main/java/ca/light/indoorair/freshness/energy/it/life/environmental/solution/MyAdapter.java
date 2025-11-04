@@ -52,6 +52,13 @@ public class MyAdapter extends RecyclerView.Adapter<MyViewHolder> {
                 currentItem.setDeviceOn(isChecked);
                 holder.device_status.setText(isChecked ? "On" : "Off");
                 currentItem.setStatus(isChecked ? "On" : "Off");
+
+                // Switch between lightonicon and lightofficon
+                if (isChecked) {
+                    holder.device_icon.setImageResource(R.drawable.lightonicon);
+                } else {
+                    holder.device_icon.setImageResource(R.drawable.lightofficon);
+                }
             });
         } else {
             // For other items, just display the status
