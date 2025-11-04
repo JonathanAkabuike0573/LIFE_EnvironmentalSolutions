@@ -50,7 +50,7 @@ public class DashBoardFragment extends Fragment {
 
         List<item> items = new ArrayList<>();
         items.add(new item("Air Quality", "Good", R.drawable.air_qualityicon, true, true));
-        items.add(new item("Smart Light", "Off", R.drawable.light, false, true));
+        items.add(new item("Smart Light", "Off", R.drawable.lightofficon, false, true));
         items.add(new item("Thermostat", "22°C", R.drawable.thermostaticon, true, false));
         items.add(new item("Air Conditioner", "Off", R.drawable.airconditionericon, false, true));
         items.add(new item("Wifi", "Off", R.drawable.logolife, false, true));
