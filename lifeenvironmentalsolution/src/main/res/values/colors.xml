@@ -29,4 +29,11 @@
     <color name="btn_primary_bg">@color/primary</color>
     <color name="btn_primary_text">@color/on_primary</color>
     <color name="signupbgcolor">#f0ffe7</color>
+
+    <!-- Bottom Navigation Colors -->
+    <color name="bottom_nav_background">#81D4FA</color> <!-- Light Blue -->
+    <color name="bottom_nav_item_selected">#FFFFFFFF</color> <!-- White -->
+    <color name="bottom_nav_item_unselected">#FF000000</color> <!-- Black -->
+    <color name="bottom_nav_pill_background">#40FFFFFF</color> <!-- 25% transparent white -->
+
 </resources>
