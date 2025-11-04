@@ -53,8 +53,8 @@ public class DashBoardFragment extends Fragment {
         items.add(new item("Smart Light", "Off", R.drawable.lightofficon, false, true));
         items.add(new item("Thermostat", "22°C", R.drawable.thermostaticon, true, false));
         items.add(new item("Air Conditioner", "Off", R.drawable.airconditionericon, false, true));
-        items.add(new item("Wifi", "Off", R.drawable.logolife, false, true));
-        items.add(new item("Smart TV", "Off", R.drawable.logolife, false, true));
+        items.add(new item("Occupancy Sensor", "Off", R.drawable.sensor_occupied, false, false));
+        items.add(new item("Smart TV", "Off", R.drawable.tv_officon, false, true));
 
 
 
