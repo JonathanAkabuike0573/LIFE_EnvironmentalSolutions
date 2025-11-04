@@ -22,28 +22,28 @@
     <androidx.cardview.widget.CardView
         android:id="@+id/weather_card"
         android:layout_width="0dp"
-        android:layout_height="174dp"
+        android:layout_height="200dp"
         android:layout_marginStart="24dp"
-        android:layout_marginTop="88dp"
+        android:layout_marginTop="72dp"
         android:layout_marginEnd="24dp"
         app:cardCornerRadius="24dp"
-        app:cardElevation="4dp"
+        app:cardElevation="10dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="175dp"
-            android:background="@drawable/weather_card_background">
+            android:layout_height="match_parent"
+            android:background="@drawable/clearskybg">
 
             <ImageView
                 android:id="@+id/weather_icon"
                 android:layout_width="80dp"
                 android:layout_height="80dp"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="70dp"
-                android:src="@drawable/light"
+                android:layout_marginTop="60dp"
+                android:src="@drawable/rainy_weathericon"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -51,9 +51,9 @@
                 android:id="@+id/temperature_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="134dp"
-                android:layout_marginTop="16dp"
-                android:text="29°"
+                android:layout_marginStart="176dp"
+                android:layout_marginTop="40dp"
+                android:text="9°"
                 android:textColor="@android:color/white"
                 android:textSize="48sp"
                 android:textStyle="bold"
@@ -64,18 +64,20 @@
                 android:id="@+id/weather_description"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Mostly Sunny"
+                android:layout_marginStart="148dp"
+                android:layout_marginTop="104dp"
+                android:text="Mostly Rainy"
                 android:textColor="@android:color/white"
                 android:textSize="18sp"
-                app:layout_constraintStart_toStartOf="@id/temperature_text"
-                app:layout_constraintTop_toBottomOf="@id/temperature_text" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/celsius_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="16dp"
-                android:layout_marginBottom="16dp"
+                android:layout_marginBottom="28dp"
                 android:text="Celcius"
                 android:textColor="@android:color/white"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -101,15 +103,13 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="24dp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView7"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintTop_toBottomOf="@+id/textView7" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
