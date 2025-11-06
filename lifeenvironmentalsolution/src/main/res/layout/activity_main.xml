@@ -52,6 +52,8 @@
             app:itemTextColor="@color/bottom_nav_item_tint"
             app:itemBackground="@drawable/bottom_nav_item_background"
             app:menu="@menu/bottom_nav_menu"
+            app:itemActiveIndicatorStyle="@style/App.BottomNavigationView.ActiveIndicator"
+            style="@style/App.BottomNavigationView.ActiveIndicator"
             app:labelVisibilityMode="labeled" />
 
     </RelativeLayout>

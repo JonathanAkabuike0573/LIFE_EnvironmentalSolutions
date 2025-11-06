@@ -1,6 +1,7 @@
 package ca.light.indoorair.freshness.energy.it.life.environmental.solution;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -90,6 +91,7 @@ public class MainActivity extends AppCompatActivity {
             });
 
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
