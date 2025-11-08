@@ -75,6 +75,13 @@ CENG-322-OCC,  Software Project -->
     <string name="waiting_for_sensor_data">Waiting for sensor data</string>
     <string name="waiting_for_sensor_datas">Waiting for sensor data</string>
     <string name="waiting_for_sensor_datasz">Waiting for sensor data</string>
+    <color name="air_quality_excellent">#4CAF50</color> <!-- Green -->
+    <color name="air_quality_good">#8BC34A</color> <!-- Light Green -->
+    <color name="air_quality_moderate">#FFC107</color> <!-- Amber -->
+    <color name="air_quality_poor">#FF9800</color> <!-- Orange -->
+    <color name="air_quality_very_poor">#F44336</color> <!-- Red -->
+    <color name="air_quality_offline">#9E9E9E</color> <!-- Gray -->
+
 
 
 </resources>
