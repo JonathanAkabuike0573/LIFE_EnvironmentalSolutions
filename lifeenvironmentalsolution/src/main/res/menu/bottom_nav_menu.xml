@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/bottom_nav_menu"
+    android:background="@android:color/holo_blue_dark">
 
     <item
         android:id="@+id/dashboard"
-        android:icon="@drawable/home_foreground"
+        android:icon="@drawable/homeiconn"
         android:title="@string/dashboard" />
     <item
         android:id="@+id/notification"
-        android:icon="@drawable/notification_foreground"
+        android:icon="@drawable/sensorsicon"
         android:title="@string/sensors" />
     <item
         android:id="@+id/settings"
-        android:icon="@android:drawable/ic_menu_preferences"
+        android:icon="@drawable/settings_icon"
         android:title="@string/settings" />
 
 </menu>
