@@ -12,6 +12,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -21,7 +23,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 public class DashBoardFragment extends Fragment {
 
@@ -40,7 +44,26 @@ public class DashBoardFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_dash_board, container, false);
+        View view = inflater.inflate(R.layout.fragment_dash_board, container, false);
+
+
+
+        List<item> items = new ArrayList<>();
+        items.add(new item("Air Quality", "Good", R.drawable.air_qualityicon, true, true));
+        items.add(new item("Smart Light", "Off", R.drawable.lightofficon, false, true));
+        items.add(new item("Thermostat", "22°C", R.drawable.thermostaticon, true, false));
+        items.add(new item("Air Conditioner", "Off", R.drawable.airconditionericon, false, true));
+        items.add(new item("Occupancy Sensor", "Off", R.drawable.sensor_occupied, false, false));
+        items.add(new item("Smart TV", "Off", R.drawable.tv_officon, false, true));
+
+
+
+
+        RecyclerView recycler = view.findViewById(R.id.recyclerView);
+        recycler.setLayoutManager(new GridLayoutManager(getContext(), 2));
+        recycler.setAdapter(new MyAdapter(getContext(), items));
+
+        return view;
     }
 
     @Override
