@@ -12,7 +12,10 @@ import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 // This is our concrete implementation using Firebase.
 public class FirebaseAuthProvider implements AuthProvider {
@@ -87,5 +90,35 @@ public class FirebaseAuthProvider implements AuthProvider {
         mGoogleSignInClient.signOut().addOnCompleteListener(activity, task -> {
             onComplete.run();
         });
+    }
+
+
+    @Override
+    public void signUpWithEmail(String email, String password, String name, String phone, AuthCallback callback) {
+        mAuth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener(activity, authTask -> {
+                    if (authTask.isSuccessful()) {
+                        // Auth user created successfully. Now save the additional data.
+                        String uid = mAuth.getCurrentUser().getUid();
+                        DatabaseReference userNode = FirebaseDatabase.getInstance().getReference("users").child(uid);
+                        HelperClass helperClass = new HelperClass(name, email, phone);
+
+                        userNode.setValue(helperClass).addOnCompleteListener(dbTask -> {
+                            if (dbTask.isSuccessful()) {
+                                callback.onSuccess(); // Entire process was successful
+                            } else {
+                                // This is a rare but important case to handle
+                                callback.onFailure("User created, but failed to save user data.");
+                            }
+                        });
+                    } else {
+                        // Auth creation failed (e.g., email already exists)
+                        if (authTask.getException() instanceof FirebaseAuthUserCollisionException) {
+                            callback.onFailure("An account with this email already exists.");
+                        } else {
+                            callback.onFailure(authTask.getException().getMessage());
+                        }
+                    }
+                });
     }
 }

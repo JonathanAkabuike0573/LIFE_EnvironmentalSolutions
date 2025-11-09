@@ -66,6 +66,22 @@ CENG-322-OCC,  Software Project -->
     <string name="camera_permission_denied">Camera permission denied</string>
     <string name="camera_permission_granted">Camera permission granted</string>
     <string name="enter_email">Enter email</string>
+    <string name="air_quality">Air Quality</string>
+    <string name="light">Light</string>
+    <string name="presence">Presence</string>
+    <string name="user_has_been_registered_successfully">User has been registered successfully</string>
+    <string name="username">Username</string>
+    <string name="users">Users</string>
+    <string name="waiting_for_sensor_data">Waiting for sensor data</string>
+    <string name="waiting_for_sensor_datas">Waiting for sensor data</string>
+    <string name="waiting_for_sensor_datasz">Waiting for sensor data</string>
+    <color name="air_quality_excellent">#4CAF50</color> <!-- Green -->
+    <color name="air_quality_good">#8BC34A</color> <!-- Light Green -->
+    <color name="air_quality_moderate">#FFC107</color> <!-- Amber -->
+    <color name="air_quality_poor">#FF9800</color> <!-- Orange -->
+    <color name="air_quality_very_poor">#F44336</color> <!-- Red -->
+    <color name="air_quality_offline">#9E9E9E</color> <!-- Gray -->
+
 
 
 </resources>
