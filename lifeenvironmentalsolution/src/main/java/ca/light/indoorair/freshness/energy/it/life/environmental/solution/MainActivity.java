@@ -200,8 +200,7 @@ public class MainActivity extends AppCompatActivity {
                 } else if (id == R.id.nav_sign_out) {
                     signOut();
                 } else if (id == R.id.nav_feedback) {
-                    Intent intent = new Intent(MainActivity.this, FeedBackPage.class);
-                    startActivity(intent);
+                    setCurrentFragment(new FeedBackPage());
                 }
                 item.setChecked(true);
                 drawerLayout.closeDrawers();
