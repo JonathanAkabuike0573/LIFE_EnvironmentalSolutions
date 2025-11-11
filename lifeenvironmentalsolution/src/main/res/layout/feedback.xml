@@ -106,24 +106,6 @@
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp" />
 
-    <!-- Device Model -->
-    <EditText
-        android:id="@+id/etDeviceModel"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:hint="Device Model"
-        android:inputType="text"
-        android:padding="12dp"
-        android:textColor="#000000"
-        android:textColorHint="#888888"
-        android:background="#FFFFFF"
-        app:layout_constraintTop_toBottomOf="@id/etPhone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="8dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp" />
-
     <!-- Feedback Text Box -->
     <EditText
         android:id="@+id/etFeedback"
@@ -136,7 +118,7 @@
         android:textColorHint="#888888"
         android:background="#FFFFFF"
         android:inputType="textMultiLine"
-        app:layout_constraintTop_toBottomOf="@id/etDeviceModel"
+        app:layout_constraintTop_toBottomOf="@id/etPhone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="16dp"
