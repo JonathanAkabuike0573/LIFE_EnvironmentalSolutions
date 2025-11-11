@@ -1,9 +1,9 @@
 package ca.light.indoorair.freshness.energy.it.life.environmental.solution;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RatingBar;
@@ -20,7 +20,7 @@ public class FeedBackPage extends AppCompatActivity {
 
     private static final String TAG = "FeedBackPage"; // Tag for logging
 
-    private EditText etName, etEmail, etPhone, etDeviceModel, etFeedback;
+    private EditText etName, etEmail, etPhone, etFeedback;
     private RatingBar ratingBar;
     private Button btnSend;
     private DatabaseReference feedbackDbRef;
@@ -35,7 +35,6 @@ public class FeedBackPage extends AppCompatActivity {
         etName = findViewById(R.id.etName);
         etEmail = findViewById(R.id.etEmail);
         etPhone = findViewById(R.id.etPhone);
-        etDeviceModel = findViewById(R.id.etDeviceModel);
         etFeedback = findViewById(R.id.etFeedback);
         ratingBar = findViewById(R.id.ratingBar);
         btnSend = findViewById(R.id.btnSend);
@@ -47,9 +46,11 @@ public class FeedBackPage extends AppCompatActivity {
         String name = etName.getText().toString().trim();
         String email = etEmail.getText().toString().trim();
         String phone = etPhone.getText().toString().trim();
-        String deviceModel = etDeviceModel.getText().toString().trim();
         String feedback = etFeedback.getText().toString().trim();
         float rating = ratingBar.getRating();
+
+        // Programmatically get the device model
+        String deviceModel = Build.MANUFACTURER + " " + Build.MODEL;
 
         // --- Start of new logging ---
         Log.d(TAG, "Submit button clicked. Reading data...");
@@ -62,7 +63,7 @@ public class FeedBackPage extends AppCompatActivity {
         // --- End of new logging ---
 
         if (TextUtils.isEmpty(name) || TextUtils.isEmpty(email) || TextUtils.isEmpty(phone) ||
-            TextUtils.isEmpty(deviceModel) || TextUtils.isEmpty(feedback) || rating == 0) {
+                TextUtils.isEmpty(feedback) || rating == 0) {
             Toast.makeText(this, "Please fill all fields and provide a rating.", Toast.LENGTH_SHORT).show();
             Log.w(TAG, "Submission failed: Not all fields were filled."); // Log a warning
             return;
@@ -88,7 +89,6 @@ public class FeedBackPage extends AppCompatActivity {
                             etName.setText("");
                             etEmail.setText("");
                             etPhone.setText("");
-                            etDeviceModel.setText("");
                             etFeedback.setText("");
                             ratingBar.setRating(0);
                         } else {
