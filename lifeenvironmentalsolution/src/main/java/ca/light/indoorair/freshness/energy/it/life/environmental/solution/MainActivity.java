@@ -208,7 +208,11 @@ public class MainActivity extends AppCompatActivity {
                     signOut();
                 } else if (id == R.id.nav_feedback) {
                     setCurrentFragment(new FeedBackPage());
-
+                }
+                // --- ADD THIS NEW BLOCK ---
+                else if (id == R.id.nav_about) {
+                    setTitle(getString(R.string.about_us));
+                    setCurrentFragment(new AboutUsFragment());
                 }
                 drawerLayout.closeDrawers();
                 return true;

@@ -131,6 +131,19 @@ CENG-322-OCC,  Software Project -->
     <string name="password">Password</string>
     <string name="confirm_password">Confirm Password</string>
     <string name="already_have_an_account">Already have an account?</string>
+
+    <!-- Strings for About Us Page -->
+    <string name="about_us">About Us</string>
+    <string name="app_logo">App Logo</string>
+    <string name="about_us_description">LIFE Environmental Solutions is dedicated to improving indoor air quality through innovative technology and real-time monitoring. Our mission is to create healthier living and working spaces for everyone.</string>
+    <string name="developed_by">Developed By</string>
+    <string name="team_members">
+        Mohamed Ali\n
+        Jonathan Akabuike\n
+        Kieran Sharma\n
+        Farhan Habibzad
+    </string>
+    <string name="feedback">Feedback</string>
     <color name="air_quality_excellent">#4CAF50</color> <!-- Green -->
     <color name="air_quality_good">#8BC34A</color> <!-- Light Green -->
     <color name="air_quality_moderate">#FFC107</color> <!-- Amber -->
