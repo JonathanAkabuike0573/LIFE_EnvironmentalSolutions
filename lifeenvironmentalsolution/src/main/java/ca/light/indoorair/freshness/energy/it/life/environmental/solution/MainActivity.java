@@ -125,26 +125,28 @@ public class MainActivity extends AppCompatActivity {
             return true; // Consume the event
         });
         fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.main, new DashBoardFragment()).commit();
-
 
         Fragment dashBoardFragment = new DashBoardFragment();
-        Fragment notificationFragment = new SensorFragment();
+        Fragment sensorFragment = new SensorFragment();
         Fragment settingsFragment = new SettingsFragment();
 
         setCurrentFragment(dashBoardFragment);
+        setTitle(getString(R.string.home));
 
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
             if (id == R.id.dashboard) {
                 setCurrentFragment(dashBoardFragment);
+                setTitle(getString(R.string.home));
                 return true;
             } else if (id == R.id.notification) {
-                setCurrentFragment(notificationFragment);
+                setCurrentFragment(sensorFragment);
+                setTitle(getString(R.string.sensors));
                 return true;
             } else if (id == R.id.settings) {
                 setCurrentFragment(settingsFragment);
+                setTitle(getString(R.string.settings));
                 return true;
             }
 
@@ -191,18 +193,23 @@ public class MainActivity extends AppCompatActivity {
             navigationView.setNavigationItemSelectedListener(item -> {
                 int id = item.getItemId();
                 if (id == R.id.nav_home) {
+                    setCurrentFragment(dashBoardFragment);
                     setTitle(getString(R.string.home));
+                    bottomNavigationView.setSelectedItemId(R.id.dashboard);
                 } else if (id == R.id.nav_sensors) {
-                    Intent intent = new Intent(MainActivity.this, NotificationActivity.class);
-                    startActivity(intent);
+                    setCurrentFragment(sensorFragment);
+                    setTitle(getString(R.string.sensors));
+                    bottomNavigationView.setSelectedItemId(R.id.notification);
                 } else if (id == R.id.nav_settings) {
+                    setCurrentFragment(settingsFragment);
                     setTitle(getString(R.string.settings));
+                    bottomNavigationView.setSelectedItemId(R.id.settings);
                 } else if (id == R.id.nav_sign_out) {
                     signOut();
                 } else if (id == R.id.nav_feedback) {
                     setCurrentFragment(new FeedBackPage());
+
                 }
-                item.setChecked(true);
                 drawerLayout.closeDrawers();
                 return true;
             });
@@ -381,8 +388,8 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void setCurrentFragment(Fragment homefragment) {
-        getSupportFragmentManager().beginTransaction().replace(R.id.main, homefragment).commit();
+    private void setCurrentFragment(Fragment fragment) {
+        getSupportFragmentManager().beginTransaction().replace(R.id.main, fragment).commit();
     }
 
     private void signOut() {
