@@ -31,7 +31,7 @@
                     android:id="@+id/light_level_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Light Intensity"
+                    android:text="@string/light_intensity"
                     android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
                     android:textColor="?android:attr/textColorPrimary"
                     app:layout_constraintTop_toTopOf="parent"
@@ -90,7 +90,7 @@
                     android:id="@+id/light_level_unit_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="LUX"
+                    android:text="@string/lux"
                     android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
                     app:layout_constraintTop_toBottomOf="@+id/light_level_value_text"
                     app:layout_constraintStart_toStartOf="@+id/light_level_value_text"
@@ -100,7 +100,7 @@
                     android:id="@+id/last_updated_label"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Last Updated:"
+                    android:text="@string/last_updated"
                     android:layout_marginTop="24dp"
                     android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
                     app:layout_constraintTop_toBottomOf="@+id/light_level_progress"
@@ -140,7 +140,7 @@
                     android:id="@+id/switch_light_control"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Auto Brightness"
+                    android:text="@string/auto_brightness"
                     android:checked="true"
                     android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"/>
 
@@ -149,7 +149,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Brightness"
+                    android:text="@string/brightness"
                     android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"/>
 
                 <com.google.android.material.slider.Slider
@@ -166,7 +166,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Color Temperature"
+                    android:text="@string/color_temperature"
                     android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"/>
 
                 <com.google.android.material.button.MaterialButtonToggleGroup
@@ -183,7 +183,7 @@
                         android:layout_width="0dp"
                         android:layout_weight="1"
                         android:layout_height="wrap_content"
-                        android:text="Warm"/>
+                        android:text="@string/warm"/>
 
                     <Button
                         android:id="@+id/button_neutral"
@@ -191,7 +191,7 @@
                         android:layout_width="0dp"
                         android:layout_weight="1"
                         android:layout_height="wrap_content"
-                        android:text="Neutral"/>
+                        android:text="@string/neutral"/>
 
                     <Button
                         android:id="@+id/button_cool"
@@ -199,7 +199,7 @@
                         android:layout_width="0dp"
                         android:layout_weight="1"
                         android:layout_height="wrap_content"
-                        android:text="Cool"/>
+                        android:text="@string/cool"/>
                 </com.google.android.material.button.MaterialButtonToggleGroup>
 
                 <View android:layout_width="match_parent" android:layout_height="1dp" android:background="?android:attr/listDivider" android:layout_marginTop="16dp" android:layout_marginBottom="16dp"/>
@@ -207,7 +207,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Mood Presets"
+                    android:text="@string/mood_presets"
                     android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"/>
 
                 <com.google.android.material.chip.ChipGroup
@@ -222,21 +222,21 @@
                         style="@style/Widget.MaterialComponents.Chip.Choice"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Focus" />
+                        android:text="@string/focus" />
 
                     <com.google.android.material.chip.Chip
                         android:id="@+id/chip_relax"
                         style="@style/Widget.MaterialComponents.Chip.Choice"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Relax" />
+                        android:text="@string/relax" />
 
                     <com.google.android.material.chip.Chip
                         android:id="@+id/chip_nightlight"
                         style="@style/Widget.MaterialComponents.Chip.Choice"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Nightlight" />
+                        android:text="@string/nightlight" />
 
                 </com.google.android.material.chip.ChipGroup>
 
