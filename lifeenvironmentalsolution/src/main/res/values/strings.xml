@@ -6,7 +6,6 @@ CENG-322-OCC,  Software Project -->
     <string name="app_logo" translatable="false">app_logo</string>
     <string name="splash_screen">Splash Screen</string>
     <string name="button">Button</string>
-
     <string name="navigation_drawer_open">Open</string>
     <string name="navigation_drawer_close">Close</string>
     <string name="life_environmental_solutions">LIFE Environmental Solutions</string>
@@ -140,6 +139,8 @@ CENG-322-OCC,  Software Project -->
         Farhan Habibzad
     </string>
     <string name="feedback">Feedback</string>
+    <string name="version_label">Version %1$s (%2$d)</string>
+    <string name="about_the_app">About the App</string>
     <color name="air_quality_excellent">#4CAF50</color> <!-- Green -->
     <color name="air_quality_good">#8BC34A</color> <!-- Light Green -->
     <color name="air_quality_moderate">#FFC107</color> <!-- Amber -->
