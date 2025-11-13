@@ -339,15 +339,10 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
         int itemId = item.getItemId();
-        if (itemId == R.id.themetoggle) {
-            toggleTheme();
-            return true;
-        } else if (itemId == R.id.action_notification) {
+     if (itemId == R.id.action_notification) {
             askNotificationPermission();
             return true;
-        } else if (itemId == R.id.action_camera) {
-            askCameraPermission();
-            return true;
+
         }
         return super.onOptionsItemSelected(item);
     }
