@@ -127,9 +127,13 @@ public class MainActivity extends AppCompatActivity {
         fragmentManager = getSupportFragmentManager();
 
         Fragment dashBoardFragment = new DashBoardFragment();
-        Fragment sensorFragment = new SensorFragment();
+
         Fragment settingsFragment = new SettingsFragment();
         Fragment purchasesFragment = new PurchasesFragment();
+        Fragment AirQualityFragment = new AirQualityFragment();
+        Fragment LightFragment = new LightFragment();
+        Fragment PresenceFragment = new PresenceFragment();
+
 
         setCurrentFragment(dashBoardFragment);
         setTitle(getString(R.string.home));
@@ -141,13 +145,17 @@ public class MainActivity extends AppCompatActivity {
                 setCurrentFragment(dashBoardFragment);
                 setTitle(getString(R.string.home));
                 return true;
-            } else if (id == R.id.notification) {
-                setCurrentFragment(sensorFragment);
-                setTitle(getString(R.string.sensors));
+            } else if (id == R.id.air_quality) {
+                setCurrentFragment(new AirQualityFragment());
+                setTitle(getString(R.string.air_quality));
                 return true;
-            } else if (id == R.id.purchases) {
-                setCurrentFragment(purchasesFragment);
-                setTitle(getString(R.string.purchases));
+            } else if (id == R.id.light) {
+                setCurrentFragment(new LightFragment());
+                setTitle(getString(R.string.light));
+                return true;
+            } else if (id == R.id.presence) {
+                setCurrentFragment(new PresenceFragment());
+                setTitle(getString(R.string.presence));
                 return true;
             }
             return true;
@@ -195,10 +203,6 @@ public class MainActivity extends AppCompatActivity {
                     setCurrentFragment(dashBoardFragment);
                     setTitle(getString(R.string.home));
                     bottomNavigationView.setSelectedItemId(R.id.dashboard);
-                } else if (id == R.id.nav_sensors) {
-                    setCurrentFragment(sensorFragment);
-                    setTitle(getString(R.string.sensors));
-                    bottomNavigationView.setSelectedItemId(R.id.notification);
                 } else if (id == R.id.nav_settings) {
                     setCurrentFragment(settingsFragment);
                     setTitle(getString(R.string.settings));
@@ -316,9 +320,7 @@ public class MainActivity extends AppCompatActivity {
 
                     applyMenuItemColor(subMenuItem, color);
                 }
-                if (menuItem.getItemId() == R.id.notification) {
 
-                }
             }
         }
         return true;
