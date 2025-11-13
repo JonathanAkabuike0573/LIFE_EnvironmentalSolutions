@@ -73,6 +73,8 @@ CENG-322-OCC,  Software Project -->
     <string name="users">utilisateurs</string>
     <string name="permission_granted">permission_granted</string>
     <string name="permission_denied">permission_denied</string>
-    <string name="camera_permission_granted">camera_permission_granted</string>
+    <string name="camera_permission_granted">Autorisation de la caméra accordée</string>
     <string name="permission_already_granted">Autorisation déjà accordée</string>
+    <string name="camera_permission_already_granted">Autorisation de la caméra déjà accordée</string>
+    <string name="camera_permission_denied">Autorisation de la caméra refusée</string>
 </resources>

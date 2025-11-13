@@ -77,5 +77,14 @@
     <style name="Text.HighlightTitle" parent="TextAppearance.Material3.TitleLarge">
         <item name="android:textColor">@color/primary</item>
     </style>
+    
+    <!-- BottomNavigationView Style to remove the default indicator -->
+    <style name="App.BottomNavigationView" parent="Widget.Material3.BottomNavigationView">
+        <item name="itemActiveIndicatorStyle">@style/App.BottomNavigationView.ActiveIndicator</item>
+    </style>
+
+    <style name="App.BottomNavigationView.ActiveIndicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
+        <item name="android:color">@android:color/transparent</item>
+    </style>
 
 </resources>

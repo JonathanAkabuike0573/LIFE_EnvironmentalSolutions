@@ -17,11 +17,11 @@
             android:icon="@drawable/settings_foreground"/>
         <item
             android:id="@+id/nav_about"
-            android:title="About"
+            android:title="@string/about_us"
             android:icon="@drawable/settings_foreground" />
         <item
             android:id="@+id/nav_feedback"
-            android:title="Feedback"
+            android:title="@string/feedback"
             android:icon="@drawable/ic_feedback" />
     </group>
     <group android:id="@+id/group_bottom">
