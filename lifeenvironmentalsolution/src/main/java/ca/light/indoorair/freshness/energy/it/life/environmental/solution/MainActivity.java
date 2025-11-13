@@ -144,10 +144,6 @@ public class MainActivity extends AppCompatActivity {
                 setCurrentFragment(sensorFragment);
                 setTitle(getString(R.string.sensors));
                 return true;
-            } else if (id == R.id.settings) {
-                setCurrentFragment(settingsFragment);
-                setTitle(getString(R.string.settings));
-                return true;
             }
 
 
@@ -203,7 +199,6 @@ public class MainActivity extends AppCompatActivity {
                 } else if (id == R.id.nav_settings) {
                     setCurrentFragment(settingsFragment);
                     setTitle(getString(R.string.settings));
-                    bottomNavigationView.setSelectedItemId(R.id.settings);
                 } else if (id == R.id.nav_sign_out) {
                     signOut();
                 } else if (id == R.id.nav_feedback) {
