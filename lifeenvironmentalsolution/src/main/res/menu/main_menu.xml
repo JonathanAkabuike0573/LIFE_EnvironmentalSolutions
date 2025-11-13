@@ -11,25 +11,18 @@
 
         app:showAsAction="always" >
         <menu android:background="@android:color/background_dark">
-            <item
-                android:id="@+id/action_settings"
-                android:title="Help"
-                app:showAsAction="ifRoom" />
-            <item
-                android:id="@+id/themetoggle"
-                android:title="@string/toggle_mode"
-                app:showAsAction="never"
-
-                />
-            <item
-                android:id="@+id/action_camera"
-                android:title="Camera"
-                app:showAsAction="never" />
 
             <item
                 android:id="@+id/action_notification"
                 android:title="@string/notification"
                 app:showAsAction="never" />
+            <item
+                android:id="@+id/action_settings"
+                android:title="Help"
+                app:showAsAction="ifRoom" />
+
+
+
         </menu>
     </item>
 

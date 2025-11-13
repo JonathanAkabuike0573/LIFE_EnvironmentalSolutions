@@ -7,14 +7,18 @@
         android:id="@+id/dashboard"
         android:icon="@drawable/homeiconn"
         android:title="@string/dashboard" />
-    <item
-        android:id="@+id/notification"
-        android:icon="@drawable/sensorsicon"
-        android:title="@string/sensors" />
 
     <item
-        android:id="@+id/purchases"
+        android:id="@+id/air_quality"
         android:icon="@drawable/shopping_cart"
-        android:title="@string/purchases" />
+        android:title="@string/air_quality" />
+    <item
+        android:id="@+id/light"
+        android:icon="@drawable/shopping_cart"
+        android:title="@string/light" />
+    <item
+        android:id="@+id/presence"
+        android:icon="@drawable/shopping_cart"
+        android:title="@string/presence" />
 
 </menu>
