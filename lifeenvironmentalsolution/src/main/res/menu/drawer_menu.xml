@@ -7,10 +7,7 @@
             android:id="@+id/nav_home"
             android:title="@string/dashboard"
             android:icon="@drawable/home_foreground"/>
-        <item
-            android:id="@+id/nav_sensors"
-            android:title="@string/sensors"
-            android:icon="@drawable/sensors_foreground"/>
+
         <item
             android:id="@+id/nav_settings"
             android:title="@string/settings"
