@@ -25,7 +25,7 @@
         android:id="@+id/navheaderusername"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Life ENvironmental solution"
+        android:text="@string/life_environmental_solution"
         android:textColor="@color/white"
         android:textSize="16dp"
         android:textStyle="bold"/>
@@ -33,7 +33,7 @@
         android:id="@+id/navheaderemail"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="emai.gmail.com"
+        android:text="@string/emai_gmail_com"
         android:textColor="@color/white"
         android:textSize="14sp"
         android:layout_marginBottom="16dp"/>
