@@ -132,13 +132,15 @@ CENG-322-OCC,  Software Project -->
     <string name="about_us_description">LIFE Environmental Solutions se consacre à lamélioration de la qualité de lair intérieur grâce à une technologie innovante et à une surveillance en temps réel. Notre mission est de créer des espaces de vie et de travail plus sains pour tous.</string>
     <string name="developed_by">Développé par</string>
     <string name="team_members">
-        <string name="version_label">version_label</string>
-<string name="version_label">Version %1$s (%2$d)</string>
-        <string name="about_the_app">À propos de lapplication</string>
+    <string name="version_label">version_label</string>
+     <string name="version_label">Version %1$s (%2$d)</string>
+     <string name="about_the_app">À propos de lapplication</string>
+         <string name="purchases">purchases</string>
     Mohamed Ali\n
     Jonathan Akabuike\n
     Kieran Sharma\n
     Farhan Habibzad
 </string>
+    <string name="purchases">achats</string>
     <string name="feedback">Commentaires</string>
 </resources>

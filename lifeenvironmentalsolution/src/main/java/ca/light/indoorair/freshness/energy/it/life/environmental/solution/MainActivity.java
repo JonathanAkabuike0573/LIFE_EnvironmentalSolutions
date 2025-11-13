@@ -129,6 +129,7 @@ public class MainActivity extends AppCompatActivity {
         Fragment dashBoardFragment = new DashBoardFragment();
         Fragment sensorFragment = new SensorFragment();
         Fragment settingsFragment = new SettingsFragment();
+        Fragment purchasesFragment = new PurchasesFragment();
 
         setCurrentFragment(dashBoardFragment);
         setTitle(getString(R.string.home));
@@ -144,9 +145,11 @@ public class MainActivity extends AppCompatActivity {
                 setCurrentFragment(sensorFragment);
                 setTitle(getString(R.string.sensors));
                 return true;
+            } else if (id == R.id.purchases) {
+                setCurrentFragment(purchasesFragment);
+                setTitle(getString(R.string.purchases));
+                return true;
             }
-
-
             return true;
         });
 
