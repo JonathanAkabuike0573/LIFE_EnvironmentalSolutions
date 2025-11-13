@@ -7,30 +7,27 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 public class PurchasesFragment extends Fragment {
 
-    // Required empty public constructor
     public PurchasesFragment() {
-        // Required empty public constructor
+
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment.
-     */
+
     public static PurchasesFragment newInstance() {
         PurchasesFragment fragment = new PurchasesFragment();
-        // You can add arguments here if needed:
-        // Bundle args = new Bundle();
-        // fragment.setArguments(args);
+
+        Bundle args = new Bundle();
+        fragment.setArguments(args);
         return fragment;
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+
         return inflater.inflate(R.layout.fragment_purchases, container, false);
     }
 
@@ -38,19 +35,26 @@ public class PurchasesFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Get a reference to the button in the layout
-        Button viewReceiptsButton = view.findViewById(R.id.button_view_receipts);
+        // new "Confirm and Pay" button
+        Button confirmAndPayButton = view.findViewById(R.id.button_confirm_and_pay);
 
-        // Set up a simple click listener for demonstration
-        viewReceiptsButton.setOnClickListener(new View.OnClickListener() {
+        // Set up a click listener for the main payment action
+        confirmAndPayButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // In a real app, this would navigate to a receipts screen or dialog
-                Toast.makeText(getContext(), "Showing digital receipts...", Toast.LENGTH_SHORT).show();
+
+                Toast.makeText(getContext(), "Processing Payment using selected method...", Toast.LENGTH_LONG).show();
             }
         });
 
-        // Add code here to load and display the actual list of purchases (e.g., using a RecyclerView)
-        // ...
-    }
-}
+        //  Add functionality for the "View Receipts" link
+        TextView viewReceiptsLink = view.findViewById(R.id.text_view_receipts_link);
+        if (viewReceiptsLink != null) {
+            viewReceiptsLink.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    Toast.makeText(getContext(), "Navigating to Receipts History Screen...", Toast.LENGTH_SHORT).show();
+                }
+            });
+        } } }
