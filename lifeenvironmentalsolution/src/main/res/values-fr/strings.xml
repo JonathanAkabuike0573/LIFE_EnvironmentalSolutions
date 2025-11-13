@@ -6,7 +6,6 @@ CENG-322-OCC,  Software Project -->
     <string name="app_logo" translatable="false">app_logo</string>
     <string name="splash_screen">Écran daccueil</string>
     <string name="button">Bouton</string>
-
     <string name="navigation_drawer_open">Ouvrir</string>
     <string name="navigation_drawer_close">Fermer</string>
     <string name="life_environmental_solutions">LIFE Solutions Environnementales</string>
@@ -17,16 +16,13 @@ CENG-322-OCC,  Software Project -->
     <string name="are_you_sure_you_want_to_exit">Êtes-vous sûr de vouloir quitter ?</string>
     <string name="yes">Oui</string>
     <string name="no">Non</string>
-
     <string name="hello_blank_fragment">Bonjour fragment vide</string>
     <string name="dashboard">Tableau de bord</string>
     <string name="notification">Notification</string>
-
     <string name="jonathan_akabuike_n01510573" translatable="false">Jonathan Akabuike N01510573</string>
     <string name="mohamed_ali_n01440760" translatable="false">Mohamed Ali N01440760</string>
     <string name="kieran_sharma_n01548225" translatable="false">Kieran Sharma N01548225</string>
     <string name="farhan_habibzai_n01610299" translatable="false">Farhan Habibzai N01610299</string>
-
     <string name="by">PAR</string>
     <string name="toggle_mode">Changer de mode</string>
     <string name="options">OPTIONS</string>
@@ -40,7 +36,6 @@ CENG-322-OCC,  Software Project -->
     <string name="listen">Écouter</string>
     <string name="clear_cache">Vider le cache</string>
     <string name="frees_up_storage_space">Libère de l’espace de stockage</string>
-
     <string name="or">OU</string>
     <string name="login">Connexion</string>
     <string name="sign_in_with_google">Se connecter avec Google</string>
@@ -54,7 +49,6 @@ CENG-322-OCC,  Software Project -->
     <string name="invalid_credentials">Identifiants invalides</string>
     <string name="user_does_not_exist">L’utilisateur n’existe pas</string>
     <string name="default_web_client_id" translatable="false">624010139445-e7is3268ksuradhslegahmnv6b25enoo.apps.googleusercontent.com</string>
-
     <string name="dark_mode_desc">Réduit l’éblouissement de l’écran pour un confort visuel la nuit.</string>
     <string name="portrait_desc">Maintient l’application en orientation verticale.</string>
     <string name="clear">Effacer</string>
@@ -77,4 +71,70 @@ CENG-322-OCC,  Software Project -->
     <string name="permission_already_granted">Autorisation déjà accordée</string>
     <string name="camera_permission_already_granted">Autorisation de la caméra déjà accordée</string>
     <string name="camera_permission_denied">Autorisation de la caméra refusée</string>
+    <string name="device_icon">icône de lappareil</string>
+    <string name="status_on">statut activé</string>
+    <string name="send">Envoyer</string>
+    <string name="tell_us_about_your_experience">Parlez-nous de votre expérience !</string>
+    <string name="phone">Téléphone</string>
+    <string name="email">E-mail</string>
+    <string name="name">Nom</string>
+    <string name="we_highly_value_your_feedback_kindly_take_a_moment_to_rate_your_experience_and_provide_us_with_your_valuable_feedback">Nous accordons une grande importance à vos commentaires ! Veuillez prendre un moment pour évaluer votre expérience et nous fournir vos précieux commentaires.</string>
+    <string name="rate_your_experience">Évaluez votre expérience</string>
+    <string name="co2_reading">Lecture de CO2</string>
+    <string name="ppm">PPM</string>
+    <string name="last_updated">Dernière mise à jour :</string>
+    <string name="manual_refresh">Actualisation manuelle</string>
+    <string name="refresh_data">Actualiser les données</string>
+    <string name="alert_level_2000_ppm">Niveau dalerte (2000 PPM)</string>
+    <string name="auto_ventilation">Ventilation automatique</string>
+    <string name="air_purifier">Purificateur dair</string>
+    <string name="power">Alimentation</string>
+    <string name="intensity">Intensité</string>
+    <string name="open_a_window_to_improve_air_circulation">💡 Ouvrez une fenêtre pour améliorer la circulation de lair.</string>
+    <string name="loading">Chargement...</string>
+    <string name="_9">9°</string>
+    <string name="mostly_rainy">Principalement pluvieux</string>
+    <string name="celcius">Celcius</string>
+    <string name="my_device">Mon appareil</string>
+    <string name="light_intensity">Intensité lumineuse</string>
+    <string name="lux">LUX</string>
+    <string name="auto_brightness">Luminosité automatique</string>
+    <string name="brightness">Luminosité</string>
+    <string name="color_temperature">Température de couleur</string>
+    <string name="warm">Chaud</string>
+    <string name="neutral">Neutre</string>
+    <string name="cool">Froid</string>
+    <string name="mood_presets">Préréglages dambiance</string>
+    <string name="focus">Concentration</string>
+    <string name="relax">Détente</string>
+    <string name="nightlight">Veilleuse</string>
+    <string name="room_occupancy">Occupation de la pièce</string>
+    <string name="empty">Vide</string>
+    <string name="enable_motion_detection">Activer la détection de mouvement</string>
+    <string name="auto_actions">Actions automatiques</string>
+    <string name="turn_off_lights_when_room_is_empty">Éteindre les lumières lorsque la pièce est vide</string>
+    <string name="trigger_alert_if_movement_detected_after_hours">Déclencher une alerte si un mouvement est détecté après les heures</string>
+    <string name="manual_override">Désactivation manuelle</string>
+    <string name="mark_occupied">Marquer Occupé</string>
+    <string name="mark_empty">Marquer Vide</string>
+    <string name="activity_log">Journal dactivité</string>
+    <string name="_17_45_movement_detected">17:45 - Mouvement Détecté</string>
+    <string name="_17_31_room_empty">17:31 - Pièce Vide</string>
+    <string name="life_environmental_solution">Solution environnementale LIFE</string>
+    <string name="emai_gmail_com">emai.gmail.com</string>
+    <string name="full_name">Nom complet</string>
+    <string name="phone_number">Numéro de téléphone</string>
+    <string name="password">Mot de passe</string>
+    <string name="confirm_password">Confirmer le mot de passe</string>
+    <string name="already_have_an_account">Vous avez déjà un compte ?</string>
+    <string name="about_us">À Propos de Nous</string>
+    <string name="about_us_description">LIFE Environmental Solutions se consacre à lamélioration de la qualité de lair intérieur grâce à une technologie innovante et à une surveillance en temps réel. Notre mission est de créer des espaces de vie et de travail plus sains pour tous.</string>
+    <string name="developed_by">Développé par</string>
+    <string name="team_members">
+    Mohamed Ali\n
+    Jonathan Akabuike\n
+    Kieran Sharma\n
+    Farhan Habibzad
+</string>
+    <string name="feedback">Commentaires</string>
 </resources>
