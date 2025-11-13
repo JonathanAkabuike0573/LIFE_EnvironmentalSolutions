@@ -129,6 +129,7 @@ public class MainActivity extends AppCompatActivity {
         Fragment dashBoardFragment = new DashBoardFragment();
         Fragment sensorFragment = new SensorFragment();
         Fragment settingsFragment = new SettingsFragment();
+        Fragment purchasesFragment = new PurchasesFragment();
 
         setCurrentFragment(dashBoardFragment);
         setTitle(getString(R.string.home));
@@ -144,13 +145,11 @@ public class MainActivity extends AppCompatActivity {
                 setCurrentFragment(sensorFragment);
                 setTitle(getString(R.string.sensors));
                 return true;
-            } else if (id == R.id.settings) {
-                setCurrentFragment(settingsFragment);
-                setTitle(getString(R.string.settings));
+            } else if (id == R.id.purchases) {
+                setCurrentFragment(purchasesFragment);
+                setTitle(getString(R.string.purchases));
                 return true;
             }
-
-
             return true;
         });
 
@@ -203,12 +202,15 @@ public class MainActivity extends AppCompatActivity {
                 } else if (id == R.id.nav_settings) {
                     setCurrentFragment(settingsFragment);
                     setTitle(getString(R.string.settings));
-                    bottomNavigationView.setSelectedItemId(R.id.settings);
                 } else if (id == R.id.nav_sign_out) {
                     signOut();
                 } else if (id == R.id.nav_feedback) {
                     setCurrentFragment(new FeedBackPage());
-
+                }
+                // --- ADD THIS NEW BLOCK ---
+                else if (id == R.id.nav_about) {
+                    setTitle(getString(R.string.about_us));
+                    setCurrentFragment(new AboutUsFragment());
                 }
                 drawerLayout.closeDrawers();
                 return true;
