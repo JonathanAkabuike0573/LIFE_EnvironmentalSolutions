@@ -11,9 +11,10 @@
         android:id="@+id/notification"
         android:icon="@drawable/sensorsicon"
         android:title="@string/sensors" />
+
     <item
-        android:id="@+id/settings"
-        android:icon="@drawable/settings_icon"
-        android:title="@string/settings" />
+        android:id="@+id/purchases"
+        android:icon="@drawable/shopping_cart"
+        android:title="@string/purchases" />
 
 </menu>
