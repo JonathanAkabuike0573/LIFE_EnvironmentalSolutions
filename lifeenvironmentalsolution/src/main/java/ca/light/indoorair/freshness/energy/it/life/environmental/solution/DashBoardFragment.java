@@ -88,7 +88,7 @@ public class DashBoardFragment extends Fragment {
      * This method depends on an abstraction (UserDataProvider), not a concrete class.
      * This is Method Injection.
      */
-    private void loadGreeting(UserDataProvider dataProvider) {
+    protected void loadGreeting(UserDataProvider dataProvider) {
         // Use the injected provider to fetch data.
         dataProvider.fetchUserData(new UserDataProvider.UserDataCallback() {
             @Override
@@ -134,7 +134,7 @@ public class DashBoardFragment extends Fragment {
      * Determines the time of day and sets the appropriate greeting message.
      * @param name The user's name to include in the greeting.
      */
-    private void setGreeting(String name) {
+    protected void setGreeting(String name) {
         Calendar calendar = getCalendarInstance();
         String fullGreeting = generateGreetingMessage(name, calendar);
         if (userGreeting != null) {
