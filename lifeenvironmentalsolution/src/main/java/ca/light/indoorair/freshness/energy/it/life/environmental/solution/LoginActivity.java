@@ -77,7 +77,7 @@ public class LoginActivity extends AppCompatActivity {
         return new AuthProvider.AuthCallback() {
             @Override
             public void onSuccess() {
-                Toast.makeText(LoginActivity.this, "Login Successful.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(LoginActivity.this, R.string.login_successful , Toast.LENGTH_SHORT).show();
                 if (rememberMeCheckBox.isChecked()) {
                     String emailToSave = emailEditText.getText() != null ? emailEditText.getText().toString().trim() : "";
                     if (!emailToSave.isEmpty()) {
@@ -98,12 +98,12 @@ public class LoginActivity extends AppCompatActivity {
 
     private boolean validateInputs(String email, String password) {
         if (email.isEmpty() || !Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            emailEditText.setError("Please enter a valid email");
+            emailEditText.setError(getString(R.string.please_enter_a_valid_email));
             emailEditText.requestFocus();
             return false;
         }
         if (password.isEmpty()) {
-            passwordEditText.setError("Password cannot be empty");
+            passwordEditText.setError(getString(R.string.password_cannot_be_empty));
             passwordEditText.requestFocus();
             return false;
         }
