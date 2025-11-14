@@ -143,19 +143,21 @@ public class MainActivity extends AppCompatActivity {
             int id = item.getItemId();
             if (id == R.id.dashboard) {
                 setCurrentFragment(dashBoardFragment);
-                setTitle(getString(R.string.home));
                 return true;
             } else if (id == R.id.air_quality) {
                 setCurrentFragment(new AirQualityFragment());
                 setTitle(getString(R.string.air_quality));
+                toolbar.setTitle(getString(R.string.air_quality));
                 return true;
             } else if (id == R.id.light) {
                 setCurrentFragment(new LightFragment());
                 setTitle(getString(R.string.light));
+                toolbar.setTitle(getString(R.string.light));
                 return true;
             } else if (id == R.id.presence) {
                 setCurrentFragment(new PresenceFragment());
                 setTitle(getString(R.string.presence));
+                toolbar.setTitle(getString(R.string.presence));
                 return true;
             }
             return true;
