@@ -142,6 +142,8 @@ CENG-322-OCC,  Software Project -->
     <string name="version_label">Version %1$s (%2$d)</string>
     <string name="about_the_app">About the App</string>
     <string name="purchases">purchases</string>
+    <string name="please_enter_a_valid_email">Please enter a valid email</string>
+    <string name="login_successful">Login Successful.</string>
     <color name="air_quality_excellent">#4CAF50</color> <!-- Green -->
     <color name="air_quality_good">#8BC34A</color> <!-- Light Green -->
     <color name="air_quality_moderate">#FFC107</color> <!-- Amber -->
