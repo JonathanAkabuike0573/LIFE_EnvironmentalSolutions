@@ -5,7 +5,8 @@
     android:id="@+id/frameLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/frag_home_bg"
+    android:background="@color/btn_primary_text"
+    android:paddingBottom="20dp"
     tools:context=".DashBoardFragment">
 
     <TextView
@@ -15,18 +16,20 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="36dp"
         android:layout_marginTop="28dp"
+        android:textColor="@color/black"
+        android:textStyle="bold"
         android:text="@string/loading"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/weather_card"
-        android:layout_width="0dp"
-        android:layout_height="200dp"
+        android:layout_width="390dp"
+        android:layout_height="179dp"
         android:layout_marginStart="24dp"
         android:layout_marginTop="72dp"
         android:layout_marginEnd="24dp"
-        app:cardCornerRadius="24dp"
+        app:cardCornerRadius="12dp"
         app:cardElevation="10dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -37,21 +40,11 @@
             android:layout_height="match_parent"
             android:background="@drawable/clearskybg">
 
-            <ImageView
-                android:id="@+id/weather_icon"
-                android:layout_width="80dp"
-                android:layout_height="80dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="60dp"
-                android:src="@drawable/rainy_weathericon"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
             <TextView
                 android:id="@+id/temperature_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="176dp"
+                android:layout_marginStart="50dp"
                 android:layout_marginTop="40dp"
                 android:text="@string/_9"
                 android:textColor="@android:color/white"
@@ -64,7 +57,7 @@
                 android:id="@+id/weather_description"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="148dp"
+                android:layout_marginStart="50dp"
                 android:layout_marginTop="104dp"
                 android:text="@string/mostly_rainy"
                 android:textColor="@android:color/white"
@@ -91,25 +84,21 @@
         android:id="@+id/textView7"
         android:layout_width="125dp"
         android:layout_height="30dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginStart="36dp"
+        android:layout_marginTop="276dp"
         android:text="@string/my_device"
         android:textSize="20dp"
         android:textStyle="bold"
-        app:layout_constraintTop_toBottomOf="@id/weather_card"
         app:layout_constraintStart_toStartOf="parent"
-         />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="24dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        android:layout_marginTop="320dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView7" />
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

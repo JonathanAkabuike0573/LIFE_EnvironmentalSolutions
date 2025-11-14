@@ -127,8 +127,13 @@ public class MainActivity extends AppCompatActivity {
         fragmentManager = getSupportFragmentManager();
 
         Fragment dashBoardFragment = new DashBoardFragment();
-        Fragment sensorFragment = new SensorFragment();
+
         Fragment settingsFragment = new SettingsFragment();
+        Fragment purchasesFragment = new PurchasesFragment();
+        Fragment AirQualityFragment = new AirQualityFragment();
+        Fragment LightFragment = new LightFragment();
+        Fragment PresenceFragment = new PresenceFragment();
+
 
         setCurrentFragment(dashBoardFragment);
         setTitle(getString(R.string.home));
@@ -138,19 +143,23 @@ public class MainActivity extends AppCompatActivity {
             int id = item.getItemId();
             if (id == R.id.dashboard) {
                 setCurrentFragment(dashBoardFragment);
-                setTitle(getString(R.string.home));
                 return true;
-            } else if (id == R.id.notification) {
-                setCurrentFragment(sensorFragment);
-                setTitle(getString(R.string.sensors));
+            } else if (id == R.id.air_quality) {
+                setCurrentFragment(new AirQualityFragment());
+                setTitle(getString(R.string.air_quality));
+                toolbar.setTitle(getString(R.string.air_quality));
                 return true;
-            } else if (id == R.id.settings) {
-                setCurrentFragment(settingsFragment);
-                setTitle(getString(R.string.settings));
+            } else if (id == R.id.light) {
+                setCurrentFragment(new LightFragment());
+                setTitle(getString(R.string.light));
+                toolbar.setTitle(getString(R.string.light));
+                return true;
+            } else if (id == R.id.presence) {
+                setCurrentFragment(new PresenceFragment());
+                setTitle(getString(R.string.presence));
+                toolbar.setTitle(getString(R.string.presence));
                 return true;
             }
-
-
             return true;
         });
 
@@ -196,20 +205,17 @@ public class MainActivity extends AppCompatActivity {
                     setCurrentFragment(dashBoardFragment);
                     setTitle(getString(R.string.home));
                     bottomNavigationView.setSelectedItemId(R.id.dashboard);
-                } else if (id == R.id.nav_sensors) {
-                    setCurrentFragment(sensorFragment);
-                    setTitle(getString(R.string.sensors));
-                    bottomNavigationView.setSelectedItemId(R.id.notification);
                 } else if (id == R.id.nav_settings) {
                     setCurrentFragment(settingsFragment);
                     setTitle(getString(R.string.settings));
-                    bottomNavigationView.setSelectedItemId(R.id.settings);
+                }else if (id == R.id.nav_purchase) {
+                    setCurrentFragment(purchasesFragment);
+                    setTitle(getString(R.string.purchases));
                 } else if (id == R.id.nav_sign_out) {
                     signOut();
                 } else if (id == R.id.nav_feedback) {
                     setCurrentFragment(new FeedBackPage());
                 }
-                // --- ADD THIS NEW BLOCK ---
                 else if (id == R.id.nav_about) {
                     setTitle(getString(R.string.about_us));
                     setCurrentFragment(new AboutUsFragment());
@@ -318,9 +324,7 @@ public class MainActivity extends AppCompatActivity {
 
                     applyMenuItemColor(subMenuItem, color);
                 }
-                if (menuItem.getItemId() == R.id.notification) {
 
-                }
             }
         }
         return true;
@@ -341,15 +345,10 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
         int itemId = item.getItemId();
-        if (itemId == R.id.themetoggle) {
-            toggleTheme();
-            return true;
-        } else if (itemId == R.id.action_notification) {
+     if (itemId == R.id.action_notification) {
             askNotificationPermission();
             return true;
-        } else if (itemId == R.id.action_camera) {
-            askCameraPermission();
-            return true;
+
         }
         return super.onOptionsItemSelected(item);
     }

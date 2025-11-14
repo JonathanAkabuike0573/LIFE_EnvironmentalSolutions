@@ -6,7 +6,6 @@ CENG-322-OCC,  Software Project -->
     <string name="app_logo" translatable="false">app_logo</string>
     <string name="splash_screen">Splash Screen</string>
     <string name="button">Button</string>
-
     <string name="navigation_drawer_open">Open</string>
     <string name="navigation_drawer_close">Close</string>
     <string name="life_environmental_solutions">LIFE Environmental Solutions</string>
@@ -38,7 +37,6 @@ CENG-322-OCC,  Software Project -->
     <string name="listen">Listen</string>
     <string name="clear_cache">Clear Cache</string>
     <string name="frees_up_storage_space">Frees up storage space</string>
-
     <string name="or">OR</string>
     <string name="login">Login</string>
     <string name="sign_in_with_google">Sign in with Google</string>
@@ -131,10 +129,7 @@ CENG-322-OCC,  Software Project -->
     <string name="password">Password</string>
     <string name="confirm_password">Confirm Password</string>
     <string name="already_have_an_account">Already have an account?</string>
-
-    <!-- Strings for About Us Page -->
     <string name="about_us">About Us</string>
-    <string name="app_logo">App Logo</string>
     <string name="about_us_description">LIFE Environmental Solutions is dedicated to improving indoor air quality through innovative technology and real-time monitoring. Our mission is to create healthier living and working spaces for everyone.</string>
     <string name="developed_by">Developed By</string>
     <string name="team_members">
@@ -144,6 +139,11 @@ CENG-322-OCC,  Software Project -->
         Farhan Habibzad
     </string>
     <string name="feedback">Feedback</string>
+    <string name="version_label">Version %1$s (%2$d)</string>
+    <string name="about_the_app">About the App</string>
+    <string name="purchases">purchases</string>
+    <string name="please_enter_a_valid_email">Please enter a valid email</string>
+    <string name="login_successful">Login Successful.</string>
     <color name="air_quality_excellent">#4CAF50</color> <!-- Green -->
     <color name="air_quality_good">#8BC34A</color> <!-- Light Green -->
     <color name="air_quality_moderate">#FFC107</color> <!-- Amber -->
