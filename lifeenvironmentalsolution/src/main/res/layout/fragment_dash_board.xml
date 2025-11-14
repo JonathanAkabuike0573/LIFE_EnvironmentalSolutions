@@ -40,21 +40,11 @@
             android:layout_height="match_parent"
             android:background="@drawable/clearskybg">
 
-            <ImageView
-                android:id="@+id/weather_icon"
-                android:layout_width="80dp"
-                android:layout_height="80dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="60dp"
-                android:src="@drawable/rainy_weathericon"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
             <TextView
                 android:id="@+id/temperature_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="176dp"
+                android:layout_marginStart="50dp"
                 android:layout_marginTop="40dp"
                 android:text="@string/_9"
                 android:textColor="@android:color/white"
@@ -67,7 +57,7 @@
                 android:id="@+id/weather_description"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="148dp"
+                android:layout_marginStart="50dp"
                 android:layout_marginTop="104dp"
                 android:text="@string/mostly_rainy"
                 android:textColor="@android:color/white"
