@@ -35,9 +35,15 @@ public class DashBoardFragment extends Fragment {
     // Declare Firebase variables
     private FirebaseAuth mAuth;
     private DatabaseReference userRef;
+    private UserDataProvider dataProvider;
 
     public DashBoardFragment() {
         // Required empty public constructor
+    }
+
+    // Public setter for dependency injection
+    public void setDataProvider(UserDataProvider provider) {
+        this.dataProvider = provider;
     }
 
     @Override
@@ -82,7 +88,7 @@ public class DashBoardFragment extends Fragment {
      * This method depends on an abstraction (UserDataProvider), not a concrete class.
      * This is Method Injection.
      */
-    private void loadGreeting(UserDataProvider dataProvider) {
+    protected void loadGreeting(UserDataProvider dataProvider) {
         // Use the injected provider to fetch data.
         dataProvider.fetchUserData(new UserDataProvider.UserDataCallback() {
             @Override
@@ -103,13 +109,13 @@ public class DashBoardFragment extends Fragment {
         });
     }
 
+    // Protected method to retrieve a Calendar instance.
+    protected Calendar getCalendarInstance() {
+        return Calendar.getInstance();
+    }
 
-    /**
-     * Determines the time of day and sets the appropriate greeting message.
-     * @param name The user's name to include in the greeting.
-     */
-    private void setGreeting(String name) {
-        Calendar calendar = Calendar.getInstance();
+    // FIX: Extracted greeting logic into a testable, package-private method
+    String generateGreetingMessage(String name, Calendar calendar) {
         int hourOfDay = calendar.get(Calendar.HOUR_OF_DAY);
 
         String greeting;
@@ -121,7 +127,18 @@ public class DashBoardFragment extends Fragment {
             greeting = "Good evening";
         }
 
-        String fullGreeting = greeting + ", " + name;
-        userGreeting.setText(fullGreeting);
+        return greeting + ", " + name;
+    }
+
+    /**
+     * Determines the time of day and sets the appropriate greeting message.
+     * @param name The user's name to include in the greeting.
+     */
+    protected void setGreeting(String name) {
+        Calendar calendar = getCalendarInstance();
+        String fullGreeting = generateGreetingMessage(name, calendar);
+        if (userGreeting != null) {
+            userGreeting.setText(fullGreeting);
+        }
     }
 }

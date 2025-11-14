@@ -17,6 +17,10 @@
             android:title="@string/about_us"
             android:icon="@drawable/settings_foreground" />
         <item
+            android:id="@+id/nav_purchase"
+            android:title="@string/purchases"
+            android:icon="@drawable/shopping_cart" />
+        <item
             android:id="@+id/nav_feedback"
             android:title="@string/feedback"
             android:icon="@drawable/ic_feedback" />

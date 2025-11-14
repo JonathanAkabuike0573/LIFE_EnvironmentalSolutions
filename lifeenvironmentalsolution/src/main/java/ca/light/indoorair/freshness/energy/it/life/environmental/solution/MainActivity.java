@@ -206,12 +206,14 @@ public class MainActivity extends AppCompatActivity {
                 } else if (id == R.id.nav_settings) {
                     setCurrentFragment(settingsFragment);
                     setTitle(getString(R.string.settings));
+                }else if (id == R.id.nav_purchase) {
+                    setCurrentFragment(purchasesFragment);
+                    setTitle(getString(R.string.purchases));
                 } else if (id == R.id.nav_sign_out) {
                     signOut();
                 } else if (id == R.id.nav_feedback) {
                     setCurrentFragment(new FeedBackPage());
                 }
-                // --- ADD THIS NEW BLOCK ---
                 else if (id == R.id.nav_about) {
                     setTitle(getString(R.string.about_us));
                     setCurrentFragment(new AboutUsFragment());
