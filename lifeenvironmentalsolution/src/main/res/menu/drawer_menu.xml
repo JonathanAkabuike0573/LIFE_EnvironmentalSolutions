@@ -7,11 +7,6 @@
             android:id="@+id/nav_home"
             android:title="@string/dashboard"
             android:icon="@drawable/home_foreground"/>
-
-        <item
-            android:id="@+id/nav_settings"
-            android:title="@string/settings"
-            android:icon="@drawable/settings_foreground"/>
         <item
             android:id="@+id/nav_about"
             android:title="@string/about_us"
@@ -24,6 +19,10 @@
             android:id="@+id/nav_feedback"
             android:title="@string/feedback"
             android:icon="@drawable/ic_feedback" />
+        <item
+            android:id="@+id/nav_settings"
+            android:title="@string/settings"
+            android:icon="@drawable/settings_foreground"/>
     </group>
     <group android:id="@+id/group_bottom">
         <item
