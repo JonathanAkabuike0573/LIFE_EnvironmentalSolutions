@@ -169,6 +169,21 @@ CENG-322-OCC,  Software Project -->
     <string name="attachment_summary_on">Automatically download attachments for incoming emails
     </string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
+    <string name="contact_us">contact us</string>
+    <string name="phone_number_342_409_3349">phone number: 342-409-3349</string>
+    <string name="email_contact_life_gmail_com">email contact: LIFE@gmail.com</string>
+    <string name="account">ACCOUNT</string>
+    <string name="profile_management">Profile Management</string>
+    <string name="preferences">PREFERENCES</string>
+    <string name="units">Units</string>
+    <string name="select_measurement_units">Select measurement units</string>
+    <string name="notifications">NOTIFICATIONS</string>
+    <string name="smart_notification">Smart Notification</string>
+    <string name="tips_and_alerts_when_it_matters">Tips and alerts when it matters</string>
+    <string name="morning_report">Morning report</string>
+    <string name="the_day_s_forcast_received_at_7am">The day\'s forcast received at 7am</string>
+    <string name="evening_reports">Evening reports</string>
+    <string name="the_day_s_forcast_received_at_7pm">The day\'s forcast received at 7pm</string>
 
 
 </resources>
