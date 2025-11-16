@@ -156,20 +156,22 @@ public class MainActivity extends AppCompatActivity {
             int id = item.getItemId();
             if (id == R.id.dashboard) {
                 setCurrentFragment(dashBoardFragment);
+                getSupportActionBar().setTitle(getString(R.string.home));
+                toolbar.setTitle(getString(R.string.home));
                 return true;
             } else if (id == R.id.air_quality) {
                 setCurrentFragment(new AirQualityFragment());
-                setTitle(getString(R.string.air_quality));
+               getSupportActionBar().setTitle(getString(R.string.air_quality));
                 toolbar.setTitle(getString(R.string.air_quality));
                 return true;
             } else if (id == R.id.light) {
                 setCurrentFragment(new LightFragment());
-                setTitle(getString(R.string.light));
+                getSupportActionBar().setTitle(getString(R.string.light));
                 toolbar.setTitle(getString(R.string.light));
                 return true;
             } else if (id == R.id.presence) {
                 setCurrentFragment(new PresenceFragment());
-                setTitle(getString(R.string.presence));
+                getSupportActionBar().setTitle(getString(R.string.presence));
                 toolbar.setTitle(getString(R.string.presence));
                 return true;
             }
@@ -215,20 +217,23 @@ public class MainActivity extends AppCompatActivity {
                 int id = item.getItemId();
                 if (id == R.id.nav_home) {
                     setCurrentFragment(dashBoardFragment);
-                    setTitle(getString(R.string.home));
                     bottomNavigationView.setSelectedItemId(R.id.dashboard);
                 } else if (id == R.id.nav_settings) {
                     setCurrentFragment(settingsFragment);
-                    setTitle(getString(R.string.settings));
+                    getSupportActionBar().setTitle(getString(R.string.settings));
+                    toolbar.setTitle(getString(R.string.settings));
                     toggleBottomNavigationView();
                 }else if (id == R.id.nav_purchase) {
                     setCurrentFragment(purchasesFragment);
-                    setTitle(getString(R.string.purchases));
+                    getSupportActionBar().setTitle(getString(R.string.purchases));
+                    toolbar.setTitle(getString(R.string.purchases));
                 } else if (id == R.id.nav_sign_out) {
                     signOut();
                 } else if (id == R.id.nav_feedback) {
                     setCurrentFragment(new FeedBackPage());
                     toggleBottomNavigationView();
+                    getSupportActionBar().setTitle(getString(R.string.feedback));
+                    toolbar.setTitle(getString(R.string.feedback));
                 }
                 else if (id == R.id.nav_about) {
                     setTitle(getString(R.string.about_us));

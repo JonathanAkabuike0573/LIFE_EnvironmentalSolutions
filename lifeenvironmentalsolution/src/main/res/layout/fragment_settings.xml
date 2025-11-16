@@ -9,20 +9,6 @@
     android:background="@color/frag_settings_bg"
     tools:context=".SettingsFragment">
 
-    <!-- Page title -->
-
-    <!-- IMPORTANT: ScrollView allows for more settings without breaking the UI -->
-
-    <TextView
-        android:id="@+id/tv_settings_title"
-        style="@style/Text.HighlightTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="152dp"
-        android:layout_marginTop="28dp"
-        android:text="@string/settings"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
     <ScrollView
         android:layout_width="0dp"
@@ -32,7 +18,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_settings_title"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0">
 
         <!-- Main card that holds all settings -->
@@ -89,6 +75,32 @@
                         android:textSize="@dimen/text_m" />
                 </RelativeLayout>
 
+
+                <!-- Setting: Change Password (Using RelativeLayout) -->
+                <RelativeLayout
+                    android:id="@+id/row_change_password"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="@dimen/space_s"
+                    android:paddingBottom="@dimen/space_s">
+
+                    <ImageView
+                        android:id="@+id/iv_change_password_arrow"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:src="@drawable/chevron_righticon" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toStartOf="@id/iv_change_password_arrow"
+                        android:text="Change Password"
+                        android:textColor="@color/on_surface"
+                        android:textSize="@dimen/text_m" />
+                </RelativeLayout>
 
                 <!-- Section: Preferences -->
                 <TextView
@@ -343,6 +355,60 @@
                 </RelativeLayout>
 
                 <!-- Add other settings like Clear Cache using the same RelativeLayout pattern -->
+
+                <!-- Section: App Info -->
+                <TextView
+                    android:id="@+id/section_app_info"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="@dimen/space_m"
+                    android:paddingBottom="@dimen/space_s"
+                    android:text="APP INFO"
+                    android:textColor="@color/primary"
+                    android:textStyle="bold" />
+
+                <!-- Setting: Contact Support (Using RelativeLayout) -->
+                <RelativeLayout
+                    android:id="@+id/row_contact_support"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="@dimen/space_s"
+                    android:paddingBottom="@dimen/space_s">
+
+                    <ImageView
+                        android:id="@+id/iv_contact_support_arrow"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:src="@drawable/chevron_righticon" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toStartOf="@id/iv_contact_support_arrow"
+                        android:text="Contact Support"
+                        android:textColor="@color/on_surface"
+                        android:textSize="@dimen/text_m" />
+                </RelativeLayout>
+
+                <!-- Setting: App Version (Using RelativeLayout) -->
+                <RelativeLayout
+                    android:id="@+id/row_app_version"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="@dimen/space_s"
+                    android:paddingBottom="@dimen/space_s">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:text="App Version (1.0.0)"
+                        android:textColor="@color/on_surface"
+                        android:textSize="@dimen/text_m" />
+                </RelativeLayout>
 
             </LinearLayout>
 
