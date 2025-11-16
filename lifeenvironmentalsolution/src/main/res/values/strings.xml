@@ -184,6 +184,13 @@ CENG-322-OCC,  Software Project -->
     <string name="the_day_s_forcast_received_at_7am">The day\'s forcast received at 7am</string>
     <string name="evening_reports">Evening reports</string>
     <string name="the_day_s_forcast_received_at_7pm">The day\'s forcast received at 7pm</string>
+    <string name="firebase_error">"Firebase Error: "</string>
+    <string name="presence_detection_enabled">Presence detection enabled</string>
+    <string name="presence_detection_disabled">Presence detection disabled</string>
+    <string name="not_monitoring">Not Monitoring</string>
+    <string name="lastupdatedtime">--:--</string>
+    <string name="occupied">occupied</string>
+    <string name="n_a">N/A</string>
 
 
 </resources>
