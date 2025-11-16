@@ -8,6 +8,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.material.appbar.MaterialToolbar;
+
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link AccountFragment#newInstance} factory method to
@@ -59,6 +61,14 @@ public class AccountFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_account, container, false);
+       View view = inflater.inflate(R.layout.fragment_account_management, container, false);
+
+        MaterialToolbar toolbar = view.findViewById(R.id.toolbar);
+        toolbar.setNavigationOnClickListener(v -> {
+            getParentFragmentManager().popBackStack();
+        });
+
+       return view;
+
     }
 }
