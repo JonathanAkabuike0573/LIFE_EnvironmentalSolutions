@@ -18,6 +18,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -66,6 +67,8 @@ public class MainActivity extends AppCompatActivity {
     private BottomNavigationView bottomNavigationView;
 
 
+
+
     private final ActivityResultLauncher<String> requestPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
                 if (isGranted) {
@@ -109,6 +112,8 @@ public class MainActivity extends AppCompatActivity {
             bottomNavigationView.setPadding(0, 0, 0, systemBars.bottom);
             return insets;
         });
+
+
 
         // Setup gesture detector to listen for screen taps
         gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
