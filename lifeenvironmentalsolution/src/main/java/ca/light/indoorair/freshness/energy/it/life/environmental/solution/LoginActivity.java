@@ -4,22 +4,21 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Patterns;
-import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 
+// No longer importing com.google.firebase.auth.FirebaseAuthProvider
+// No longer importing static androidx.core.app.PendingIntentCompat.getActivity
+
 public class LoginActivity extends AppCompatActivity {
 
-    // Constants for SharedPreferences
     private static final String PREFS_NAME = "LoginPrefs";
     private static final String PREF_EMAIL = "email";
 
@@ -29,37 +28,23 @@ public class LoginActivity extends AppCompatActivity {
     private TextView signup;
     private CheckBox rememberMeCheckBox;
 
-    // The Activity only knows about the interface, not the implementation.
     private AuthProvider authProvider;
-
-    private final ActivityResultLauncher<Intent> googleSignInLauncher = registerForActivityResult(
-            new ActivityResultContracts.StartActivityForResult(),
-            result -> {
-                if (result.getResultCode() == RESULT_OK) {
-                    // Delegate the result handling to the provider
-                    authProvider.handleGoogleSignInResult(result.getData(), createAuthCallback());
-                }
-            });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.login_page);
 
-        // Check if user is already signed in.
         if (FirebaseAuth.getInstance().getCurrentUser() != null) {
             navigateToMainActivity();
-            return; // Important: return to prevent rest of onCreate from running
+            return;
         }
 
+        setContentView(R.layout.login_page);
         bindViews();
-
-        // METHOD INJECTION: We create the concrete provider and "inject" it here.
-        // The rest of the class will only interact with the `authProvider` interface.
+        // Correctly instantiate our custom provider, passing the activity context.
         this.authProvider = new FirebaseAuthProvider(this);
-
-        wireClicks();
-        loadCredentials();
+        wireClickListeners();
+        loadSavedCredentials();
     }
 
     private void bindViews() {
@@ -71,39 +56,33 @@ public class LoginActivity extends AppCompatActivity {
         googleSignInButton = findViewById(R.id.btn_google);
     }
 
-    private void wireClicks() {
-        loginButton.setOnClickListener(v -> loginUser());
-
-        signup.setOnClickListener(v -> {
-            startActivity(new Intent(LoginActivity.this, SignupActivity.class));
-        });
+    private void wireClickListeners() {
+        loginButton.setOnClickListener(v -> performEmailLogin());
+        signup.setOnClickListener(v -> startActivity(new Intent(LoginActivity.this, SignupActivity.class)));
 
         googleSignInButton.setOnClickListener(v -> {
-            // Delegate the Google Sign-In action to the provider.
-            authProvider.signInWithGoogle(googleSignInLauncher);
+            authProvider.signInWithGoogle(createAuthCallback());
         });
     }
 
-    private void loginUser() {
+    private void performEmailLogin() {
         String email = emailEditText.getText() != null ? emailEditText.getText().toString().trim() : "";
         String password = passwordEditText.getText() != null ? passwordEditText.getText().toString() : "";
 
-        if (!validateInputs(email, password)) {
-            return; // Stop if validation fails
-        }
-
-        // Delegate the login action to the provider.
+        if (!validateInputs(email, password)) return;
         authProvider.signInWithEmail(email, password, createAuthCallback());
     }
 
-    // A helper method to create a reusable callback for handling auth results.
     private AuthProvider.AuthCallback createAuthCallback() {
         return new AuthProvider.AuthCallback() {
             @Override
             public void onSuccess() {
-                Toast.makeText(LoginActivity.this, "Login Successful.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(LoginActivity.this, R.string.login_successful , Toast.LENGTH_SHORT).show();
                 if (rememberMeCheckBox.isChecked()) {
-                    saveCredentials(emailEditText.getText().toString().trim());
+                    String emailToSave = emailEditText.getText() != null ? emailEditText.getText().toString().trim() : "";
+                    if (!emailToSave.isEmpty()) {
+                        saveCredentials(emailToSave);
+                    }
                 } else {
                     clearCredentials();
                 }
@@ -119,19 +98,19 @@ public class LoginActivity extends AppCompatActivity {
 
     private boolean validateInputs(String email, String password) {
         if (email.isEmpty() || !Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            emailEditText.setError("Please enter a valid email");
+            emailEditText.setError(getString(R.string.please_enter_a_valid_email));
             emailEditText.requestFocus();
             return false;
         }
         if (password.isEmpty()) {
-            passwordEditText.setError("Password cannot be empty");
+            passwordEditText.setError(getString(R.string.password_cannot_be_empty));
             passwordEditText.requestFocus();
             return false;
         }
         return true;
     }
 
-    private void loadCredentials() {
+    private void loadSavedCredentials() {
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         String savedEmail = prefs.getString(PREF_EMAIL, null);
         if (savedEmail != null) {
