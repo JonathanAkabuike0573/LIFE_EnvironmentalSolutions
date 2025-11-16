@@ -1,27 +1,26 @@
 package ca.light.indoorair.freshness.energy.it.life.environmental.solution;
 
-import android.content.Intent;
-import androidx.activity.result.ActivityResultLauncher;
-
-// This is the contract for any class that can handle user authentication.
+/**
+ * Defines the contract for authentication operations, abstracting the underlying implementation.
+ */
 public interface AuthProvider {
 
-    // A callback interface to handle the asynchronous results of authentication.
     interface AuthCallback {
         void onSuccess();
         void onFailure(String errorMessage);
     }
 
-    // Method for standard email and password login.
     void signInWithEmail(String email, String password, AuthCallback callback);
 
-    // Method to initiate the Google sign-in flow.
-    void signInWithGoogle(ActivityResultLauncher<Intent> googleSignInLauncher);
+    void signUpWithEmail(String email, String password, String name, String phone, AuthCallback callback);
 
-    // Method to handle the result from the Google sign-in activity.
-    void handleGoogleSignInResult(Intent data, AuthCallback callback);
-        void signUpWithEmail(String email, String password, String name, String phone, AuthCallback callback);
+    /**
+     * Initiates the Google Sign-In flow.
+     * The provider will handle the entire asynchronous flow, including any necessary UI,
+     * and will report the final result via the provided callback.
+     * @param callback The callback to invoke with the final success or failure result.
+     */
+    void signInWithGoogle(AuthCallback callback);
 
-    // Method to sign the user out.
     void signOut(Runnable onComplete);
 }

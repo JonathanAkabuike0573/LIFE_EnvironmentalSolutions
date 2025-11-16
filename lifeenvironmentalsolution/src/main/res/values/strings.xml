@@ -6,7 +6,6 @@ CENG-322-OCC,  Software Project -->
     <string name="app_logo" translatable="false">app_logo</string>
     <string name="splash_screen">Splash Screen</string>
     <string name="button">Button</string>
-
     <string name="navigation_drawer_open">Open</string>
     <string name="navigation_drawer_close">Close</string>
     <string name="life_environmental_solutions">LIFE Environmental Solutions</string>
@@ -38,7 +37,6 @@ CENG-322-OCC,  Software Project -->
     <string name="listen">Listen</string>
     <string name="clear_cache">Clear Cache</string>
     <string name="frees_up_storage_space">Frees up storage space</string>
-
     <string name="or">OR</string>
     <string name="login">Login</string>
     <string name="sign_in_with_google">Sign in with Google</string>
@@ -75,6 +73,102 @@ CENG-322-OCC,  Software Project -->
     <string name="waiting_for_sensor_data">Waiting for sensor data</string>
     <string name="waiting_for_sensor_datas">Waiting for sensor data</string>
     <string name="waiting_for_sensor_datasz">Waiting for sensor data</string>
+    <string name="device_icon">device icon</string>
+    <string name="status_on">status on</string>
+    <string name="send">Send</string>
+    <string name="tell_us_about_your_experience">Tell us about your experience!</string>
+    <string name="phone">Phone</string>
+    <string name="email">Email</string>
+    <string name="name">Name</string>
+    <string name="we_highly_value_your_feedback_kindly_take_a_moment_to_rate_your_experience_and_provide_us_with_your_valuable_feedback">We highly value your feedback! Kindly take a moment to rate your experience and provide us with your valuable feedback.</string>
+    <string name="rate_your_experience">Rate your experience</string>
+    <string name="co2_reading">CO2 Reading</string>
+    <string name="ppm">PPM</string>
+    <string name="last_updated">Last Updated:</string>
+    <string name="manual_refresh">Manual Refresh</string>
+    <string name="refresh_data">Refresh Data</string>
+    <string name="alert_level_2000_ppm">Alert Level (2000 PPM)</string>
+    <string name="auto_ventilation">Auto Ventilation</string>
+    <string name="air_purifier">Air Purifier</string>
+    <string name="power">Power</string>
+    <string name="intensity">Intensity</string>
+    <string name="open_a_window_to_improve_air_circulation">💡 Open a window to improve air circulation.</string>
+    <string name="loading">Loading...</string>
+    <string name="_9">9°</string>
+    <string name="mostly_rainy">Mostly Rainy</string>
+    <string name="celcius">Celcius</string>
+    <string name="my_device">My device</string>
+    <string name="light_intensity">Light Intensity</string>
+    <string name="lux">LUX</string>
+    <string name="auto_brightness">Auto Brightness</string>
+    <string name="brightness">Brightness</string>
+    <string name="color_temperature">Color Temperature</string>
+    <string name="warm">Warm</string>
+    <string name="neutral">Neutral</string>
+    <string name="cool">Cool</string>
+    <string name="mood_presets">Mood Presets</string>
+    <string name="focus">Focus</string>
+    <string name="relax">Relax</string>
+    <string name="nightlight">Nightlight</string>
+    <string name="room_occupancy">Room Occupancy</string>
+    <string name="empty">Empty</string>
+    <string name="enable_motion_detection">Enable Motion Detection</string>
+    <string name="auto_actions">Auto Actions</string>
+    <string name="turn_off_lights_when_room_is_empty">Turn off lights when room is empty</string>
+    <string name="trigger_alert_if_movement_detected_after_hours">Trigger alert if movement detected after hours</string>
+    <string name="manual_override">Manual Override</string>
+    <string name="mark_occupied">Mark Occupied</string>
+    <string name="mark_empty">Mark Empty</string>
+    <string name="activity_log">Activity Log</string>
+    <string name="_17_45_movement_detected">17:45 - Movement Detected</string>
+    <string name="_17_31_room_empty">17:31 - Room Empty</string>
+    <string name="life_environmental_solution">Life ENvironmental solution</string>
+    <string name="emai_gmail_com">emai.gmail.com</string>
+    <string name="full_name">Full Name</string>
+    <string name="phone_number">Phone Number</string>
+    <string name="password">Password</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="already_have_an_account">Already have an account?</string>
+    <string name="about_us">About Us</string>
+    <string name="about_us_description">LIFE Environmental Solutions is dedicated to improving indoor air quality through innovative technology and real-time monitoring. Our mission is to create healthier living and working spaces for everyone.</string>
+    <string name="developed_by">Developed By</string>
+    <string name="team_members">
+        Mohamed Ali\n
+        Jonathan Akabuike\n
+        Kieran Sharma\n
+        Farhan Habibzad
+    </string>
+    <string name="feedback">Feedback</string>
+    <string name="version_label">Version %1$s (%2$d)</string>
+    <string name="about_the_app">About the App</string>
+    <string name="purchases">purchases</string>
+    <string name="please_enter_a_valid_email">Please enter a valid email</string>
+    <string name="login_successful">Login Successful.</string>
+    <color name="air_quality_excellent">#4CAF50</color> <!-- Green -->
+    <color name="air_quality_good">#8BC34A</color> <!-- Light Green -->
+    <color name="air_quality_moderate">#FFC107</color> <!-- Amber -->
+    <color name="air_quality_poor">#FF9800</color> <!-- Orange -->
+    <color name="air_quality_very_poor">#F44336</color> <!-- Red -->
+    <color name="air_quality_offline">#9E9E9E</color> <!-- Gray -->
+
+    <string-array name="units_array">
+        <item>Metric (°C)</item>
+        <item>Imperial (°F)</item>
+    </string-array>
+    <!-- Preference Titles -->
+    <string name="messages_header">Messages</string>
+    <string name="sync_header">Sync</string>
+
+    <!-- Messages Preferences -->
+    <string name="signature_title">Your signature</string>
+    <string name="reply_title">Default reply action</string>
+
+    <!-- Sync Preferences -->
+    <string name="sync_title">Sync email periodically</string>
+    <string name="attachment_title">Download incoming attachments</string>
+    <string name="attachment_summary_on">Automatically download attachments for incoming emails
+    </string>
+    <string name="attachment_summary_off">Only download attachments when manually requested</string>
 
 
 </resources>

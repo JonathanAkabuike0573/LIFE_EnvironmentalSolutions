@@ -9,202 +9,411 @@
     android:background="@color/frag_settings_bg"
     tools:context=".SettingsFragment">
 
-    <!-- Page title -->
-    <TextView
-        android:id="@+id/tv_settings_title"
-        style="@style/Text.HighlightTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/settings"
-        android:layout_marginStart="@dimen/space_l"
-        android:layout_marginTop="@dimen/space_l"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Main card that holds all settings -->
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/card_settings"
-        style="@style/Widget.App.LoginCard"
+    <ScrollView
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/space_l"
-        android:layout_marginEnd="@dimen/space_l"
+        android:layout_height="0dp"
         android:layout_marginTop="@dimen/space_l"
-        app:cardUseCompatPadding="true"
-        app:layout_constraintTop_toBottomOf="@id/tv_settings_title"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0">
 
-        <LinearLayout
+        <!-- Main card that holds all settings -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/card_settings"
+            style="@style/Widget.App.LoginCard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="@dimen/space_m">
+            android:layout_marginStart="@dimen/space_l"
+            android:layout_marginEnd="@dimen/space_l"
+            app:cardUseCompatPadding="true">
 
-            <!-- Section: Display -->
-            <TextView
-                android:id="@+id/section_display"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/display"
-                android:paddingTop="@dimen/space_s"
-                android:paddingBottom="@dimen/space_s"
-                android:paddingStart="@dimen/space_s"
-                android:textStyle="bold"
-                android:textColor="@color/primary"/>
+                android:orientation="vertical"
+                android:padding="@dimen/space_m">
 
-            <!-- Row: Enable Dark Mode -->
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/row_dark_mode"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingTop="@dimen/space_s"
-                android:paddingBottom="@dimen/space_s">
-
-                <LinearLayout
-                    android:id="@+id/dark_mode_texts"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/sw_dark_mode"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    android:paddingEnd="@dimen/space_m">
-
-                    <TextView
-                        android:id="@+id/tv_dark_mode_title"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/enable_dark_mode"
-                        android:textColor="@color/on_surface"
-                        android:textSize="@dimen/text_m"/>
-
-                    <TextView
-                        android:id="@+id/tv_dark_mode_sub"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/dark_mode_desc"
-                        android:textColor="@color/text_field_hint"
-                        android:textSize="@dimen/text_s"/>
-                </LinearLayout>
-
-                <com.google.android.material.materialswitch.MaterialSwitch
-                    android:id="@+id/sw_dark_mode"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"/>
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <com.google.android.material.divider.MaterialDivider
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-            <!-- Row: Lock to Portrait Mode -->
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/row_portrait"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingTop="@dimen/space_s"
-                android:paddingBottom="@dimen/space_s">
-
-                <LinearLayout
-                    android:id="@+id/portrait_texts"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/sw_portrait"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    android:paddingEnd="@dimen/space_m">
-
-                    <TextView
-                        android:id="@+id/tv_portrait_title"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/lock_to_portrait_mode"
-                        android:textColor="@color/on_surface"
-                        android:textSize="@dimen/text_m"/>
-
-                    <TextView
-                        android:id="@+id/tv_portrait_sub"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/portrait_desc"
-                        android:textColor="@color/text_field_hint"
-                        android:textSize="@dimen/text_s"/>
-                </LinearLayout>
-
-                <com.google.android.material.materialswitch.MaterialSwitch
-                    android:id="@+id/sw_portrait"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"/>
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <!-- Section: Notifications & Data -->
-            <TextView
-                android:id="@+id/section_notifications"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/notifications_amp_data"
-                android:paddingTop="@dimen/space_m"
-                android:paddingBottom="@dimen/space_s"
-                android:paddingStart="@dimen/space_s"
-                android:textStyle="bold"
-                android:textColor="@color/primary"/>
-
-            <!-- Row: Notification Tone (button + "listen") -->
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/row_tone"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingTop="@dimen/space_s"
-                android:paddingBottom="@dimen/space_s">
-
+                <!-- Section: Account -->
                 <TextView
-                    android:id="@+id/tv_notification_tone"
-                    android:layout_width="0dp"
+                    android:id="@+id/section_account"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/notification_tone"
-                    android:textColor="@color/on_surface"
-                    android:textSize="@dimen/text_m"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/btn_listen"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    android:paddingEnd="@dimen/space_m"/>
+                    android:paddingTop="@dimen/space_s"
+                    android:paddingBottom="@dimen/space_s"
+                    android:text="ACCOUNT"
+                    android:textColor="@color/primary"
+                    android:textStyle="bold" />
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn_listen"
-                    style="@style/Widget.App.Button.Secondary"
-                    android:layout_width="wrap_content"
+                <!-- Setting: Account Management (Using RelativeLayout) -->
+                <RelativeLayout
+                    android:id="@+id/row_account"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/listen"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"/>
-            </androidx.constraintlayout.widget.ConstraintLayout>
+                    android:paddingTop="@dimen/space_s"
+                    android:paddingBottom="@dimen/space_s">
 
-            <com.google.android.material.divider.MaterialDivider
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                    <ImageView
+                        android:id="@+id/iv_account_arrow"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:src="@drawable/chevron_righticon" />
 
-            <!-- Row: Clear Cache (with helper text + action) -->
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/row_clear_cache"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingTop="@dimen/space_s"
-                android:paddingBottom="@dimen/space_s"/>
+                    <TextView
+                        android:id="@+id/tv_account_title"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toStartOf="@id/iv_account_arrow"
+                        android:text="Profile Management"
+                        android:textColor="@color/on_surface"
+                        android:textSize="@dimen/text_m" />
+                </RelativeLayout>
 
-            <!-- Preview / illustration at the bottom (kept) -->
-        </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
+
+                <!-- Setting: Change Password (Using RelativeLayout) -->
+                <RelativeLayout
+                    android:id="@+id/row_change_password"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="@dimen/space_s"
+                    android:paddingBottom="@dimen/space_s">
+
+                    <ImageView
+                        android:id="@+id/iv_change_password_arrow"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:src="@drawable/chevron_righticon" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toStartOf="@id/iv_change_password_arrow"
+                        android:text="Change Password"
+                        android:textColor="@color/on_surface"
+                        android:textSize="@dimen/text_m" />
+                </RelativeLayout>
+
+                <!-- Section: Preferences -->
+                <TextView
+                    android:id="@+id/section_display"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+
+                    android:paddingTop="@dimen/space_s"
+                    android:paddingBottom="@dimen/space_s"
+                    android:text="PREFERENCES"
+                    android:textColor="@color/primary"
+                    android:textStyle="bold" />
+
+                <!-- Setting: Lock to Portrait Mode (Using RelativeLayout) -->
+                <RelativeLayout
+                    android:id="@+id/row_portrait"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="@dimen/space_s"
+                    android:paddingBottom="@dimen/space_s">
+
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/sw_portrait"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true" />
+
+                    <LinearLayout
+                        android:id="@+id/portrait_texts"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toStartOf="@id/sw_portrait"
+                        android:orientation="vertical"
+                        android:paddingEnd="@dimen/space_m">
+
+                        <TextView
+                            android:id="@+id/tv_portrait_title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/lock_to_portrait_mode"
+                            android:textColor="@color/on_surface"
+                            android:textSize="@dimen/text_m" />
+
+                        <TextView
+                            android:id="@+id/tv_portrait_sub"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/portrait_desc"
+                            android:textColor="@color/text_field_hint"
+                            android:textSize="@dimen/text_s" />
+                    </LinearLayout>
+                </RelativeLayout>
+
+                <com.google.android.material.divider.MaterialDivider
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <!-- Setting: Units (Using RelativeLayout) -->
+                <RelativeLayout
+                    android:id="@+id/row_units"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="@dimen/space_s"
+                    android:paddingBottom="@dimen/space_s">
+
+                    <Spinner
+                        android:id="@+id/spinner_units"
+                        android:layout_width="wrap_content"
+                        android:layout_height="48dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:entries="@array/units_array"
+                        tools:ignore="SpeakableTextPresentCheck" />
+
+                    <LinearLayout
+                        android:id="@+id/units_texts"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toStartOf="@id/spinner_units"
+                        android:orientation="vertical"
+                        android:paddingEnd="@dimen/space_m">
+
+                        <TextView
+                            android:id="@+id/tv_units_title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Units"
+                            android:textColor="@color/on_surface"
+                            android:textSize="@dimen/text_m" />
+
+                        <TextView
+                            android:id="@+id/tv_units_sub"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Select measurement units"
+                            android:textColor="@color/text_field_hint"
+                            android:textSize="@dimen/text_s" />
+                    </LinearLayout>
+                </RelativeLayout>
+
+                <com.google.android.material.divider.MaterialDivider
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <!-- Section: Notifications -->
+                <TextView
+                    android:id="@+id/section_notifications"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="@dimen/space_m"
+                    android:paddingBottom="@dimen/space_s"
+                    android:text="NOTIFICATIONS"
+                    android:textColor="@color/primary"
+                    android:textStyle="bold" />
+
+                <!-- Setting: Smart Notification (Using RelativeLayout) -->
+
+                <RelativeLayout
+                    android:id="@+id/smart_notifcation"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="@dimen/space_s"
+                    android:paddingBottom="@dimen/space_s">
+
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/sw_smart_notification"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true" />
+
+                    <LinearLayout
+                        android:id="@+id/notification_texts"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toStartOf="@id/sw_smart_notification"
+                        android:orientation="vertical"
+                        android:paddingEnd="@dimen/space_m">
+
+                        <TextView
+                            android:id="@+id/smart_notification_title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Smart Notification"
+                            android:textColor="@color/on_surface"
+                            android:textSize="@dimen/text_m" />
+
+                        <TextView
+                            android:id="@+id/smart_notification_sub"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Tips and alerts when it matters"
+                            android:textColor="@color/text_field_hint"
+                            android:textSize="@dimen/text_s" />
+                    </LinearLayout>
+                </RelativeLayout>
+
+                <com.google.android.material.divider.MaterialDivider
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <!-- Setting: Morning Report (Using RelativeLayout) -->
+                <RelativeLayout
+                    android:id="@+id/row_morning_report"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="@dimen/space_s"
+                    android:paddingBottom="@dimen/space_s">
+
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/sw_morning_report"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true" />
+
+                    <LinearLayout
+                        android:id="@+id/morning_report_texts"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toStartOf="@id/sw_morning_report"
+                        android:orientation="vertical"
+                        android:paddingEnd="@dimen/space_m">
+
+                        <TextView
+                            android:id="@+id/tv_morning_report_title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Morning report"
+                            android:textColor="@color/on_surface"
+                            android:textSize="@dimen/text_m" />
+
+                        <TextView
+                            android:id="@+id/tv_morning_report_sub"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="The day's forcast received at 7am"
+                            android:textColor="@color/text_field_hint"
+                            android:textSize="@dimen/text_s" />
+                    </LinearLayout>
+                </RelativeLayout>
+
+                <com.google.android.material.divider.MaterialDivider
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <!-- Setting: Evening Reports (Using RelativeLayout) -->
+                <RelativeLayout
+                    android:id="@+id/row_evening_reports"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="@dimen/space_s"
+                    android:paddingBottom="@dimen/space_s">
+
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/sw_evening_reports"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true" />
+
+                    <LinearLayout
+                        android:id="@+id/evening_reports_texts"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toStartOf="@id/sw_evening_reports"
+                        android:orientation="vertical"
+                        android:paddingEnd="@dimen/space_m">
+
+                        <TextView
+                            android:id="@+id/tv_evening_reports_title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Evening reports"
+                            android:textColor="@color/on_surface"
+                            android:textSize="@dimen/text_m" />
+
+                        <TextView
+                            android:id="@+id/tv_evening_reports_sub"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="The day's forcast received at 7pm"
+                            android:textColor="@color/text_field_hint"
+                            android:textSize="@dimen/text_s" />
+                    </LinearLayout>
+                </RelativeLayout>
+
+                <!-- Add other settings like Clear Cache using the same RelativeLayout pattern -->
+
+                <!-- Section: App Info -->
+                <TextView
+                    android:id="@+id/section_app_info"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="@dimen/space_m"
+                    android:paddingBottom="@dimen/space_s"
+                    android:text="APP INFO"
+                    android:textColor="@color/primary"
+                    android:textStyle="bold" />
+
+                <!-- Setting: Contact Support (Using RelativeLayout) -->
+                <RelativeLayout
+                    android:id="@+id/row_contact_support"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="@dimen/space_s"
+                    android:paddingBottom="@dimen/space_s">
+
+                    <ImageView
+                        android:id="@+id/iv_contact_support_arrow"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:src="@drawable/chevron_righticon" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toStartOf="@id/iv_contact_support_arrow"
+                        android:text="Contact Support"
+                        android:textColor="@color/on_surface"
+                        android:textSize="@dimen/text_m" />
+                </RelativeLayout>
+
+                <!-- Setting: App Version (Using RelativeLayout) -->
+                <RelativeLayout
+                    android:id="@+id/row_app_version"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="@dimen/space_s"
+                    android:paddingBottom="@dimen/space_s">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:text="App Version (1.0.0)"
+                        android:textColor="@color/on_surface"
+                        android:textSize="@dimen/text_m" />
+                </RelativeLayout>
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

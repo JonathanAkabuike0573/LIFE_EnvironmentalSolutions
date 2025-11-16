@@ -7,13 +7,18 @@
         android:id="@+id/dashboard"
         android:icon="@drawable/homeiconn"
         android:title="@string/dashboard" />
+
     <item
-        android:id="@+id/notification"
-        android:icon="@drawable/sensorsicon"
-        android:title="@string/sensors" />
+        android:id="@+id/air_quality"
+        android:icon="@drawable/airicon"
+        android:title="@string/air_quality" />
     <item
-        android:id="@+id/settings"
-        android:icon="@android:drawable/ic_menu_preferences"
-        android:title="@string/settings" />
+        android:id="@+id/light"
+        android:icon="@drawable/smartlighticon"
+        android:title="@string/light" />
+    <item
+        android:id="@+id/presence"
+        android:icon="@drawable/detection_on"
+        android:title="@string/presence" />
 
 </menu>
