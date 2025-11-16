@@ -143,4 +143,19 @@ CENG-322-OCC,  Software Project -->
 </string>
     <string name="purchases">achats</string>
     <string name="feedback">Commentaires</string>
+    <string name="contact_us">Nous contacter</string>
+    <string name="phone_number_342_409_3349">numéro de téléphone : 342-409-3349</string>
+    <string name="email_contact_life_gmail_com">contact e-mail : LIFE@gmail.com</string>
+    <string name="account">COMPTE</string>
+    <string name="profile_management">Gestion du profil</string>
+    <string name="preferences">PRÉFÉRENCES</string>
+    <string name="units">Unités</string>
+    <string name="select_measurement_units">Sélectionner les unités de mesure</string>
+    <string name="notifications">NOTIFICATIONS</string>
+    <string name="smart_notification">Notification intelligente</string>
+    <string name="tips_and_alerts_when_it_matters">Conseils et alertes lorsque cela compte</string>
+    <string name="morning_report">Rapport du matin</string>
+    <string name="the_day_s_forcast_received_at_7am">Les prévisions du jour reçues à 7h</string>
+    <string name="evening_reports">Rapports du soir</string>
+    <string name="the_day_s_forcast_received_at_7pm">Les prévisions du jour reçues à 19h</string>
 </resources>
