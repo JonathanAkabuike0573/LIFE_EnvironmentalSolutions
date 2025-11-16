@@ -35,7 +35,7 @@ public class DashBoardFragment extends Fragment {
     // Declare Firebase variables
     private FirebaseAuth mAuth;
     private DatabaseReference userRef;
-    private UserDataProvider dataProvider;
+    UserDataProvider dataProvider;
 
     public DashBoardFragment() {
         // Required empty public constructor
@@ -94,8 +94,12 @@ public class DashBoardFragment extends Fragment {
             @Override
             public void onDataReceived(String userName) {
                 // When data is received, update the UI.
-                String firstName = userName.split(" ")[0];
-                setGreeting(firstName);
+                if (userName != null && !userName.trim().isEmpty()) {
+                    String firstName = userName.split(" ")[0];
+                    setGreeting(firstName);
+                } else {
+                    setGreeting("User"); // Fallback for empty/null username
+                }
             }
 
             @Override

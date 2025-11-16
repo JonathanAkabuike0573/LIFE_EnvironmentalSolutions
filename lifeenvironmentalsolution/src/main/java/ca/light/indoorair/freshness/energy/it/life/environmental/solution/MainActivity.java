@@ -156,8 +156,8 @@ public class MainActivity extends AppCompatActivity {
             int id = item.getItemId();
             if (id == R.id.dashboard) {
                 setCurrentFragment(dashBoardFragment);
-                getSupportActionBar().setTitle(getString(R.string.home));
-                toolbar.setTitle(getString(R.string.home));
+                getSupportActionBar().setTitle(getString(R.string.dashboard));
+                toolbar.setTitle(getString(R.string.dashboard));
                 return true;
             } else if (id == R.id.air_quality) {
                 setCurrentFragment(new AirQualityFragment());
@@ -218,6 +218,9 @@ public class MainActivity extends AppCompatActivity {
                 if (id == R.id.nav_home) {
                     setCurrentFragment(dashBoardFragment);
                     bottomNavigationView.setSelectedItemId(R.id.dashboard);
+                    getSupportActionBar().setTitle(getString(R.string.dashboard));
+                    toolbar.setTitle(getString(R.string.dashboard));
+
                 } else if (id == R.id.nav_settings) {
                     setCurrentFragment(settingsFragment);
                     getSupportActionBar().setTitle(getString(R.string.settings));
@@ -239,6 +242,8 @@ public class MainActivity extends AppCompatActivity {
                     setTitle(getString(R.string.about_us));
                     setCurrentFragment(new AboutUsFragment());
                     toggleBottomNavigationView();
+                    getSupportActionBar().setTitle(getString(R.string.about_us));
+                    toolbar.setTitle(getString(R.string.about_us));
                 }
                 drawerLayout.closeDrawers();
                 return true;
