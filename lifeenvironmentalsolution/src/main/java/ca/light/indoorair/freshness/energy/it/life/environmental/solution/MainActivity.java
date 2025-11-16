@@ -1,10 +1,12 @@
 package ca.light.indoorair.freshness.energy.it.life.environmental.solution;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
@@ -17,6 +19,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -64,7 +67,6 @@ public class MainActivity extends AppCompatActivity {
     private GestureDetector gestureDetector;
     private BottomNavigationView bottomNavigationView;
 
-
     private final ActivityResultLauncher<String> requestPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
                 if (isGranted) {
@@ -90,11 +92,22 @@ public class MainActivity extends AppCompatActivity {
             });
 
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 //        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
+
+        SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+
+        // Lock screen orientation if set in preferences
+        boolean isPortraitLock = sharedPreferences.getBoolean("portrait_lock", false);
+        if (isPortraitLock) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        } else {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+        }
 
         // Initialize Firebase Auth
         auth = FirebaseAuth.getInstance();
@@ -107,6 +120,8 @@ public class MainActivity extends AppCompatActivity {
             bottomNavigationView.setPadding(0, 0, 0, systemBars.bottom);
             return insets;
         });
+
+
 
         // Setup gesture detector to listen for screen taps
         gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
@@ -123,36 +138,48 @@ public class MainActivity extends AppCompatActivity {
             return true; // Consume the event
         });
         fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.main, new DashBoardFragment()).commit();
-
 
         Fragment dashBoardFragment = new DashBoardFragment();
-        Fragment notificationFragment = new SensorFragment();
+
         Fragment settingsFragment = new SettingsFragment();
+        Fragment purchasesFragment = new PurchasesFragment();
+        Fragment AirQualityFragment = new AirQualityFragment();
+        Fragment LightFragment = new LightFragment();
+        Fragment PresenceFragment = new PresenceFragment();
+
 
         setCurrentFragment(dashBoardFragment);
+        setTitle(getString(R.string.home));
 
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
             if (id == R.id.dashboard) {
                 setCurrentFragment(dashBoardFragment);
+                getSupportActionBar().setTitle(getString(R.string.home));
+                toolbar.setTitle(getString(R.string.home));
                 return true;
-            } else if (id == R.id.notification) {
-                setCurrentFragment(notificationFragment);
+            } else if (id == R.id.air_quality) {
+                setCurrentFragment(new AirQualityFragment());
+               getSupportActionBar().setTitle(getString(R.string.air_quality));
+                toolbar.setTitle(getString(R.string.air_quality));
                 return true;
-            } else if (id == R.id.settings) {
-                setCurrentFragment(settingsFragment);
+            } else if (id == R.id.light) {
+                setCurrentFragment(new LightFragment());
+                getSupportActionBar().setTitle(getString(R.string.light));
+                toolbar.setTitle(getString(R.string.light));
+                return true;
+            } else if (id == R.id.presence) {
+                setCurrentFragment(new PresenceFragment());
+                getSupportActionBar().setTitle(getString(R.string.presence));
+                toolbar.setTitle(getString(R.string.presence));
                 return true;
             }
-
-
             return true;
         });
 
 
         // Load the saved theme preference
-        SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         boolean isDarkMode = sharedPreferences.getBoolean(THEME_KEY, false);
 
         toolbar = findViewById(R.id.toolbar);
@@ -189,19 +216,30 @@ public class MainActivity extends AppCompatActivity {
             navigationView.setNavigationItemSelectedListener(item -> {
                 int id = item.getItemId();
                 if (id == R.id.nav_home) {
-                    setTitle(getString(R.string.home));
-                } else if (id == R.id.nav_sensors) {
-                    Intent intent = new Intent(MainActivity.this, NotificationActivity.class);
-                    startActivity(intent);
+                    setCurrentFragment(dashBoardFragment);
+                    bottomNavigationView.setSelectedItemId(R.id.dashboard);
                 } else if (id == R.id.nav_settings) {
-                    setTitle(getString(R.string.settings));
+                    setCurrentFragment(settingsFragment);
+                    getSupportActionBar().setTitle(getString(R.string.settings));
+                    toolbar.setTitle(getString(R.string.settings));
+                    toggleBottomNavigationView();
+                }else if (id == R.id.nav_purchase) {
+                    setCurrentFragment(purchasesFragment);
+                    getSupportActionBar().setTitle(getString(R.string.purchases));
+                    toolbar.setTitle(getString(R.string.purchases));
                 } else if (id == R.id.nav_sign_out) {
                     signOut();
                 } else if (id == R.id.nav_feedback) {
-                    Intent intent = new Intent(MainActivity.this, FeedBackPage.class);
-                    startActivity(intent);
+                    setCurrentFragment(new FeedBackPage());
+                    toggleBottomNavigationView();
+                    getSupportActionBar().setTitle(getString(R.string.feedback));
+                    toolbar.setTitle(getString(R.string.feedback));
                 }
-                item.setChecked(true);
+                else if (id == R.id.nav_about) {
+                    setTitle(getString(R.string.about_us));
+                    setCurrentFragment(new AboutUsFragment());
+                    toggleBottomNavigationView();
+                }
                 drawerLayout.closeDrawers();
                 return true;
             });
@@ -306,9 +344,7 @@ public class MainActivity extends AppCompatActivity {
 
                     applyMenuItemColor(subMenuItem, color);
                 }
-                if (menuItem.getItemId() == R.id.notification) {
 
-                }
             }
         }
         return true;
@@ -329,18 +365,14 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
         int itemId = item.getItemId();
-        if (itemId == R.id.themetoggle) {
-            toggleTheme();
-            return true;
-        } else if (itemId == R.id.action_notification) {
+     if (itemId == R.id.action_notification) {
             askNotificationPermission();
             return true;
-        } else if (itemId == R.id.action_camera) {
-            askCameraPermission();
-            return true;
+
         }
         return super.onOptionsItemSelected(item);
     }
+
 
     private void toggleBottomNavigationView() {
         if (bottomNavigationView.getVisibility() == View.VISIBLE) {
@@ -380,8 +412,9 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void setCurrentFragment(Fragment homefragment) {
-        getSupportFragmentManager().beginTransaction().replace(R.id.main, homefragment).commit();
+    private void setCurrentFragment(Fragment fragment) {
+        getSupportFragmentManager().beginTransaction().replace(R.id.main, fragment).commit();
+
     }
 
     private void signOut() {
