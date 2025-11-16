@@ -89,6 +89,7 @@
                         android:textSize="@dimen/text_m" />
                 </RelativeLayout>
 
+
                 <!-- Section: Preferences -->
                 <TextView
                     android:id="@+id/section_display"

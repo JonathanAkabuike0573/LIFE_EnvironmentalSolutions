@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
@@ -66,9 +67,6 @@ public class MainActivity extends AppCompatActivity {
     private GestureDetector gestureDetector;
     private BottomNavigationView bottomNavigationView;
 
-
-
-
     private final ActivityResultLauncher<String> requestPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
                 if (isGranted) {
@@ -100,6 +98,16 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 //        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
+
+        SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+
+        // Lock screen orientation if set in preferences
+        boolean isPortraitLock = sharedPreferences.getBoolean("portrait_lock", false);
+        if (isPortraitLock) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        } else {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+        }
 
         // Initialize Firebase Auth
         auth = FirebaseAuth.getInstance();
@@ -170,7 +178,6 @@ public class MainActivity extends AppCompatActivity {
 
 
         // Load the saved theme preference
-        SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         boolean isDarkMode = sharedPreferences.getBoolean(THEME_KEY, false);
 
         toolbar = findViewById(R.id.toolbar);
@@ -213,6 +220,7 @@ public class MainActivity extends AppCompatActivity {
                 } else if (id == R.id.nav_settings) {
                     setCurrentFragment(settingsFragment);
                     setTitle(getString(R.string.settings));
+                    toggleBottomNavigationView();
                 }else if (id == R.id.nav_purchase) {
                     setCurrentFragment(purchasesFragment);
                     setTitle(getString(R.string.purchases));
@@ -220,10 +228,12 @@ public class MainActivity extends AppCompatActivity {
                     signOut();
                 } else if (id == R.id.nav_feedback) {
                     setCurrentFragment(new FeedBackPage());
+                    toggleBottomNavigationView();
                 }
                 else if (id == R.id.nav_about) {
                     setTitle(getString(R.string.about_us));
                     setCurrentFragment(new AboutUsFragment());
+                    toggleBottomNavigationView();
                 }
                 drawerLayout.closeDrawers();
                 return true;
@@ -358,6 +368,7 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+
     private void toggleBottomNavigationView() {
         if (bottomNavigationView.getVisibility() == View.VISIBLE) {
             bottomNavigationView.animate().translationY(bottomNavigationView.getHeight()).withEndAction(() -> bottomNavigationView.setVisibility(View.GONE));
@@ -398,6 +409,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void setCurrentFragment(Fragment fragment) {
         getSupportFragmentManager().beginTransaction().replace(R.id.main, fragment).commit();
+
     }
 
     private void signOut() {
