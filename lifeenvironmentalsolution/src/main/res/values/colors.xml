@@ -6,6 +6,7 @@
     <color name="red">#FFC00000</color>
     <color name="teal_blue">#008080</color>
     <color name="light_gray">#D3D3D3</color>
+    <color name="light_background_yellow">#FFFCE1</color>
 
     <!-- App palette -->
     <color name="primary">#1565C0</color>
