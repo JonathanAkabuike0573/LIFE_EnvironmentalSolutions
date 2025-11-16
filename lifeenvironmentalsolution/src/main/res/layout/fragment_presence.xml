@@ -31,7 +31,7 @@
                     android:id="@+id/presence_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Room Occupancy"
+                    android:text="@string/room_occupancy"
                     android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
                     android:textColor="?android:attr/textColorPrimary"
                     app:layout_constraintTop_toTopOf="parent"
@@ -62,7 +62,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    android:text="Empty"
+                    android:text="@string/empty"
                     android:textSize="28sp"
                     android:textStyle="bold"
                     app:layout_constraintTop_toBottomOf="@+id/presence_icon"
@@ -73,7 +73,7 @@
                     android:id="@+id/last_updated_label"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Last Updated:"
+                    android:text="@string/last_updated"
                     android:layout_marginTop="32dp"
                     android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
                     app:layout_constraintTop_toBottomOf="@+id/presence_status_text"
@@ -114,7 +114,7 @@
                     android:id="@+id/switch_motion_detection"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Enable Motion Detection"
+                    android:text="@string/enable_motion_detection"
                     android:checked="true"
                     android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"/>
 
@@ -124,7 +124,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Auto Actions"
+                    android:text="@string/auto_actions"
                     android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"/>
 
                 <CheckBox
@@ -132,13 +132,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="Turn off lights when room is empty" />
+                    android:text="@string/turn_off_lights_when_room_is_empty" />
 
                 <CheckBox
                     android:id="@+id/checkbox_alert_after_hours"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Trigger alert if movement detected after hours" />
+                    android:text="@string/trigger_alert_if_movement_detected_after_hours" />
 
 
                 <View android:layout_width="match_parent" android:layout_height="1dp" android:background="?android:attr/listDivider" android:layout_marginTop="16dp" android:layout_marginBottom="16dp"/>
@@ -147,7 +147,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Manual Override"
+                    android:text="@string/manual_override"
                     android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"/>
 
                 <LinearLayout
@@ -163,7 +163,7 @@
                         android:layout_weight="1"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="8dp"
-                        android:text="Mark Occupied"/>
+                        android:text="@string/mark_occupied"/>
 
                     <Button
                         android:id="@+id/button_mark_empty"
@@ -172,7 +172,7 @@
                         android:layout_weight="1"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
-                        android:text="Mark Empty"/>
+                        android:text="@string/mark_empty"/>
                 </LinearLayout>
 
                 <View android:layout_width="match_parent" android:layout_height="1dp" android:background="?android:attr/listDivider" android:layout_marginTop="16dp" android:layout_marginBottom="16dp"/>
@@ -181,7 +181,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Activity Log"
+                    android:text="@string/activity_log"
                     android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"/>
                 
                 <LinearLayout
@@ -194,12 +194,12 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="17:45 - Movement Detected"
+                        android:text="@string/_17_45_movement_detected"
                         android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"/>
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="17:31 - Room Empty"
+                        android:text="@string/_17_31_room_empty"
                         android:layout_marginTop="4dp"
                         android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"/>
                 </LinearLayout>
