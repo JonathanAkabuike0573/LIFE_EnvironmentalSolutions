@@ -109,12 +109,11 @@
                 android:orientation="vertical"
                 android:padding="20dp">
 
-                <!-- Sensor Toggle -->
                 <com.google.android.material.switchmaterial.SwitchMaterial
-                    android:id="@+id/switch_motion_detection"
+                    android:id="@+id/switch_presence_detection"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/enable_motion_detection"
+                    android:text="Enable Presence Detection"
                     android:checked="true"
                     android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"/>
 
