@@ -210,10 +210,10 @@ public class LightFragment extends Fragment {
 
         // Update the qualitative assessment and status indicator
         if (lux < LUX_DIM_THRESHOLD) {
-            lightLevelText.setText("Dim");
+            lightLevelText.setText(R.string.dim);
             statusIndicator.setBackgroundResource(R.drawable.circle_indicator_yellow);
         } else if (lux < LUX_NORMAL_THRESHOLD) {
-            lightLevelText.setText("Normal");
+            lightLevelText.setText(R.string.normal);
             statusIndicator.setBackgroundResource(R.drawable.circle_indicator_green);
         } else {
             lightLevelText.setText("Bright");
