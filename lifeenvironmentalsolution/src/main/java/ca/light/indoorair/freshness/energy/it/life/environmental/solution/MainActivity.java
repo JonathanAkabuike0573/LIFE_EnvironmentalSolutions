@@ -276,7 +276,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
         } else {
-            navUserName.setText("Guest User");
+            navUserName.setText(R.string.guest_user);
             navUserEmail.setText("");
         }
     }
@@ -317,7 +317,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // ---------------------------------------------------------
-    //  ⭐ UPDATED THEME BUTTON HANDLING
+    //  UPDATED THEME BUTTON HANDLING
     // ---------------------------------------------------------
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
