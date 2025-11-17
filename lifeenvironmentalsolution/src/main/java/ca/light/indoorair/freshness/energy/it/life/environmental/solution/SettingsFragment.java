@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -18,11 +19,14 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.materialswitch.MaterialSwitch;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class SettingsFragment extends Fragment {
 
@@ -34,8 +38,10 @@ public class SettingsFragment extends Fragment {
     private static final String EVENING_REPORT_KEY = "evening_report";
 
     private RelativeLayout profileManagement;
+    private RelativeLayout changePasswordLayout;
 
     private SharedPreferences sharedPreferences;
+    private FirebaseAuth mAuth;
 
     public SettingsFragment() {
         // Required empty public constructor
@@ -48,6 +54,8 @@ public class SettingsFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_settings, container, false);
 
         profileManagement = view.findViewById(R.id.row_account);
+        changePasswordLayout = view.findViewById(R.id.row_change_password);
+        mAuth = FirebaseAuth.getInstance();
 
         profileManagement.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -60,6 +68,8 @@ public class SettingsFragment extends Fragment {
 
             }
         });
+
+        changePasswordLayout.setOnClickListener(v -> showChangePasswordDialog());
 
         return view;
 
@@ -122,5 +132,50 @@ public class SettingsFragment extends Fragment {
             String message = isChecked ? "Evening report enabled" : "Evening report disabled";
             Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
         });
+    }
+
+    private void showChangePasswordDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setTitle("Change Password");
+
+        View viewInflated = LayoutInflater.from(getContext()).inflate(R.layout.dialog_change_password, (ViewGroup) getView(), false);
+        final EditText newPasswordEditText = viewInflated.findViewById(R.id.new_password_edit_text);
+        final EditText confirmPasswordEditText = viewInflated.findViewById(R.id.confirm_password_edit_text);
+
+        builder.setView(viewInflated);
+
+        builder.setPositiveButton("Confirm", (dialog, which) -> {
+            String newPassword = newPasswordEditText.getText().toString().trim();
+            String confirmPassword = confirmPasswordEditText.getText().toString().trim();
+
+            if (newPassword.length() < 6) {
+                Toast.makeText(getContext(), "Password must be at least 6 characters", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (!newPassword.equals(confirmPassword)) {
+                Toast.makeText(getContext(), "Passwords do not match", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            changePassword(newPassword);
+        });
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
+
+        builder.show();
+    }
+
+    private void changePassword(String newPassword) {
+        FirebaseUser user = mAuth.getCurrentUser();
+        if (user != null) {
+            user.updatePassword(newPassword)
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            Toast.makeText(getContext(), "Password updated successfully", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(getContext(), "Failed to update password", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+        }
     }
 }
