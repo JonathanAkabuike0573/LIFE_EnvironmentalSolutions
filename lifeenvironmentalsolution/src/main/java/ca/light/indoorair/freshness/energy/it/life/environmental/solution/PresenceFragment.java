@@ -220,7 +220,7 @@ public class PresenceFragment extends Fragment {
                 }
             }
         } else {
-            lastUpdatedTimeText.setText("N/A");
+            lastUpdatedTimeText.setText(R.string.n_a);
         }
 
         if (sessionDuration != null) {
