@@ -191,6 +191,10 @@ CENG-322-OCC,  Software Project -->
     <string name="lastupdatedtime">--:--</string>
     <string name="occupied">occupied</string>
     <string name="n_a">N/A</string>
+    <string name="good_evening">Good evening</string>
+    <string name="good_afternoon">Good afternoon</string>
+    <string name="good_morning">Good morning</string>
+    <string name="guest_user">Guest User</string>
 
 
 </resources>

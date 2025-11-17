@@ -1,5 +1,6 @@
 package ca.light.indoorair.freshness.energy.it.life.environmental.solution;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +12,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.preference.PreferenceManager;
 
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.firebase.database.DataSnapshot;
@@ -37,6 +39,11 @@ public class PresenceFragment extends Fragment {
     private DatabaseReference presenceRef;
     private ValueEventListener presenceListener;
 
+    // SharedPreferences
+    private SharedPreferences sharedPreferences;
+    private SharedPreferences.OnSharedPreferenceChangeListener preferenceChangeListener;
+
+
     public PresenceFragment() {
         // Required empty public constructor
     }
@@ -49,15 +56,13 @@ public class PresenceFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        if (getContext() != null) {
+            sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+        }
+
         initializeViews(view);
         initializeFirebase();
         setupListeners();
-
-        if (presenceDetectionSwitch.isChecked()) {
-            startListeningForPresence();
-        } else {
-            resetUI();
-        }
     }
 
     private void initializeViews(View view) {
@@ -100,27 +105,31 @@ public class PresenceFragment extends Fragment {
 
     private void setupListeners() {
         presenceDetectionSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (buttonView.isPressed()) { // Only trigger on user interaction
-                if (isChecked) {
-                    startListeningForPresence();
-                    Toast.makeText(getContext(), "Presence detection enabled", Toast.LENGTH_SHORT).show();
-                } else {
-                    stopListeningForPresence();
-                    Toast.makeText(getContext(), "Presence detection disabled", Toast.LENGTH_SHORT).show();
-                }
+            sharedPreferences.edit().putBoolean("presence_detection_enabled", isChecked).apply();
+
+            if (isChecked) {
+                startListeningForPresence();
+                Toast.makeText(getContext(), "Presence detection enabled", Toast.LENGTH_SHORT).show();
+            } else {
+                stopListeningForPresence();
+                Toast.makeText(getContext(), "Presence detection disabled", Toast.LENGTH_SHORT).show();
             }
         });
 
         markOccupiedButton.setOnClickListener(v -> manualOverride("Occupied"));
         markEmptyButton.setOnClickListener(v -> manualOverride("Empty"));
+
+        // Listener for changes from other sources (like the dashboard)
+        preferenceChangeListener = (prefs, key) -> {
+            if (key.equals("presence_detection_enabled")) {
+                syncSwitchState();
+            }
+        };
     }
 
     private void manualOverride(String status) {
-        // Programmatically set switch to off, which triggers the listener if not for isPressed()
         presenceDetectionSwitch.setChecked(false);
-
-        // Stop listening and update UI manually
-        stopListeningForPresence();
+        sharedPreferences.edit().putBoolean("presence_detection_enabled", false).apply();
         updatePresenceUI(status, "Manual Override", 0L, 0L);
         Toast.makeText(getContext(), "Manual override set to " + status, Toast.LENGTH_SHORT).show();
     }
@@ -138,18 +147,27 @@ public class PresenceFragment extends Fragment {
         resetUI();
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        if (presenceDetectionSwitch != null && presenceDetectionSwitch.isChecked()) {
+    private void syncSwitchState() {
+        boolean isEnabled = sharedPreferences.getBoolean("presence_detection_enabled", true);
+        presenceDetectionSwitch.setChecked(isEnabled);
+        if (isEnabled) {
             startListeningForPresence();
+        } else {
+            stopListeningForPresence();
         }
     }
 
     @Override
-    public void onStop() {
-        super.onStop();
-        // Ensure listener is removed
+    public void onResume() {
+        super.onResume();
+        syncSwitchState();
+        sharedPreferences.registerOnSharedPreferenceChangeListener(preferenceChangeListener);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        sharedPreferences.unregisterOnSharedPreferenceChangeListener(preferenceChangeListener);
         if (presenceRef != null && presenceListener != null) {
             presenceRef.removeEventListener(presenceListener);
         }
@@ -158,7 +176,7 @@ public class PresenceFragment extends Fragment {
     private void resetUI() {
         presenceStatusText.setText("Not Monitoring");
         lastUpdatedTimeText.setText("--:--");
-        presenceIcon.setImageResource(android.R.color.transparent); // Blank screen
+        presenceIcon.setImageResource(android.R.color.transparent);
         statusIndicator.setBackgroundResource(R.drawable.circle_indicator_gray);
         sessionDurationText.setText("--");
         totalDetectionsText.setText("--");
