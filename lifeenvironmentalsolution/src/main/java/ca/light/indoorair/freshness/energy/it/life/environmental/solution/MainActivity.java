@@ -64,7 +64,6 @@ public class MainActivity extends AppCompatActivity {
     private ActionBarDrawerToggle toggle;
     private static final String PREFS_NAME = "MyPrefsFile";
     private static final String THEME_KEY = "ThemeKey";
-    private GestureDetector gestureDetector;
     private BottomNavigationView bottomNavigationView;
 
     private final ActivityResultLauncher<String> requestPermissionLauncher =
@@ -107,20 +106,6 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0);
             bottomNavigationView.setPadding(0, 0, 0, systemBars.bottom);
             return insets;
-        });
-
-        gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
-            @Override
-            public boolean onSingleTapUp(MotionEvent e) {
-                toggleBottomNavigationView();
-                return true;
-            }
-        });
-
-        View mainContent = findViewById(R.id.main);
-        mainContent.setOnTouchListener((v, event) -> {
-            gestureDetector.onTouchEvent(event);
-            return true;
         });
 
         fragmentManager = getSupportFragmentManager();
@@ -204,7 +189,6 @@ public class MainActivity extends AppCompatActivity {
                     setCurrentFragment(settingsFragment);
                     getSupportActionBar().setTitle(getString(R.string.settings));
                     toolbar.setTitle(getString(R.string.settings));
-                    toggleBottomNavigationView();
                 } else if (id == R.id.nav_purchase) {
                     setCurrentFragment(purchasesFragment);
                     getSupportActionBar().setTitle(getString(R.string.purchases));
@@ -213,13 +197,11 @@ public class MainActivity extends AppCompatActivity {
                     signOut();
                 } else if (id == R.id.nav_feedback) {
                     setCurrentFragment(new FeedBackPage());
-                    toggleBottomNavigationView();
                     getSupportActionBar().setTitle(getString(R.string.feedback));
                     toolbar.setTitle(getString(R.string.feedback));
                 } else if (id == R.id.nav_about) {
                     setTitle(getString(R.string.about_us));
                     setCurrentFragment(new AboutUsFragment());
-                    toggleBottomNavigationView();
                     getSupportActionBar().setTitle(getString(R.string.about_us));
                     toolbar.setTitle(getString(R.string.about_us));
                 }
@@ -340,17 +322,6 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
     // ---------------------------------------------------------
-
-    private void toggleBottomNavigationView() {
-        if (bottomNavigationView.getVisibility() == View.VISIBLE) {
-            bottomNavigationView.animate().translationY(bottomNavigationView.getHeight())
-                    .withEndAction(() -> bottomNavigationView.setVisibility(View.GONE));
-
-        } else {
-            bottomNavigationView.setVisibility(View.VISIBLE);
-            bottomNavigationView.animate().translationY(1);
-        }
-    }
 
     private void askCameraPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
