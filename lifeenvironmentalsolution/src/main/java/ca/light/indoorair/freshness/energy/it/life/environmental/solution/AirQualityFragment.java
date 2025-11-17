@@ -207,7 +207,7 @@ public class AirQualityFragment extends Fragment {
             // Handle the case where there is no data (e.g., sensor is offline)
             airQualityProgress.setProgress(0);
             airQualityValueText.setText("--");
-            airQualityLevelText.setText("Offline");
+            airQualityLevelText.setText(R.string.offline);
             lastUpdatedTime.setText("--:--");
             int grayColor = ContextCompat.getColor(getContext(), R.color.air_quality_offline);
             ((GradientDrawable) statusIndicator.getBackground()).setColor(grayColor);

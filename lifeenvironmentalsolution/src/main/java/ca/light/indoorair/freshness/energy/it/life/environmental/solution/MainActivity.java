@@ -70,10 +70,8 @@ public class MainActivity extends AppCompatActivity {
     private final ActivityResultLauncher<String> requestPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
                 if (isGranted) {
-                    // FCM SDK (and your app) can post notifications.
                     Toast.makeText(this, R.string.permission_granted, Toast.LENGTH_SHORT).show();
                 } else {
-                    // TODO: Inform user that that your app will not show notifications.
                     Toast.makeText(this, R.string.permission_denied, Toast.LENGTH_SHORT).show();
                 }
             });
@@ -81,12 +79,8 @@ public class MainActivity extends AppCompatActivity {
     private final ActivityResultLauncher<String> requestCameraPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
                 if (isGranted) {
-                    // Permission is granted. You can now open the camera.
                     Toast.makeText(this, R.string.camera_permission_granted, Toast.LENGTH_SHORT).show();
-                    // Intent to open camera can be placed here.
                 } else {
-                    // Explain to the user that the feature is unavailable because the
-                    // features requires a permission that the user has denied.
                     Toast.makeText(this, R.string.camera_permission_denied, Toast.LENGTH_SHORT).show();
                 }
             });
@@ -96,12 +90,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
 
         SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
 
-        // Lock screen orientation if set in preferences
         boolean isPortraitLock = sharedPreferences.getBoolean("portrait_lock", false);
         if (isPortraitLock) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -109,21 +101,14 @@ public class MainActivity extends AppCompatActivity {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
         }
 
-        // Initialize Firebase Auth
         auth = FirebaseAuth.getInstance();
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            // Toggling navigation bar visibility will change insets, so we need to handle it.
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            // We apply padding for status bar and navigation bar, but for the bottom part
-            // we let the bottom navigation view handle its own padding.
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0);
             bottomNavigationView.setPadding(0, 0, 0, systemBars.bottom);
             return insets;
         });
 
-
-
-        // Setup gesture detector to listen for screen taps
         gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
             @Override
             public boolean onSingleTapUp(MotionEvent e) {
@@ -135,18 +120,17 @@ public class MainActivity extends AppCompatActivity {
         View mainContent = findViewById(R.id.main);
         mainContent.setOnTouchListener((v, event) -> {
             gestureDetector.onTouchEvent(event);
-            return true; // Consume the event
+            return true;
         });
+
         fragmentManager = getSupportFragmentManager();
 
         Fragment dashBoardFragment = new DashBoardFragment();
-
         Fragment settingsFragment = new SettingsFragment();
         Fragment purchasesFragment = new PurchasesFragment();
         Fragment AirQualityFragment = new AirQualityFragment();
         Fragment LightFragment = new LightFragment();
         Fragment PresenceFragment = new PresenceFragment();
-
 
         setCurrentFragment(dashBoardFragment);
         setTitle(getString(R.string.home));
@@ -161,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             } else if (id == R.id.air_quality) {
                 setCurrentFragment(new AirQualityFragment());
-               getSupportActionBar().setTitle(getString(R.string.air_quality));
+                getSupportActionBar().setTitle(getString(R.string.air_quality));
                 toolbar.setTitle(getString(R.string.air_quality));
                 return true;
             } else if (id == R.id.light) {
@@ -178,8 +162,6 @@ public class MainActivity extends AppCompatActivity {
             return true;
         });
 
-
-        // Load the saved theme preference
         boolean isDarkMode = sharedPreferences.getBoolean(THEME_KEY, false);
 
         toolbar = findViewById(R.id.toolbar);
@@ -189,10 +171,8 @@ public class MainActivity extends AppCompatActivity {
             actionBar.setDisplayShowTitleEnabled(false);
         }
 
-        // Apply the loaded theme
         if (isDarkMode) {
             getDelegate().setLocalNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-
         } else {
             getDelegate().setLocalNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         }
@@ -210,7 +190,6 @@ public class MainActivity extends AppCompatActivity {
             drawerLayout.addDrawerListener(toggle);
             toggle.syncState();
 
-            //  Load user's name and email into the navigation header
             updateNavHeader();
 
             navigationView.setNavigationItemSelectedListener(item -> {
@@ -226,7 +205,7 @@ public class MainActivity extends AppCompatActivity {
                     getSupportActionBar().setTitle(getString(R.string.settings));
                     toolbar.setTitle(getString(R.string.settings));
                     toggleBottomNavigationView();
-                }else if (id == R.id.nav_purchase) {
+                } else if (id == R.id.nav_purchase) {
                     setCurrentFragment(purchasesFragment);
                     getSupportActionBar().setTitle(getString(R.string.purchases));
                     toolbar.setTitle(getString(R.string.purchases));
@@ -237,8 +216,7 @@ public class MainActivity extends AppCompatActivity {
                     toggleBottomNavigationView();
                     getSupportActionBar().setTitle(getString(R.string.feedback));
                     toolbar.setTitle(getString(R.string.feedback));
-                }
-                else if (id == R.id.nav_about) {
+                } else if (id == R.id.nav_about) {
                     setTitle(getString(R.string.about_us));
                     setCurrentFragment(new AboutUsFragment());
                     toggleBottomNavigationView();
@@ -250,49 +228,34 @@ public class MainActivity extends AppCompatActivity {
             });
         }
 
-        // Intercept back button press
-        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true /* enabled by default */) {
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
                 new AlertDialog.Builder(MainActivity.this)
-                        .setIcon(ContextCompat.getDrawable(MainActivity.this, R.drawable.logolife)) // Using a system alert icon
+                        .setIcon(ContextCompat.getDrawable(MainActivity.this, R.drawable.logolife))
                         .setTitle(R.string.exit_application)
                         .setMessage(R.string.are_you_sure_you_want_to_exit)
-                        .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                finish(); // Exit the application
-                            }
-                        })
-                        .setNegativeButton(R.string.no, null) // Do nothing, stay on the app
+                        .setPositiveButton(R.string.yes, (dialog, which) -> finish())
+                        .setNegativeButton(R.string.no, null)
                         .show();
             }
         });
     }
 
-    /**
-     * Finds the current user and updates the navigation header with their name and email.
-     */
     private void updateNavHeader() {
-        // Ensure navigationView is not null
         if (navigationView == null) return;
 
         View headerView = navigationView.getHeaderView(0);
 
-        // Use your specific IDs from nav_header.xml
         TextView navUserName = headerView.findViewById(R.id.navheaderusername);
         TextView navUserEmail = headerView.findViewById(R.id.navheaderemail);
 
         FirebaseUser currentUser = auth.getCurrentUser();
 
         if (currentUser != null) {
-            // Set the email directly from the FirebaseUser object
             String email = currentUser.getEmail();
-            if (email != null) {
-                navUserEmail.setText(email);
-            }
+            if (email != null) navUserEmail.setText(email);
 
-            // To get the user's name, read it from the Realtime Database
             String uid = currentUser.getUid();
             DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("users").child(uid);
 
@@ -302,8 +265,7 @@ public class MainActivity extends AppCompatActivity {
                     if (snapshot.exists()) {
                         HelperClass userProfile = snapshot.getValue(HelperClass.class);
                         if (userProfile != null) {
-                            String name = userProfile.getName();
-                            navUserName.setText(name);
+                            navUserName.setText(userProfile.getName());
                         }
                     }
                 }
@@ -314,44 +276,33 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
         } else {
-            // Handle case where there is no signed-in user
-            navUserName.setText("Guest User");
+            navUserName.setText(R.string.guest_user);
             navUserEmail.setText("");
         }
     }
 
-
-    // Options Menu
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
 
-        // Load the saved theme preference
         SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         boolean isDarkMode = sharedPreferences.getBoolean(THEME_KEY, false);
 
-        // Define the color based on the current theme
-        int color;
-        if (isDarkMode) {
-            color = ContextCompat.getColor(this, android.R.color.white);
-        } else {
-            color = ContextCompat.getColor(this, android.R.color.black);
-        }
+        int color = isDarkMode ?
+                ContextCompat.getColor(this, android.R.color.white) :
+                ContextCompat.getColor(this, android.R.color.black);
 
-        // Iterate through all menu items to apply the color
         for (int i = 0; i < menu.size(); i++) {
             MenuItem menuItem = menu.getItem(i);
             applyMenuItemColor(menuItem, color);
 
             if (menuItem.hasSubMenu()) {
                 for (int j = 0; j < menuItem.getSubMenu().size(); j++) {
-                    MenuItem subMenuItem = menuItem.getSubMenu().getItem(j);
-
-                    applyMenuItemColor(subMenuItem, color);
+                    applyMenuItemColor(menuItem.getSubMenu().getItem(j), color);
                 }
-
             }
         }
+
         return true;
     }
 
@@ -365,23 +316,35 @@ public class MainActivity extends AppCompatActivity {
         menuItem.setTitle(spannableString);
     }
 
+    // ---------------------------------------------------------
+    //  UPDATED THEME BUTTON HANDLING
+    // ---------------------------------------------------------
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (toggle != null && toggle.onOptionsItemSelected(item)) {
             return true;
         }
+
         int itemId = item.getItemId();
-     if (itemId == R.id.action_notification) {
+
+        if (itemId == R.id.action_notification) {
             askNotificationPermission();
             return true;
 
+        } else if (itemId == R.id.action_togglemode) {
+            toggleTheme();     // flip dark/light mode
+            recreate();        // refresh UI
+            return true;
         }
+
         return super.onOptionsItemSelected(item);
     }
-
+    // ---------------------------------------------------------
 
     private void toggleBottomNavigationView() {
         if (bottomNavigationView.getVisibility() == View.VISIBLE) {
-            bottomNavigationView.animate().translationY(bottomNavigationView.getHeight()).withEndAction(() -> bottomNavigationView.setVisibility(View.GONE));
+            bottomNavigationView.animate().translationY(bottomNavigationView.getHeight())
+                    .withEndAction(() -> bottomNavigationView.setVisibility(View.GONE));
 
         } else {
             bottomNavigationView.setVisibility(View.VISIBLE);
@@ -390,22 +353,21 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void askCameraPermission() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                == PackageManager.PERMISSION_GRANTED) {
             Toast.makeText(this, "Camera permission already granted.", Toast.LENGTH_SHORT).show();
-            // You can open camera here
         } else {
             requestCameraPermissionLauncher.launch(Manifest.permission.CAMERA);
         }
     }
 
-
     private void toggleTheme() {
         SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         boolean isDarkMode = sharedPreferences.getBoolean(THEME_KEY, false);
         SharedPreferences.Editor editor = sharedPreferences.edit();
+
         if (isDarkMode) {
             editor.putBoolean(THEME_KEY, false);
-
             editor.apply();
             getDelegate().setLocalNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         } else {
@@ -413,31 +375,24 @@ public class MainActivity extends AppCompatActivity {
             editor.apply();
             getDelegate().setLocalNightMode(AppCompatDelegate.MODE_NIGHT_YES);
         }
-
-
     }
 
     private void setCurrentFragment(Fragment fragment) {
         getSupportFragmentManager().beginTransaction().replace(R.id.main, fragment).commit();
-
     }
 
     private void signOut() {
-        // Firebase sign out
         auth.signOut();
 
-        // When a user signs out, clear the current user credential state from all credential providers.
         Identity.getSignInClient(this).signOut().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
-                // After successful sign out, navigate to the LoginActivity
                 startActivity(new Intent(MainActivity.this, LoginActivity.class));
-                finish(); // Finish MainActivity so user can't go back
+                finish();
             }
         });
     }
 
     private void askNotificationPermission() {
-        // This is only necessary for API level 33 and above.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) ==
                     PackageManager.PERMISSION_GRANTED) {

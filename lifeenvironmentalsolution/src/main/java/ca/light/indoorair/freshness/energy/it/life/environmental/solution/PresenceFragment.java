@@ -174,7 +174,7 @@ public class PresenceFragment extends Fragment {
     }
 
     private void resetUI() {
-        presenceStatusText.setText("Not Monitoring");
+        presenceStatusText.setText(R.string.not_monitoring);
         lastUpdatedTimeText.setText("--:--");
         presenceIcon.setImageResource(android.R.color.transparent);
         statusIndicator.setBackgroundResource(R.drawable.circle_indicator_gray);
@@ -186,11 +186,11 @@ public class PresenceFragment extends Fragment {
         boolean occupied = "occupied".equalsIgnoreCase(status);
 
         if (occupied) {
-            presenceStatusText.setText("Occupied");
+            presenceStatusText.setText(R.string.occupied);
             presenceIcon.setImageResource(R.drawable.ic_room_occupied);
             statusIndicator.setBackgroundResource(R.drawable.circle_indicator_green);
         } else {
-            presenceStatusText.setText("Empty");
+            presenceStatusText.setText(R.string.empty);
             presenceIcon.setImageResource(R.drawable.ic_room_empty);
             statusIndicator.setBackgroundResource(R.drawable.circle_indicator_red);
         }
