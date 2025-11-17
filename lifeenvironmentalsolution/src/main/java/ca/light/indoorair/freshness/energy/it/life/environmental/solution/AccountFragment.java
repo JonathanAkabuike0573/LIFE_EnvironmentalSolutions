@@ -105,10 +105,10 @@ public class AccountFragment extends Fragment {
 
     private void updateEmailVerificationStatus(boolean isVerified) {
         if (isVerified) {
-            emailStatus.setText("Verified");
+            emailStatus.setText(R.string.verified);
             emailStatus.setBackgroundResource(R.drawable.verified_background); // Create a green background
         } else {
-            emailStatus.setText("Unverified");
+            emailStatus.setText(R.string.unverified);
             emailStatus.setBackgroundResource(R.drawable.unverified_background); // Create an orange background
         }
     }

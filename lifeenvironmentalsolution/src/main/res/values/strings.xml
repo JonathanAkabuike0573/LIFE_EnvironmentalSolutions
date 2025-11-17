@@ -201,6 +201,14 @@ CENG-322-OCC,  Software Project -->
     <string name="thermostat">Thermostat</string>
     <string name="smart_light">Smart Light</string>
     <string name="nothingyet">-:-</string>
+    <string name="save_changes">Save Changes</string>
+    <string name="email_example">jane.doe@example.com</string>
+    <string name="name_example">Jane Doe</string>
+    <string name="verified">Verified</string>
+    <string name="unverified">Unverified</string>
+    <string name="offline">Offline</string>
+    <string name="dim">Dim</string>
+    <string name="normal">Normal</string>
 
 
 </resources>
