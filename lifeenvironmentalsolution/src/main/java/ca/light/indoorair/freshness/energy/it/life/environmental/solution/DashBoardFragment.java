@@ -38,6 +38,9 @@ public class DashBoardFragment extends Fragment {
 
     // SharedPreferences
     private SharedPreferences sharedPreferences;
+    private SharedPreferences.OnSharedPreferenceChangeListener preferenceChangeListener;
+    private MyAdapter adapter;
+    private List<item> items;
 
     public DashBoardFragment() {
         // Required empty public constructor
@@ -47,7 +50,7 @@ public class DashBoardFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_dash_board, container, false);
 
-        List<item> items = new ArrayList<>();
+        items = new ArrayList<>();
         items.add(new item("Air Quality", "Good", R.drawable.air_qualityicon, true, false));
         items.add(new item("Smart Light", "Off", R.drawable.lightofficon, false, true));
         items.add(new item("Thermostat", "22°C", R.drawable.thermostaticon, true, false));
@@ -57,7 +60,8 @@ public class DashBoardFragment extends Fragment {
 
         RecyclerView recycler = view.findViewById(R.id.recyclerView);
         recycler.setLayoutManager(new GridLayoutManager(getContext(), 2));
-        recycler.setAdapter(new MyAdapter(getContext(), items));
+        adapter = new MyAdapter(getContext(), items);
+        recycler.setAdapter(adapter);
 
         return view;
     }
@@ -74,6 +78,8 @@ public class DashBoardFragment extends Fragment {
 
         loadGreeting(new FirebaseUserDataProvider());
         initializeFirebase();
+        setupPreferenceListener();
+        updateAirQualityStatus();
     }
 
     private void initializeViews(View view) {
@@ -113,11 +119,36 @@ public class DashBoardFragment extends Fragment {
         };
     }
 
+    private void setupPreferenceListener() {
+        preferenceChangeListener = (sharedPreferences, key) -> {
+            if (key.equals("air_quality_description")) {
+                updateAirQualityStatus();
+            }
+        };
+    }
+
+    private void updateAirQualityStatus() {
+        if (sharedPreferences != null && adapter != null) {
+            String airQuality = sharedPreferences.getString("air_quality_description", "Good");
+            for (item i : items) {
+                if (i.getName().equals("Air Quality")) {
+                    i.setStatus(airQuality);
+                    adapter.notifyDataSetChanged();
+                    break;
+                }
+            }
+        }
+    }
+
     @Override
     public void onStart() {
         super.onStart();
         if (presenceRef != null && presenceListener != null) {
             presenceRef.addValueEventListener(presenceListener);
+        }
+        if (sharedPreferences != null) {
+            sharedPreferences.registerOnSharedPreferenceChangeListener(preferenceChangeListener);
+            updateAirQualityStatus();
         }
     }
 
@@ -126,6 +157,9 @@ public class DashBoardFragment extends Fragment {
         super.onStop();
         if (presenceRef != null && presenceListener != null) {
             presenceRef.removeEventListener(presenceListener);
+        }
+        if (sharedPreferences != null) {
+            sharedPreferences.unregisterOnSharedPreferenceChangeListener(preferenceChangeListener);
         }
     }
 

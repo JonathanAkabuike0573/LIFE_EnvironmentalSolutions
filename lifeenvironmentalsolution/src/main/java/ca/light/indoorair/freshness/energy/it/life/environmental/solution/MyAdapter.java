@@ -34,11 +34,11 @@ public class MyAdapter extends RecyclerView.Adapter<MyViewHolder> {
         item currentItem = list.get(position);
 
         holder.device_name.setText(currentItem.getName());
+        holder.device_status.setText(currentItem.getStatus());
 
         if (!currentItem.isShowToggle()) {
             holder.device_toggle.setVisibility(View.GONE);
             holder.device_icon.setImageResource(currentItem.getImages());
-            holder.device_status.setText(currentItem.getStatus());
             return;
         }
 
@@ -61,19 +61,21 @@ public class MyAdapter extends RecyclerView.Adapter<MyViewHolder> {
 
         String initialStatus;
         if ("Presence Sensor".equals(currentItem.getName())) {
-            initialStatus = isInitiallyOn ? "Occupied" : "Empty";
+            initialStatus = isInitiallyOn ? "On" : "Off";
         } else {
             initialStatus = isInitiallyOn ? "On" : "Off";
         }
-        holder.device_status.setText(initialStatus);
-        currentItem.setStatus(initialStatus);
+        if(!"Air Quality".equals(currentItem.getName())) {
+            holder.device_status.setText(initialStatus);
+            currentItem.setStatus(initialStatus);
+        }
         updateIcon(holder, currentItem, isInitiallyOn);
 
         // --- Listener Setup ---
         holder.device_toggle.setOnCheckedChangeListener((buttonView, isChecked) -> {
             String status;
             if ("Presence Sensor".equals(currentItem.getName())) {
-                status = isChecked ? "Occupied" : "Empty";
+                status = isChecked ? "On" : "Off";
                 // Save state for presence sensor
                 prefs.edit().putBoolean("presence_detection_enabled", isChecked).apply();
             } else {
