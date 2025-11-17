@@ -169,38 +169,34 @@
                     android:text="@string/color_temperature"
                     android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"/>
 
-                <com.google.android.material.button.MaterialButtonToggleGroup
-                    android:id="@+id/toggle_group_color_temp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    app:singleSelection="true"
-                    app:selectionRequired="true">
-
-                    <Button
-                        android:id="@+id/button_warm"
-                        style="?attr/materialButtonOutlinedStyle"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
+                 <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/chip_group_light_brightness"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/warm"/>
+                        app:singleSelection="true"
+                        app:selectionRequired="true">
 
-                    <Button
-                        android:id="@+id/button_neutral"
-                        style="?attr/materialButtonOutlinedStyle"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_height="wrap_content"
-                        android:text="@string/neutral"/>
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_warm"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Warm" />
 
-                    <Button
-                        android:id="@+id/button_cool"
-                        style="?attr/materialButtonOutlinedStyle"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_height="wrap_content"
-                        android:text="@string/cool"/>
-                </com.google.android.material.button.MaterialButtonToggleGroup>
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_neutral"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Neutral" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_cool"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Cool" />
+                    </com.google.android.material.chip.ChipGroup>
 
                 <View android:layout_width="match_parent" android:layout_height="1dp" android:background="?android:attr/listDivider" android:layout_marginTop="16dp" android:layout_marginBottom="16dp"/>
 
