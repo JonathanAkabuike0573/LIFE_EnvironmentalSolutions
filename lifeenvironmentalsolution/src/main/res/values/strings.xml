@@ -195,6 +195,12 @@ CENG-322-OCC,  Software Project -->
     <string name="good_afternoon">Good afternoon</string>
     <string name="good_morning">Good morning</string>
     <string name="guest_user">Guest User</string>
+    <string name="presence_sensor">Presence Sensor</string>
+    <string name="smart_tv">Smart TV</string>
+    <string name="air_conditioner">Air Conditioner</string>
+    <string name="thermostat">Thermostat</string>
+    <string name="smart_light">Smart Light</string>
+    <string name="nothingyet">-:-</string>
 
 
 </resources>
