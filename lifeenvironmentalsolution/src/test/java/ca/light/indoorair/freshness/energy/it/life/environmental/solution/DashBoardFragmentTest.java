@@ -1,5 +1,4 @@
 package ca.light.indoorair.freshness.energy.it.life.environmental.solution;
-
 import org.junit.Test;
 import static org.junit.Assert.*;
 import java.util.Calendar;
@@ -90,4 +89,73 @@ public class DashBoardFragmentTest {
 
         assertEquals("User", fragment.getLastGreetingName());
     }
-}
+
+    @Test
+    public void testGreetingBoundaries() {
+        DashBoardFragment fragment = new DashBoardFragment();
+        Calendar calendar = Calendar.getInstance();
+
+        // Test just before noon
+        calendar.set(Calendar.HOUR_OF_DAY, 11);
+        assertTrue(fragment.generateGreetingMessage("Test", calendar).startsWith("Good morning"));
+
+        // Test exactly at noon
+        calendar.set(Calendar.HOUR_OF_DAY, 12);
+        assertTrue(fragment.generateGreetingMessage("Test", calendar).startsWith("Good afternoon"));
+
+        // Test just before evening
+        calendar.set(Calendar.HOUR_OF_DAY, 17);
+        assertTrue(fragment.generateGreetingMessage("Test", calendar).startsWith("Good afternoon"));
+
+        // Test exactly at evening
+        calendar.set(Calendar.HOUR_OF_DAY, 18);
+        assertTrue(fragment.generateGreetingMessage("Test", calendar).startsWith("Good evening"));
+    }
+
+    @Test
+    public void testLoadGreeting_EmptyName() {
+        TestableDashBoardFragment fragment = new TestableDashBoardFragment();
+        FakeUserDataProvider provider = new FakeUserDataProvider(true, "");
+        fragment.loadGreeting(provider);
+
+        assertEquals("User", fragment.getLastGreetingName());
+    }
+
+    @Test
+    public void testLoadGreeting_WhitespaceName() {
+        TestableDashBoardFragment fragment = new TestableDashBoardFragment();
+        FakeUserDataProvider provider = new FakeUserDataProvider(true, "   ");
+        fragment.loadGreeting(provider);
+
+        assertEquals("User", fragment.getLastGreetingName());
+    }
+
+    @Test
+    public void testGreetingMessageIsNotNull() {
+        DashBoardFragment fragment = new DashBoardFragment();
+        Calendar calendar = Calendar.getInstance();
+        String greeting = fragment.generateGreetingMessage("Test", calendar);
+        assertNotNull("The greeting message should not be null", greeting);
+    }
+
+    @Test
+    public void testGreetingMessageIsNotEmpty() {
+        DashBoardFragment fragment = new DashBoardFragment();
+        Calendar calendar = Calendar.getInstance();
+        String greeting = fragment.generateGreetingMessage("Test", calendar);
+        assertFalse("The greeting message should not be empty", greeting.isEmpty());
+    }
+
+    @Test
+    public void testProviderIsNotNull() {
+        TestableDashBoardFragment fragment = new TestableDashBoardFragment();
+        FakeUserDataProvider provider = new FakeUserDataProvider(true, "Test");
+        fragment.setDataProvider(provider);
+        assertNotNull("The data provider should not be null", fragment.dataProvider);
+    }
+
+    @Test
+    public void testCalendarInstanceIsNotNull() {
+        DashBoardFragment fragment = new DashBoardFragment();
+        assertNotNull("The calendar instance should not be null", fragment.getCalendarInstance());
+    } }
