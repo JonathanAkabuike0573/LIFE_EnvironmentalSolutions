@@ -3,7 +3,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -13,7 +12,7 @@ import androidx.fragment.app.Fragment;
 
 /**
  * A simple {@link Fragment} subclass for displaying the About Us screen.
- * This fragment inflates the layout and sets the dynamic app version text.
+ * This fragment inflates the layout and no longer sets the dynamic app version text.
  */
 public class AboutUsFragment extends Fragment {
 
@@ -32,31 +31,4 @@ public class AboutUsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        // Find the TextView where the app version will be displayed
-        TextView appVersionText = view.findViewById(R.id.app_version_text);
-
-        String versionName = "N/A";
-        int versionCode = 0;
-
-        try {
-            // Get the application's package information
-            versionName = requireContext().getPackageManager()
-                    .getPackageInfo(requireContext().getPackageName(), 0)
-                    .versionName;
-
-            // Note: For API 28 and below, getLongVersionCode() is not available.
-            // Using getVersionCode() for broader compatibility.
-            versionCode = requireContext().getPackageManager()
-                    .getPackageInfo(requireContext().getPackageName(), 0)
-                    .versionCode;
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        // Construct the full version string, e.g., "Version 1.0.0 (1)"
-        String fullVersionInfo = getString(R.string.version_label, versionName, versionCode);
-        appVersionText.setText(fullVersionInfo);
-    }
-}
+    } }

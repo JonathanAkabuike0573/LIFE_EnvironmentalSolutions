@@ -15,6 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.preference.PreferenceManager;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.slider.Slider;
@@ -51,7 +52,6 @@ public class AirQualityFragment extends Fragment {
 
     // --- SharedPreferences for saving settings ---
     private SharedPreferences sharedPreferences;
-    public static final String PREFS_NAME = "AirQualityPrefs";
     public static final String KEY_ALERT_LEVEL = "alert_level";
     public static final String KEY_AUTO_VENT = "auto_vent_enabled";
     public static final String KEY_PURIFIER_POWER = "purifier_power_enabled";
@@ -76,7 +76,9 @@ public class AirQualityFragment extends Fragment {
         initializeViews(view);
 
         // Initialize SharedPreferences for storing user settings
-        sharedPreferences = requireActivity().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        if (getContext() != null) {
+            sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+        }
 
         // Setup listeners for all interactive controls (sliders, switches, button)
         setupControlListeners();
@@ -181,6 +183,11 @@ public class AirQualityFragment extends Fragment {
             airQualityValueText.setText(String.valueOf(eco2Value));
             airQualityLevelText.setText(co2Description != null ? co2Description : "Unknown");
             lastUpdatedTime.setText(formatTimestamp(timestamp));
+
+            // Save the description to SharedPreferences
+            if (co2Description != null) {
+                sharedPreferences.edit().putString("air_quality_description", co2Description).apply();
+            }
 
             // Update the color of the status indicator based on the CO2 value
             int color;

@@ -44,7 +44,7 @@
                     android:layout_height="wrap_content"
                     android:paddingTop="@dimen/space_s"
                     android:paddingBottom="@dimen/space_s"
-                    android:text="ACCOUNT"
+                    android:text="@string/account"
                     android:textColor="@color/primary"
                     android:textStyle="bold" />
 
@@ -70,7 +70,7 @@
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_toStartOf="@id/iv_account_arrow"
-                        android:text="Profile Management"
+                        android:text="@string/profile_management"
                         android:textColor="@color/on_surface"
                         android:textSize="@dimen/text_m" />
                 </RelativeLayout>
@@ -110,7 +110,7 @@
 
                     android:paddingTop="@dimen/space_s"
                     android:paddingBottom="@dimen/space_s"
-                    android:text="PREFERENCES"
+                    android:text="@string/preferences"
                     android:textColor="@color/primary"
                     android:textStyle="bold" />
 
@@ -190,7 +190,7 @@
                             android:id="@+id/tv_units_title"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Units"
+                            android:text="@string/units"
                             android:textColor="@color/on_surface"
                             android:textSize="@dimen/text_m" />
 
@@ -198,7 +198,7 @@
                             android:id="@+id/tv_units_sub"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Select measurement units"
+                            android:text="@string/select_measurement_units"
                             android:textColor="@color/text_field_hint"
                             android:textSize="@dimen/text_s" />
                     </LinearLayout>
@@ -215,7 +215,7 @@
                     android:layout_height="wrap_content"
                     android:paddingTop="@dimen/space_m"
                     android:paddingBottom="@dimen/space_s"
-                    android:text="NOTIFICATIONS"
+                    android:text="@string/notifications"
                     android:textColor="@color/primary"
                     android:textStyle="bold" />
 
@@ -248,7 +248,7 @@
                             android:id="@+id/smart_notification_title"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Smart Notification"
+                            android:text="@string/smart_notification"
                             android:textColor="@color/on_surface"
                             android:textSize="@dimen/text_m" />
 
@@ -256,7 +256,7 @@
                             android:id="@+id/smart_notification_sub"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Tips and alerts when it matters"
+                            android:text="@string/tips_and_alerts_when_it_matters"
                             android:textColor="@color/text_field_hint"
                             android:textSize="@dimen/text_s" />
                     </LinearLayout>
@@ -294,7 +294,7 @@
                             android:id="@+id/tv_morning_report_title"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Morning report"
+                            android:text="@string/morning_report"
                             android:textColor="@color/on_surface"
                             android:textSize="@dimen/text_m" />
 
@@ -302,7 +302,7 @@
                             android:id="@+id/tv_morning_report_sub"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="The day's forcast received at 7am"
+                            android:text="@string/the_day_s_forcast_received_at_7am"
                             android:textColor="@color/text_field_hint"
                             android:textSize="@dimen/text_s" />
                     </LinearLayout>
@@ -340,7 +340,7 @@
                             android:id="@+id/tv_evening_reports_title"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Evening reports"
+                            android:text="@string/evening_reports"
                             android:textColor="@color/on_surface"
                             android:textSize="@dimen/text_m" />
 
@@ -348,7 +348,7 @@
                             android:id="@+id/tv_evening_reports_sub"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="The day's forcast received at 7pm"
+                            android:text="@string/the_day_s_forcast_received_at_7pm"
                             android:textColor="@color/text_field_hint"
                             android:textSize="@dimen/text_s" />
                     </LinearLayout>
