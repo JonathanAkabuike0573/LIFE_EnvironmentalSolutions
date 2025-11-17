@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
@@ -17,8 +18,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.RatingBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -27,12 +31,14 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.HashMap;
+import java.util.Locale;
 
 public class FeedBackPage extends Fragment {
 
     private static final String TAG = "FeedBackPage"; // Tag for logging
 
     private EditText etName, etEmail, etPhone, etFeedback;
+    private TextView tvTimer;
     private static final String PREFS_NAME = "FeedbackPrefs";
     private static final String LAST_SUBMISSION_TIMESTAMP = "last_submission_timestamp";
     private static final long TWENTY_FOUR_HOURS_MILLIS = 24 * 60 * 60 * 1000;
@@ -40,6 +46,7 @@ public class FeedBackPage extends Fragment {
     private Button btnSend;
     private DatabaseReference feedbackDbRef;
     private ProgressBar feedbackSubmissionProgressBar;
+    private CountDownTimer countDownTimer;
 
 
     @Nullable
@@ -61,30 +68,56 @@ public class FeedBackPage extends Fragment {
         etFeedback = view.findViewById(R.id.etFeedback);
         ratingBar = view.findViewById(R.id.ratingBar);
         btnSend = view.findViewById(R.id.btnSend);
+        tvTimer = view.findViewById(R.id.tvTimer);
         feedbackSubmissionProgressBar = view.findViewById(R.id.feedbackSubmissionProgressBar);
 
+        checkSubmissionCooldown();
 
         btnSend.setOnClickListener(v -> submitFeedback());
     }
 
-    private void submitFeedback() {
-        // Check if the user has submitted feedback in the last 24 hours
+    private void checkSubmissionCooldown() {
         SharedPreferences prefs = requireActivity().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         long lastSubmissionTime = prefs.getLong(LAST_SUBMISSION_TIMESTAMP, 0);
         long currentTime = System.currentTimeMillis();
+        long timeDifference = currentTime - lastSubmissionTime;
 
-        if (currentTime - lastSubmissionTime < TWENTY_FOUR_HOURS_MILLIS) {
-            // It's been less than 24 hours
-            new AlertDialog.Builder(requireContext())
-                    .setTitle("Submission Limit")
-                    .setIcon(R.drawable.logolife)
-                    .setMessage("You can only submit feedback once every 24 hours.")
-                    .setPositiveButton(android.R.string.ok, null)
-                    .show();
-            Log.w(TAG, "Submission blocked: User tried to submit feedback before 24-hour cooldown.");
-            return;
+        if (timeDifference < TWENTY_FOUR_HOURS_MILLIS) {
+            btnSend.setEnabled(false);
+            long remainingTime = TWENTY_FOUR_HOURS_MILLIS - timeDifference;
+            startTimer(remainingTime);
+        } else {
+            btnSend.setEnabled(true);
+            tvTimer.setVisibility(View.GONE);
+        }
+    }
+
+    private void startTimer(long duration) {
+        if (countDownTimer != null) {
+            countDownTimer.cancel();
         }
 
+        btnSend.setEnabled(false);
+        tvTimer.setVisibility(View.VISIBLE);
+
+        countDownTimer = new CountDownTimer(duration, 1000) { // Update every second
+            @Override
+            public void onTick(long millisUntilFinished) {
+                long hours = (millisUntilFinished / (1000 * 60 * 60)) % 24;
+                long minutes = (millisUntilFinished / (1000 * 60)) % 60;
+                long seconds = (millisUntilFinished / 1000) % 60;
+                tvTimer.setText(String.format(Locale.getDefault(), "You can submit again in: %02d:%02d:%02d", hours, minutes, seconds));
+            }
+
+            @Override
+            public void onFinish() {
+                tvTimer.setVisibility(View.GONE);
+                btnSend.setEnabled(true);
+            }
+        }.start();
+    }
+
+    private void submitFeedback() {
         String name = etName.getText().toString().trim();
         String email = etEmail.getText().toString().trim();
         String phone = etPhone.getText().toString().trim();
@@ -115,16 +148,16 @@ public class FeedBackPage extends Fragment {
             return;
         }
 
-        // Validate email and phone number
+        // Validate email format
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             etEmail.setError("Please enter a valid email address");
             return;
         }
-        if (!Patterns.PHONE.matcher(phone).matches()) {
-            etPhone.setError("Please enter a valid phone number");
+        // Validate phone number length (must be at least 10 digits)
+        if (phone.length() < 10) {
+            etPhone.setError("Please enter a complete phone number (at least 10 digits)");
             return;
         }
-
         String feedbackId = feedbackDbRef.push().getKey();
 
         HashMap<String, Object> feedbackMap = new HashMap<>();
@@ -146,9 +179,8 @@ public class FeedBackPage extends Fragment {
             new Handler(Looper.getMainLooper()).postDelayed(() -> {
                 feedbackDbRef.child(feedbackId).setValue(feedbackMap)
                         .addOnCompleteListener(task -> {
-                            // Hide progress bar and re-enable button regardless of outcome
+                            // Hide progress bar
                             feedbackSubmissionProgressBar.setVisibility(View.GONE);
-                            btnSend.setEnabled(true);
 
                             if (task.isSuccessful()) {
                                 Log.d(TAG, "Firebase submission successful!");
@@ -171,10 +203,12 @@ public class FeedBackPage extends Fragment {
                                             etPhone.setText("");
                                             etFeedback.setText("");
                                             ratingBar.setRating(0);
+                                            startTimer(TWENTY_FOUR_HOURS_MILLIS);
                                         })
                                         .show();
                             } else {
                                 Log.e(TAG, "Firebase submission failed.", task.getException());
+                                btnSend.setEnabled(true);
                                 new AlertDialog.Builder(requireContext())
                                         .setTitle("Submission Failed")
                                         .setMessage("Failed to submit feedback. Please check your network connection and try again.")
@@ -183,6 +217,14 @@ public class FeedBackPage extends Fragment {
                             }
                         });
             }, 5000); // 5-second delay
+        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (countDownTimer != null) {
+            countDownTimer.cancel();
         }
     }
 }

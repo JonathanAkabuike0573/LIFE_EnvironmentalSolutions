@@ -1,8 +1,8 @@
-//Mohamed Ali  N01440760, Jonathan Akabuike N01510573, Kieran Sharma N01548225, Farhan Habibza N01610299
-//CENG-322-OCC,  Software Project
 package ca.light.indoorair.freshness.energy.it.life.environmental.solution;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import androidx.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +16,6 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -29,45 +28,40 @@ import java.util.List;
 
 public class DashBoardFragment extends Fragment {
 
-    // Declare the view variable
-    private TextView userGreeting;
+    // UI Elements
+    private TextView userGreeting, temperatureText, comfortLevelText;
 
-    // Declare Firebase variables
+    // Firebase
     private FirebaseAuth mAuth;
-    private DatabaseReference userRef;
-    private UserDataProvider dataProvider;
+    private DatabaseReference presenceRef;
+    private ValueEventListener presenceListener;
+
+    // SharedPreferences
+    private SharedPreferences sharedPreferences;
+    private SharedPreferences.OnSharedPreferenceChangeListener preferenceChangeListener;
+    private MyAdapter adapter;
+    private List<item> items;
 
     public DashBoardFragment() {
         // Required empty public constructor
     }
 
-    // Public setter for dependency injection
-    public void setDataProvider(UserDataProvider provider) {
-        this.dataProvider = provider;
-    }
-
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_dash_board, container, false);
 
-
-
-        List<item> items = new ArrayList<>();
-        items.add(new item("Air Quality", "Good", R.drawable.air_qualityicon, true, true));
+        items = new ArrayList<>();
+        items.add(new item("Air Quality", "Good", R.drawable.air_qualityicon, true, false));
         items.add(new item("Smart Light", "Off", R.drawable.lightofficon, false, true));
         items.add(new item("Thermostat", "22°C", R.drawable.thermostaticon, true, false));
         items.add(new item("Air Conditioner", "Off", R.drawable.airconditionericon, false, true));
-        items.add(new item("Occupancy Sensor", "Off", R.drawable.sensor_occupied, false, false));
+        items.add(new item("Presence Sensor", "Off", R.drawable.sensor_occupied, false, true));
         items.add(new item("Smart TV", "Off", R.drawable.tv_officon, false, true));
-
-
-
 
         RecyclerView recycler = view.findViewById(R.id.recyclerView);
         recycler.setLayoutManager(new GridLayoutManager(getContext(), 2));
-        recycler.setAdapter(new MyAdapter(getContext(), items));
+        adapter = new MyAdapter(getContext(), items);
+        recycler.setAdapter(adapter);
 
         return view;
     }
@@ -76,31 +70,130 @@ public class DashBoardFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Initialize views and Firebase Auth
-        userGreeting = view.findViewById(R.id.usergreeting); // Make sure this ID exists in fragment_dash_board.xml
+        initializeViews(view);
         mAuth = FirebaseAuth.getInstance();
+        if (getContext() != null) {
+            sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+        }
 
-        // Load the user's information to set the greeting
         loadGreeting(new FirebaseUserDataProvider());
+        initializeFirebase();
+        setupPreferenceListener();
+        updateAirQualityStatus();
     }
 
-    /**
-     * This method depends on an abstraction (UserDataProvider), not a concrete class.
-     * This is Method Injection.
-     */
+    private void initializeViews(View view) {
+        userGreeting = view.findViewById(R.id.usergreeting);
+        temperatureText = view.findViewById(R.id.temperature_text);
+        comfortLevelText = view.findViewById(R.id.weather_description); // Reusing for comfort level
+    }
+
+    private void initializeFirebase() {
+        presenceRef = FirebaseDatabase.getInstance().getReference("room_occupancy");
+        presenceListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    // Get the last entry
+                    DataSnapshot lastReading = null;
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        lastReading = snapshot;
+                    }
+
+                    if (lastReading != null) {
+                        Double tempC = lastReading.child("current_temperature_c").getValue(Double.class);
+                        Double tempF = lastReading.child("current_temperature_f").getValue(Double.class);
+                        String comfortLevel = lastReading.child("comfort_level").getValue(String.class);
+
+                        updateWeatherCard(tempC, tempF, comfortLevel);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                if (getContext() != null) {
+                    Toast.makeText(getContext(), "Error: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            }
+        };
+    }
+
+    private void setupPreferenceListener() {
+        preferenceChangeListener = (sharedPreferences, key) -> {
+            if (key.equals("air_quality_description")) {
+                updateAirQualityStatus();
+            }
+        };
+    }
+
+    private void updateAirQualityStatus() {
+        if (sharedPreferences != null && adapter != null) {
+            String airQuality = sharedPreferences.getString("air_quality_description", "Good");
+            for (item i : items) {
+                if (i.getName().equals("Air Quality")) {
+                    i.setStatus(airQuality);
+                    adapter.notifyDataSetChanged();
+                    break;
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (presenceRef != null && presenceListener != null) {
+            presenceRef.addValueEventListener(presenceListener);
+        }
+        if (sharedPreferences != null) {
+            sharedPreferences.registerOnSharedPreferenceChangeListener(preferenceChangeListener);
+            updateAirQualityStatus();
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (presenceRef != null && presenceListener != null) {
+            presenceRef.removeEventListener(presenceListener);
+        }
+        if (sharedPreferences != null) {
+            sharedPreferences.unregisterOnSharedPreferenceChangeListener(preferenceChangeListener);
+        }
+    }
+
+    private void updateWeatherCard(Double tempC, Double tempF, String comfortLevel) {
+        if (sharedPreferences == null && getContext() != null) {
+            sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+        }
+        String unit = sharedPreferences.getString("units", "Metric (°C)");
+
+        if (unit.equals("Imperial (°F)") && tempF != null) {
+            temperatureText.setText(String.format(java.util.Locale.getDefault(), "%.0f°F", tempF));
+        } else if (tempC != null) {
+            temperatureText.setText(String.format(java.util.Locale.getDefault(), "%.0f°C", tempC));
+        }
+
+        if (comfortLevel != null) {
+            comfortLevelText.setText(comfortLevel.replace("_", " "));
+        }
+    }
+
     protected void loadGreeting(UserDataProvider dataProvider) {
-        // Use the injected provider to fetch data.
         dataProvider.fetchUserData(new UserDataProvider.UserDataCallback() {
             @Override
             public void onDataReceived(String userName) {
-                // When data is received, update the UI.
-                String firstName = userName.split(" ")[0];
-                setGreeting(firstName);
+                if (userName != null && !userName.trim().isEmpty()) {
+                    String firstName = userName.split(" ")[0];
+                    setGreeting(firstName);
+                } else {
+                    setGreeting("User");
+                }
             }
 
             @Override
             public void onError(String errorMessage) {
-                // If there's an error, show a generic greeting and a toast.
                 setGreeting("User");
                 if (getContext() != null) {
                     Toast.makeText(getContext(), "Error: " + errorMessage, Toast.LENGTH_SHORT).show();
@@ -109,12 +202,10 @@ public class DashBoardFragment extends Fragment {
         });
     }
 
-    // Protected method to retrieve a Calendar instance.
     protected Calendar getCalendarInstance() {
         return Calendar.getInstance();
     }
 
-    // FIX: Extracted greeting logic into a testable, package-private method
     String generateGreetingMessage(String name, Calendar calendar) {
         int hourOfDay = calendar.get(Calendar.HOUR_OF_DAY);
 
@@ -130,10 +221,6 @@ public class DashBoardFragment extends Fragment {
         return greeting + ", " + name;
     }
 
-    /**
-     * Determines the time of day and sets the appropriate greeting message.
-     * @param name The user's name to include in the greeting.
-     */
     protected void setGreeting(String name) {
         Calendar calendar = getCalendarInstance();
         String fullGreeting = generateGreetingMessage(name, calendar);
