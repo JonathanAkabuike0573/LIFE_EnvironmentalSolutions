@@ -1,12 +1,14 @@
 package ca.light.indoorair.freshness.energy.it.life.environmental.solution;
 
-
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
@@ -15,12 +17,11 @@ public class MyAdapter extends RecyclerView.Adapter<MyViewHolder> {
 
     Context context;
     List<item> list;
+
     public MyAdapter(Context context, List<item> list) {
         this.context = context;
         this.list = list;
     }
-
-
 
     @NonNull
     @Override
@@ -33,70 +34,74 @@ public class MyAdapter extends RecyclerView.Adapter<MyViewHolder> {
         item currentItem = list.get(position);
 
         holder.device_name.setText(currentItem.getName());
-        holder.device_icon.setImageResource(currentItem.getImages());
 
-        if (currentItem.isShowToggle()) {
-            holder.device_toggle.setVisibility(View.VISIBLE);
-        } else {
+        if (!currentItem.isShowToggle()) {
             holder.device_toggle.setVisibility(View.GONE);
+            holder.device_icon.setImageResource(currentItem.getImages());
+            holder.device_status.setText(currentItem.getStatus());
+            return;
         }
 
-        // Special handling for Smart Light
-        if ("Smart Light".equals(currentItem.getName())) {
-            // Update status based on toggle state
-            holder.device_status.setText(currentItem.isDeviceOn() ? "On" : "Off");
-            holder.device_toggle.setOnCheckedChangeListener(null);
-            holder.device_toggle.setChecked(currentItem.isDeviceOn());
+        holder.device_toggle.setVisibility(View.VISIBLE);
 
-            holder.device_toggle.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                currentItem.setDeviceOn(isChecked);
-                holder.device_status.setText(isChecked ? "On" : "Off");
-                currentItem.setStatus(isChecked ? "On" : "Off");
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-                // Switch between lightonicon and lightofficon
-                if (isChecked) {
-                    holder.device_icon.setImageResource(R.drawable.lightonicon);
-                } else {
-                    holder.device_icon.setImageResource(R.drawable.lightofficon);
-                }
-            });
-        } else if ("Smart TV".equals(currentItem.getName())) {
-            // Update status based on toggle state
-            holder.device_status.setText(currentItem.isDeviceOn() ? "On" : "Off");
-            holder.device_toggle.setOnCheckedChangeListener(null);
-            holder.device_toggle.setChecked(currentItem.isDeviceOn());
-
-            holder.device_toggle.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                currentItem.setDeviceOn(isChecked);
-                holder.device_status.setText(isChecked ? "On" : "Off");
-                currentItem.setStatus(isChecked ? "On" : "Off");
-
-                // Switch between tvonicon and tvofficon
-                if (isChecked) {
-                    holder.device_icon.setImageResource(R.drawable.tv_onicon);
-                } else {
-                    holder.device_icon.setImageResource(R.drawable.tv_officon);
-                }
-            });
-        } else if ("Occupancy Sensor".equals(currentItem.getName())) {
-            // Update status based on toggle state
-            holder.device_status.setText(currentItem.isDeviceOn() ? "Occupied" : "Empty");
-            holder.device_toggle.setOnCheckedChangeListener(null);
-            holder.device_toggle.setChecked(currentItem.isDeviceOn());
-            holder.device_toggle.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                currentItem.setDeviceOn(isChecked);
-                holder.device_status.setText(isChecked ? "Occupied" : "Empty");
-                currentItem.setStatus(isChecked ? "Occupied" : "Empty");
-
-                // Switch between detection_on and detection_off icons
-                if (isChecked) {
-                    holder.device_icon.setImageResource(R.drawable.detection_on);
-                } else {
-                    holder.device_icon.setImageResource(R.drawable.detectionoff);
-                }
-            });
+        // --- Initial State Setup ---
+        boolean isInitiallyOn;
+        if ("Presence Sensor".equals(currentItem.getName())) {
+            isInitiallyOn = prefs.getBoolean("presence_detection_enabled", true);
+        } else {
+            isInitiallyOn = currentItem.isDeviceOn();
         }
 
+        // Update the model and UI without triggering the listener
+        holder.device_toggle.setOnCheckedChangeListener(null);
+        holder.device_toggle.setChecked(isInitiallyOn);
+        currentItem.setDeviceOn(isInitiallyOn);
+
+        String initialStatus;
+        if ("Presence Sensor".equals(currentItem.getName())) {
+            initialStatus = isInitiallyOn ? "Occupied" : "Empty";
+        } else {
+            initialStatus = isInitiallyOn ? "On" : "Off";
+        }
+        holder.device_status.setText(initialStatus);
+        currentItem.setStatus(initialStatus);
+        updateIcon(holder, currentItem, isInitiallyOn);
+
+        // --- Listener Setup ---
+        holder.device_toggle.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            String status;
+            if ("Presence Sensor".equals(currentItem.getName())) {
+                status = isChecked ? "Occupied" : "Empty";
+                // Save state for presence sensor
+                prefs.edit().putBoolean("presence_detection_enabled", isChecked).apply();
+            } else {
+                status = isChecked ? "On" : "Off";
+            }
+
+            String message = currentItem.getName() + " is " + status;
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+
+            // Update model and UI
+            currentItem.setDeviceOn(isChecked);
+            currentItem.setStatus(status);
+            holder.device_status.setText(status);
+            updateIcon(holder, currentItem, isChecked);
+        });
+    }
+
+    private void updateIcon(MyViewHolder holder, item currentItem, boolean isChecked) {
+        String itemName = currentItem.getName();
+        if (itemName.equals("Smart Light")) {
+            holder.device_icon.setImageResource(isChecked ? R.drawable.lightonicon : R.drawable.lightofficon);
+        } else if (itemName.equals("Smart TV")) {
+            holder.device_icon.setImageResource(isChecked ? R.drawable.tv_onicon : R.drawable.tv_officon);
+        } else if (itemName.equals("Presence Sensor")) {
+            holder.device_icon.setImageResource(isChecked ? R.drawable.detection_on : R.drawable.detectionoff);
+        } else {
+            holder.device_icon.setImageResource(currentItem.getImages());
+        }
     }
 
     @Override
