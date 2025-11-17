@@ -1,0 +1,69 @@
+package ca.light.indoorair.freshness.energy.it.life.environmental.solution;
+
+import org.junit.Test;
+import static org.junit.Assert.*;
+
+public class HelperClassTest {
+
+    // 1 - Test constructor initializes values correctly
+    @Test
+    public void testConstructorInitializesFields() {
+        HelperClass helper = new HelperClass("Alice", "alice@example.com", "1234567890");
+        assertEquals("Alice", helper.getName());
+        assertEquals("alice@example.com", helper.getEmail());
+        assertEquals("1234567890", helper.getPhoneNumber());
+    }
+
+    // 2 - Test default constructor doesn't crash
+    @Test
+    public void testDefaultConstructor() {
+        HelperClass helper = new HelperClass();
+        assertNotNull(helper);
+    }
+
+    // 3 - Test setName()
+    @Test
+    public void testSetName() {
+        HelperClass helper = new HelperClass();
+        helper.setName("Bob");
+        assertEquals("Bob", helper.getName());
+    }
+
+    // 4 - Test setEmail()
+    @Test
+    public void testSetEmail() {
+        HelperClass helper = new HelperClass();
+        helper.setEmail("bob@example.com");
+        assertEquals("bob@example.com", helper.getEmail());
+    }
+
+    // 5 - Test setPhoneNumber()
+    @Test
+    public void testSetPhoneNumber() {
+        HelperClass helper = new HelperClass();
+        helper.setPhoneNumber("9876543210");
+        assertEquals("9876543210", helper.getPhoneNumber());
+    }
+
+    // 6 - Test fields allow empty values
+    @Test
+    public void testHandlesEmptyStrings() {
+        HelperClass helper = new HelperClass("", "", "");
+        assertEquals("", helper.getName());
+        assertEquals("", helper.getEmail());
+        assertEquals("", helper.getPhoneNumber());
+    }
+
+    // 7 - Test multiple fields updated independently
+    @Test
+    public void testMultipleSettersWorkIndependently() {
+        HelperClass helper = new HelperClass();
+        helper.setName("Charlie");
+        helper.setEmail("charlie@mail.com");
+        helper.setPhoneNumber("1112223333");
+
+        assertEquals("Charlie", helper.getName());
+        assertEquals("charlie@mail.com", helper.getEmail());
+        assertEquals("1112223333", helper.getPhoneNumber());
+    }
+}
