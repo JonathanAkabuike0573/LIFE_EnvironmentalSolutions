@@ -97,7 +97,7 @@ public class LightFragment extends Fragment {
     private void setupListeners() {
         lightBrightnessChipGroup.setOnCheckedChangeListener((group, checkedId) -> {
             Chip selectedChip = group.findViewById(checkedId);
-            if (selectedChip != null) {
+            if (selectedChip != null && selectedChip.isPressed()) {
                 String selectedBrightness = selectedChip.getText().toString();
                 lightSensorDbRef.child("brightness").setValue(selectedBrightness);
                 Toast.makeText(getContext(), selectedBrightness + " selected", Toast.LENGTH_SHORT).show();
@@ -105,11 +105,13 @@ public class LightFragment extends Fragment {
         });
 
         autoBrightnessSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            sharedPreferences.edit().putBoolean(AUTO_BRIGHTNESS_KEY, isChecked).apply();
-            brightnessSlider.setEnabled(!isChecked);
-            String message = isChecked ? "Auto brightness enabled" : "Auto brightness disabled";
-            Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
-            lightSensorDbRef.child("autoBrightness").setValue(isChecked);
+            if (buttonView.isPressed()) {
+                sharedPreferences.edit().putBoolean(AUTO_BRIGHTNESS_KEY, isChecked).apply();
+                brightnessSlider.setEnabled(!isChecked);
+                String message = isChecked ? "Auto brightness enabled" : "Auto brightness disabled";
+                Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+                lightSensorDbRef.child("autoBrightness").setValue(isChecked);
+            }
         });
 
         preferenceChangeListener = (prefs, key) -> {

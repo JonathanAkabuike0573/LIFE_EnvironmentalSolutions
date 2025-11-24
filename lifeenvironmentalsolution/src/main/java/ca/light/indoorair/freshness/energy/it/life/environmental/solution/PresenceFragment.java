@@ -105,14 +105,16 @@ public class PresenceFragment extends Fragment {
 
     private void setupListeners() {
         presenceDetectionSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            sharedPreferences.edit().putBoolean("presence_detection_enabled", isChecked).apply();
+            if (buttonView.isPressed()) {
+                sharedPreferences.edit().putBoolean("presence_detection_enabled", isChecked).apply();
 
-            if (isChecked) {
-                startListeningForPresence();
-                Toast.makeText(getContext(), "Presence detection enabled", Toast.LENGTH_SHORT).show();
-            } else {
-                stopListeningForPresence();
-                Toast.makeText(getContext(), "Presence detection disabled", Toast.LENGTH_SHORT).show();
+                if (isChecked) {
+                    startListeningForPresence();
+                    Toast.makeText(getContext(), "Presence detection enabled", Toast.LENGTH_SHORT).show();
+                } else {
+                    stopListeningForPresence();
+                    Toast.makeText(getContext(), "Presence detection disabled", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
