@@ -2,11 +2,14 @@
 //CENG-322-OCC,  Software Project
 package ca.light.indoorair.freshness.energy.it.life.environmental.solution;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,9 +20,14 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -43,6 +51,23 @@ public class SettingsFragment extends Fragment {
     private SharedPreferences sharedPreferences;
     private FirebaseAuth mAuth;
 
+    private MaterialSwitch switchRequestingPermission;
+    private final ActivityResultLauncher<String> requestPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+        if (isGranted) {
+            if (switchRequestingPermission != null) {
+                switchRequestingPermission.setChecked(true);
+                // Also save the state now that permission is granted
+                String key = (String) switchRequestingPermission.getTag();
+                if (key != null) {
+                    sharedPreferences.edit().putBoolean(key, true).apply();
+                }
+            }
+        } else {
+            Toast.makeText(getContext(), "Notification permission denied", Toast.LENGTH_SHORT).show();
+        }
+        switchRequestingPermission = null;
+    });
+
     public SettingsFragment() {
         // Required empty public constructor
     }
@@ -60,6 +85,14 @@ public class SettingsFragment extends Fragment {
         profileManagement.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (getActivity() != null) {
+                    ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(R.string.profile_management);
+                    Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
+                    if (toolbar != null) {
+                        toolbar.setTitle(R.string.profile_management);
+                    }
+                }
+
                 FragmentManager fragmentManager = getParentFragmentManager();
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
                 fragmentTransaction.replace(R.id.main, new AccountFragment());
@@ -82,9 +115,21 @@ public class SettingsFragment extends Fragment {
         sharedPreferences = requireActivity().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
 
         setupPortraitSwitch(view);
-        setupSmartNotificationSwitch(view);
-        setupMorningReportSwitch(view);
-        setupEveningReportSwitch(view);
+        setupNotificationSwitch(view.findViewById(R.id.sw_smart_notification), SMART_NOTIFICATION_KEY, "Smart notifications enabled", "Smart notifications disabled");
+        setupNotificationSwitch(view.findViewById(R.id.sw_morning_report), MORNING_REPORT_KEY, "Morning report enabled", "Morning report disabled");
+        setupNotificationSwitch(view.findViewById(R.id.sw_evening_reports), EVENING_REPORT_KEY, "Evening report enabled", "Evening report disabled");
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (getActivity() != null) {
+            ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(R.string.settings);
+            Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
+            if (toolbar != null) {
+                toolbar.setTitle(R.string.settings);
+            }
+        }
     }
 
     private void setupPortraitSwitch(View view) {
@@ -101,36 +146,24 @@ public class SettingsFragment extends Fragment {
         });
     }
 
-    private void setupSmartNotificationSwitch(View view) {
-        MaterialSwitch smartNotificationSwitch = view.findViewById(R.id.sw_smart_notification);
-        smartNotificationSwitch.setChecked(sharedPreferences.getBoolean(SMART_NOTIFICATION_KEY, false));
+    private void setupNotificationSwitch(MaterialSwitch switchView, String key, String enabledMessage, String disabledMessage) {
+        switchView.setTag(key); // Store the key for later use
+        switchView.setChecked(sharedPreferences.getBoolean(key, false));
 
-        smartNotificationSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            sharedPreferences.edit().putBoolean(SMART_NOTIFICATION_KEY, isChecked).apply();
-            String message = isChecked ? "Smart notifications enabled" : "Smart notifications disabled";
-            Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
-        });
-    }
-
-    private void setupMorningReportSwitch(View view) {
-        MaterialSwitch morningReportSwitch = view.findViewById(R.id.sw_morning_report);
-        morningReportSwitch.setChecked(sharedPreferences.getBoolean(MORNING_REPORT_KEY, false));
-
-        morningReportSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            sharedPreferences.edit().putBoolean(MORNING_REPORT_KEY, isChecked).apply();
-            String message = isChecked ? "Morning report enabled" : "Morning report disabled";
-            Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
-        });
-    }
-
-    private void setupEveningReportSwitch(View view) {
-        MaterialSwitch eveningReportSwitch = view.findViewById(R.id.sw_evening_reports);
-        eveningReportSwitch.setChecked(sharedPreferences.getBoolean(EVENING_REPORT_KEY, false));
-
-        eveningReportSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            sharedPreferences.edit().putBoolean(EVENING_REPORT_KEY, isChecked).apply();
-            String message = isChecked ? "Evening report enabled" : "Evening report disabled";
-            Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+        switchView.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                    switchRequestingPermission = switchView; // Use the switchView from the outer scope
+                    switchView.setChecked(false);
+                    requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
+                } else {
+                    sharedPreferences.edit().putBoolean(key, true).apply();
+                    Toast.makeText(getContext(), enabledMessage, Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                sharedPreferences.edit().putBoolean(key, false).apply();
+                Toast.makeText(getContext(), disabledMessage, Toast.LENGTH_SHORT).show();
+            }
         });
     }
 
