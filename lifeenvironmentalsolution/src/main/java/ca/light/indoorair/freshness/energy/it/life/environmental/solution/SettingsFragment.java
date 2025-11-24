@@ -20,6 +20,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -60,6 +62,14 @@ public class SettingsFragment extends Fragment {
         profileManagement.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (getActivity() != null) {
+                    ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(R.string.profile_management);
+                    Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
+                    if (toolbar != null) {
+                        toolbar.setTitle(R.string.profile_management);
+                    }
+                }
+
                 FragmentManager fragmentManager = getParentFragmentManager();
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
                 fragmentTransaction.replace(R.id.main, new AccountFragment());
@@ -85,6 +95,18 @@ public class SettingsFragment extends Fragment {
         setupSmartNotificationSwitch(view);
         setupMorningReportSwitch(view);
         setupEveningReportSwitch(view);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (getActivity() != null) {
+            ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(R.string.settings);
+            Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
+            if (toolbar != null) {
+                toolbar.setTitle(R.string.settings);
+            }
+        }
     }
 
     private void setupPortraitSwitch(View view) {
