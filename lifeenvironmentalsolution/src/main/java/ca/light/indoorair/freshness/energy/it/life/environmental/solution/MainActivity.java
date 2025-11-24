@@ -117,8 +117,10 @@ public class MainActivity extends AppCompatActivity {
         Fragment LightFragment = new LightFragment();
         Fragment PresenceFragment = new PresenceFragment();
 
-        setCurrentFragment(dashBoardFragment);
-        setTitle(getString(R.string.home));
+        if (savedInstanceState == null) {
+            setCurrentFragment(dashBoardFragment);
+            setTitle(getString(R.string.home));
+        }
 
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setOnItemSelectedListener(item -> {
