@@ -41,6 +41,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.gms.auth.api.identity.Identity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -53,7 +54,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements FragmentManager.OnBackStackChangedListener {
 
     FragmentManager fragmentManager;
     private FirebaseAuth auth;
@@ -109,6 +110,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         fragmentManager = getSupportFragmentManager();
+        fragmentManager.addOnBackStackChangedListener(this);
 
         Fragment dashBoardFragment = new DashBoardFragment();
         Fragment settingsFragment = new SettingsFragment();
@@ -117,29 +119,31 @@ public class MainActivity extends AppCompatActivity {
         Fragment LightFragment = new LightFragment();
         Fragment PresenceFragment = new PresenceFragment();
 
-        setCurrentFragment(dashBoardFragment);
-        setTitle(getString(R.string.home));
+        if (savedInstanceState == null) {
+            setCurrentFragment(dashBoardFragment, false);
+            setTitle(getString(R.string.home));
+        }
 
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
             if (id == R.id.dashboard) {
-                setCurrentFragment(dashBoardFragment);
+                setCurrentFragment(dashBoardFragment, false);
                 getSupportActionBar().setTitle(getString(R.string.dashboard));
                 toolbar.setTitle(getString(R.string.dashboard));
                 return true;
             } else if (id == R.id.air_quality) {
-                setCurrentFragment(new AirQualityFragment());
+                setCurrentFragment(new AirQualityFragment(), false);
                 getSupportActionBar().setTitle(getString(R.string.air_quality));
                 toolbar.setTitle(getString(R.string.air_quality));
                 return true;
             } else if (id == R.id.light) {
-                setCurrentFragment(new LightFragment());
+                setCurrentFragment(new LightFragment(), false);
                 getSupportActionBar().setTitle(getString(R.string.light));
                 toolbar.setTitle(getString(R.string.light));
                 return true;
             } else if (id == R.id.presence) {
-                setCurrentFragment(new PresenceFragment());
+                setCurrentFragment(new PresenceFragment(), false);
                 getSupportActionBar().setTitle(getString(R.string.presence));
                 toolbar.setTitle(getString(R.string.presence));
                 return true;
@@ -180,28 +184,28 @@ public class MainActivity extends AppCompatActivity {
             navigationView.setNavigationItemSelectedListener(item -> {
                 int id = item.getItemId();
                 if (id == R.id.nav_home) {
-                    setCurrentFragment(dashBoardFragment);
+                    setCurrentFragment(dashBoardFragment, false);
                     bottomNavigationView.setSelectedItemId(R.id.dashboard);
                     getSupportActionBar().setTitle(getString(R.string.dashboard));
                     toolbar.setTitle(getString(R.string.dashboard));
 
                 } else if (id == R.id.nav_settings) {
-                    setCurrentFragment(settingsFragment);
+                    setCurrentFragment(settingsFragment, true);
                     getSupportActionBar().setTitle(getString(R.string.settings));
                     toolbar.setTitle(getString(R.string.settings));
                 } else if (id == R.id.nav_purchase) {
-                    setCurrentFragment(purchasesFragment);
+                    setCurrentFragment(purchasesFragment, true);
                     getSupportActionBar().setTitle(getString(R.string.purchases));
                     toolbar.setTitle(getString(R.string.purchases));
                 } else if (id == R.id.nav_sign_out) {
                     signOut();
                 } else if (id == R.id.nav_feedback) {
-                    setCurrentFragment(new FeedBackPage());
+                    setCurrentFragment(new FeedBackPage(), true);
                     getSupportActionBar().setTitle(getString(R.string.feedback));
                     toolbar.setTitle(getString(R.string.feedback));
                 } else if (id == R.id.nav_about) {
                     setTitle(getString(R.string.about_us));
-                    setCurrentFragment(new AboutUsFragment());
+                    setCurrentFragment(new AboutUsFragment(), true);
                     getSupportActionBar().setTitle(getString(R.string.about_us));
                     toolbar.setTitle(getString(R.string.about_us));
                 }
@@ -213,15 +217,31 @@ public class MainActivity extends AppCompatActivity {
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-                new AlertDialog.Builder(MainActivity.this)
-                        .setIcon(ContextCompat.getDrawable(MainActivity.this, R.drawable.logolife))
-                        .setTitle(R.string.exit_application)
-                        .setMessage(R.string.are_you_sure_you_want_to_exit)
-                        .setPositiveButton(R.string.yes, (dialog, which) -> finish())
-                        .setNegativeButton(R.string.no, null)
-                        .show();
+                if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+                    getSupportFragmentManager().popBackStack();
+                } else {
+                    new AlertDialog.Builder(MainActivity.this)
+                            .setIcon(ContextCompat.getDrawable(MainActivity.this, R.drawable.logolife))
+                            .setTitle(R.string.exit_application)
+                            .setMessage(R.string.are_you_sure_you_want_to_exit)
+                            .setPositiveButton(R.string.yes, (dialog, which) -> finish())
+                            .setNegativeButton(R.string.no, null)
+                            .show();
+                }
             }
         });
+    }
+
+    @Override
+    public void onBackStackChanged() {
+        if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            toolbar.setNavigationOnClickListener(v -> onBackPressed());
+        } else {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+            toggle.syncState();
+            toolbar.setNavigationOnClickListener(v -> drawerLayout.open());
+        }
     }
 
     private void updateNavHeader() {
@@ -348,8 +368,13 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void setCurrentFragment(Fragment fragment) {
-        getSupportFragmentManager().beginTransaction().replace(R.id.main, fragment).commit();
+    private void setCurrentFragment(Fragment fragment, boolean addToBackStack) {
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.main, fragment);
+        if (addToBackStack) {
+            transaction.addToBackStack(null);
+        }
+        transaction.commit();
     }
 
     private void signOut() {

@@ -3,6 +3,7 @@ package ca.light.indoorair.freshness.energy.it.life.environmental.solution;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -53,6 +54,7 @@ public class FeedBackPage extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        requireActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         return inflater.inflate(R.layout.feedback, container, false);
     }
 
@@ -225,6 +227,11 @@ public class FeedBackPage extends Fragment {
         super.onDestroyView();
         if (countDownTimer != null) {
             countDownTimer.cancel();
+        }
+        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences(SettingsFragment.PREFS_NAME, Context.MODE_PRIVATE);
+        boolean isPortraitLock = sharedPreferences.getBoolean("portrait_lock", false);
+        if (!isPortraitLock) {
+            requireActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
         }
     }
 }

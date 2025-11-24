@@ -209,6 +209,8 @@ CENG-322-OCC,  Software Project -->
     <string name="offline">Offline</string>
     <string name="dim">Dim</string>
     <string name="normal">Normal</string>
+    <string name="profile_photo">Profile Photo</string>
+    <string name="change_photo">Change Photo</string>
 
 
 </resources>
