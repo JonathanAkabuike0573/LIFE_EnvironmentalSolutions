@@ -1,7 +1,9 @@
 package ca.light.indoorair.freshness.energy.it.life.environmental.solution;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -11,7 +13,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -20,9 +21,10 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
-import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -52,21 +54,43 @@ public class AccountFragment extends Fragment {
                 if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
                     Uri imageUri = result.getData().getData();
                     logo.setImageURI(imageUri);
-                    // Here you would normally upload the image to Firebase Storage and save the URL in the database
                     Toast.makeText(getContext(), "Profile photo updated. Save changes to make it permanent.", Toast.LENGTH_LONG).show();
                     saveChangesButton.setEnabled(true);
                 }
             }
     );
 
+    private final ActivityResultLauncher<Intent> takePictureLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                    Bundle extras = result.getData().getExtras();
+                    if (extras != null) {
+                        logo.setImageBitmap((android.graphics.Bitmap) extras.get("data"));
+                        Toast.makeText(getContext(), "Profile photo updated. Save changes to make it permanent.", Toast.LENGTH_LONG).show();
+                        saveChangesButton.setEnabled(true);
+                    }
+                }
+            }
+    );
+
+    private final ActivityResultLauncher<String> requestCameraPermissionLauncher = registerForActivityResult(
+            new ActivityResultContracts.RequestPermission(),
+            isGranted -> {
+                if (isGranted) {
+                    launchCamera();
+                } else {
+                    Toast.makeText(getContext(), R.string.camera_permission_denied, Toast.LENGTH_SHORT).show();
+                }
+            }
+    );
 
     public AccountFragment() {
         // Required empty public constructor
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_account_management, container, false);
     }
 
@@ -85,11 +109,37 @@ public class AccountFragment extends Fragment {
             saveChangesButton.setOnClickListener(v -> saveUserProfile());
         }
 
-        changePhotoText.setOnClickListener(v -> openImagePicker());
-        logo.setOnClickListener(v -> openImagePicker());
+        changePhotoText.setOnClickListener(v -> showPhotoSourceDialog());
+        logo.setOnClickListener(v -> showPhotoSourceDialog());
     }
 
-    private void openImagePicker() {
+    private void showPhotoSourceDialog() {
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Change Profile Photo")
+                .setItems(new CharSequence[]{"Take Photo", "Choose from Gallery"}, (dialog, which) -> {
+                    if (which == 0) {
+                        checkCameraPermissionAndLaunch();
+                    } else {
+                        openGallery();
+                    }
+                })
+                .show();
+    }
+
+    private void checkCameraPermissionAndLaunch() {
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+            launchCamera();
+        } else {
+            requestCameraPermissionLauncher.launch(Manifest.permission.CAMERA);
+        }
+    }
+
+    private void launchCamera() {
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        takePictureLauncher.launch(intent);
+    }
+
+    private void openGallery() {
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         pickImageLauncher.launch(intent);
     }
