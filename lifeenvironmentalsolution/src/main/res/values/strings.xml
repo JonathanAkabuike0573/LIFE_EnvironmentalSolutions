@@ -211,6 +211,7 @@ CENG-322-OCC,  Software Project -->
     <string name="normal">Normal</string>
     <string name="profile_photo">Profile Photo</string>
     <string name="change_photo">Change Photo</string>
+    <string name="change_password">Change Password</string>
 
 
 </resources>
