@@ -5,7 +5,6 @@ package ca.light.indoorair.freshness.energy.it.life.environmental.solution;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
@@ -16,8 +15,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
-import android.widget.Switch;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -26,6 +23,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
@@ -40,6 +38,7 @@ public class SettingsFragment extends Fragment {
 
     // Define SharedPreferences constants
     public static final String PREFS_NAME = "MyPrefsFile";
+    private static final String THEME_KEY = "ThemeKey";
     private static final String PORTRAIT_LOCK_KEY = "portrait_lock";
     private static final String SMART_NOTIFICATION_KEY = "smart_notification";
     private static final String MORNING_REPORT_KEY = "morning_report";
@@ -56,7 +55,6 @@ public class SettingsFragment extends Fragment {
         if (isGranted) {
             if (switchRequestingPermission != null) {
                 switchRequestingPermission.setChecked(true);
-                // Also save the state now that permission is granted
                 String key = (String) switchRequestingPermission.getTag();
                 if (key != null) {
                     sharedPreferences.edit().putBoolean(key, true).apply();
@@ -75,61 +73,56 @@ public class SettingsFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_settings, container, false);
 
         profileManagement = view.findViewById(R.id.row_account);
         changePasswordLayout = view.findViewById(R.id.row_change_password);
         mAuth = FirebaseAuth.getInstance();
 
-        profileManagement.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (getActivity() != null) {
-                    ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(R.string.profile_management);
-                    Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
-                    if (toolbar != null) {
-                        toolbar.setTitle(R.string.profile_management);
-                    }
+        profileManagement.setOnClickListener(v -> {
+            if (getActivity() != null) {
+                ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(R.string.profile_management);
+                Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
+                if (toolbar != null) {
+                    toolbar.setTitle(R.string.profile_management);
                 }
-
-                FragmentManager fragmentManager = getParentFragmentManager();
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.main, new AccountFragment());
-                fragmentTransaction.addToBackStack(null); // Optional: if you want to navigate back
-                fragmentTransaction.commit();
-
             }
+
+            FragmentManager fragmentManager = getParentFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.replace(R.id.main, new AccountFragment());
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
         });
 
         changePasswordLayout.setOnClickListener(v -> showChangePasswordDialog());
 
         return view;
-
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
         sharedPreferences = requireActivity().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
 
+        setupThemeSwitch(view);
         setupPortraitSwitch(view);
         setupNotificationSwitch(view.findViewById(R.id.sw_smart_notification), SMART_NOTIFICATION_KEY, "Smart notifications enabled", "Smart notifications disabled");
         setupNotificationSwitch(view.findViewById(R.id.sw_morning_report), MORNING_REPORT_KEY, "Morning report enabled", "Morning report disabled");
         setupNotificationSwitch(view.findViewById(R.id.sw_evening_reports), EVENING_REPORT_KEY, "Evening report enabled", "Evening report disabled");
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (getActivity() != null) {
-            ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(R.string.settings);
-            Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
-            if (toolbar != null) {
-                toolbar.setTitle(R.string.settings);
+    private void setupThemeSwitch(View view) {
+        MaterialSwitch themeSwitch = view.findViewById(R.id.sw_dark_theme);
+        themeSwitch.setChecked(sharedPreferences.getBoolean(THEME_KEY, false));
+
+        themeSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            sharedPreferences.edit().putBoolean(THEME_KEY, isChecked).apply();
+            AppCompatDelegate.setDefaultNightMode(isChecked ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO);
+            if (getActivity() != null) {
+                getActivity().recreate();
             }
-        }
+        });
     }
 
     private void setupPortraitSwitch(View view) {
@@ -138,7 +131,6 @@ public class SettingsFragment extends Fragment {
 
         portraitSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             sharedPreferences.edit().putBoolean(PORTRAIT_LOCK_KEY, isChecked).apply();
-
             Activity activity = getActivity();
             if (activity != null) {
                 activity.setRequestedOrientation(isChecked ? ActivityInfo.SCREEN_ORIENTATION_PORTRAIT : ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
@@ -147,13 +139,13 @@ public class SettingsFragment extends Fragment {
     }
 
     private void setupNotificationSwitch(MaterialSwitch switchView, String key, String enabledMessage, String disabledMessage) {
-        switchView.setTag(key); // Store the key for later use
+        switchView.setTag(key);
         switchView.setChecked(sharedPreferences.getBoolean(key, false));
 
         switchView.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-                    switchRequestingPermission = switchView; // Use the switchView from the outer scope
+                    switchRequestingPermission = switchView;
                     switchView.setChecked(false);
                     requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
                 } else {

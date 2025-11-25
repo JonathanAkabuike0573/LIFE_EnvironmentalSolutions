@@ -13,6 +13,7 @@
             background-color: #F5F5F5;
             color: #333;
             line-height: 1.7;
+            transition: background-color 0.3s, color 0.3s;
         }
 
         h1, h2 {
@@ -39,6 +40,7 @@
             border-radius: 14px;
             box-shadow: 0 3px 8px rgba(0,0,0,0.08);
             margin-bottom: 20px;
+            transition: background-color 0.3s, box-shadow 0.3s, color 0.3s;
         }
 
         .footer {
@@ -51,6 +53,31 @@
         a {
             color: #1A73E8;
             text-decoration: none;
+        }
+
+        /* Dark Theme */
+        body.dark-theme {
+            background-color: #121212 !important;
+            color: #E0E0E0 !important;
+        }
+
+        body.dark-theme h1,
+        body.dark-theme h2 {
+            color: #81D4FA !important; /* Lighter blue for dark mode */
+        }
+
+        body.dark-theme .card {
+            background: #1E1E1E !important;
+            color: #E0E0E0 !important; /* Explicitly set text color */
+            box-shadow: 0 3px 8px rgba(0,0,0,0.4) !important;
+        }
+
+        body.dark-theme .footer {
+            color: #999 !important;
+        }
+
+        body.dark-theme a {
+            color: #81D4FA !important;
         }
     </style>
 </head>
@@ -89,6 +116,16 @@
 </div>
 
 <p class="footer">Life Environmental Solution © 2025</p>
+
+<script>
+    function applyTheme(theme) {
+        if (theme === 'dark') {
+            document.body.classList.add('dark-theme');
+        } else {
+            document.body.classList.remove('dark-theme');
+        }
+    }
+</script>
 
 </body>
 </html>

@@ -160,6 +160,45 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
 
+                <!-- Setting: Dark Theme (Using RelativeLayout) -->
+                <RelativeLayout
+                    android:id="@+id/row_dark_theme"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="@dimen/space_s"
+                    android:paddingBottom="@dimen/space_s">
+
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/sw_dark_theme"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true" />
+
+                    <LinearLayout
+                        android:id="@+id/dark_theme_texts"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toStartOf="@id/sw_dark_theme"
+                        android:orientation="vertical"
+                        android:paddingEnd="@dimen/space_m">
+
+                        <TextView
+                            android:id="@+id/tv_dark_theme_title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Dark Theme"
+                            android:textColor="@color/on_surface"
+                            android:textSize="@dimen/text_m" />
+
+                    </LinearLayout>
+                </RelativeLayout>
+
+                <com.google.android.material.divider.MaterialDivider
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
                 <!-- Setting: Units (Using RelativeLayout) -->
                 <RelativeLayout
                     android:id="@+id/row_units"
