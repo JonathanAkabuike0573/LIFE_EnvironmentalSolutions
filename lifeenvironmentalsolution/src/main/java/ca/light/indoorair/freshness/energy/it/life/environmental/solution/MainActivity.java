@@ -49,7 +49,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-public class MainActivity extends AppCompatActivity implements FragmentManager.OnBackStackChangedListener {
+public class MainActivity extends AppCompatActivity {
 
     private FragmentManager fragmentManager;
     private FirebaseAuth auth;
@@ -82,13 +82,12 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
 
         auth = FirebaseAuth.getInstance();
         fragmentManager = getSupportFragmentManager();
-        fragmentManager.addOnBackStackChangedListener(this);
 
         setupTheme();
         setupNavigation();
 
         if (savedInstanceState == null) {
-            setCurrentFragment(new DashBoardFragment(), false);
+            setCurrentFragment(new DashBoardFragment());
             getSupportActionBar().setTitle(getString(R.string.dashboard));
         }
     }
@@ -108,6 +107,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayShowTitleEnabled(true);
+            actionBar.setDisplayHomeAsUpEnabled(false);
         }
     }
 
@@ -140,71 +140,61 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         });
 
         updateNavHeader();
-        setupBackButton();
-    }
-
-    private void handleDrawerNavigation(int itemId) {
-        if (itemId == R.id.nav_home) {
-            clearBackStack();
-            setCurrentFragment(new DashBoardFragment(), false);
-            getSupportActionBar().setTitle(R.string.dashboard);
-            bottomNavigationView.setSelectedItemId(R.id.dashboard);
-        } else if (itemId == R.id.nav_profile) {
-            setCurrentFragment(new AccountFragment(), true);
-            getSupportActionBar().setTitle("Profile");
-        } else if (itemId == R.id.nav_settings) {
-            setCurrentFragment(new SettingsFragment(), true);
-            getSupportActionBar().setTitle(R.string.settings);
-        } else if (itemId == R.id.nav_purchase) {
-            setCurrentFragment(new PurchasesFragment(), true);
-            getSupportActionBar().setTitle(R.string.purchases);
-        } else if (itemId == R.id.nav_sign_out) {
-            signOut();
-        } else if (itemId == R.id.nav_feedback) {
-            setCurrentFragment(new FeedBackPage(), true);
-            getSupportActionBar().setTitle(R.string.feedback);
-        } else if (itemId == R.id.nav_about) {
-            setCurrentFragment(new AboutUsFragment(), true);
-            getSupportActionBar().setTitle(R.string.about_us);
-        }
-    }
-
-    private void handleBottomNavigation(int itemId) {
-        clearBackStack();
-        if (itemId == R.id.dashboard) {
-            setCurrentFragment(new DashBoardFragment(), false);
-            getSupportActionBar().setTitle(R.string.dashboard);
-        } else if (itemId == R.id.air_quality) {
-            setCurrentFragment(new AirQualityFragment(), false);
-            getSupportActionBar().setTitle(R.string.air_quality);
-        } else if (itemId == R.id.light) {
-            setCurrentFragment(new LightFragment(), false);
-            getSupportActionBar().setTitle(R.string.light);
-        } else if (itemId == R.id.presence) {
-            setCurrentFragment(new PresenceFragment(), false);
-            getSupportActionBar().setTitle(R.string.presence);
-        }
-    }
-
-    private void clearBackStack() {
-        if (fragmentManager.getBackStackEntryCount() > 0) {
-            fragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-        }
-    }
-
-    private void setupBackButton() {
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
                 if (drawerLayout.isDrawerOpen(navigationView)) {
                     drawerLayout.closeDrawers();
-                } else if (fragmentManager.getBackStackEntryCount() > 0) {
-                    fragmentManager.popBackStack();
                 } else {
                     showExitDialog();
                 }
             }
         });
+    }
+
+    private void handleDrawerNavigation(int itemId) {
+        if (itemId == R.id.nav_home) {
+            setCurrentFragment(new DashBoardFragment());
+            getSupportActionBar().setTitle(R.string.dashboard);
+            bottomNavigationView.setSelectedItemId(R.id.dashboard);
+        } else if (itemId == R.id.nav_sign_out) {
+            signOut();
+        } else {
+            clearBottomNavSelection();
+            if (itemId == R.id.nav_profile) {
+                setCurrentFragment(new AccountFragment());
+                getSupportActionBar().setTitle("Profile");
+            } else if (itemId == R.id.nav_settings) {
+                setCurrentFragment(new SettingsFragment());
+                getSupportActionBar().setTitle(getString(R.string.settings));
+            } else if (itemId == R.id.nav_purchase) {
+                setCurrentFragment(new PurchasesFragment());
+                getSupportActionBar().setTitle(getString(R.string.purchases));
+            } else if (itemId == R.id.nav_feedback) {
+                setCurrentFragment(new FeedBackPage());
+                getSupportActionBar().setTitle(getString(R.string.feedback));
+            } else if (itemId == R.id.nav_about) {
+                setCurrentFragment(new AboutUsFragment());
+                getSupportActionBar().setTitle(getString(R.string.about_us));
+            }
+        }
+    }
+
+    private void handleBottomNavigation(int itemId) {
+        bottomNavigationView.getMenu().findItem(itemId).setChecked(true);
+        if (itemId == R.id.dashboard) {
+            setCurrentFragment(new DashBoardFragment());
+            getSupportActionBar().setTitle(R.string.dashboard);
+        } else if (itemId == R.id.air_quality) {
+            setCurrentFragment(new AirQualityFragment());
+            getSupportActionBar().setTitle(R.string.air_quality);
+        } else if (itemId == R.id.light) {
+            setCurrentFragment(new LightFragment());
+            getSupportActionBar().setTitle(R.string.light);
+        } else if (itemId == R.id.presence) {
+            setCurrentFragment(new PresenceFragment());
+            getSupportActionBar().setTitle(R.string.presence);
+        }
     }
 
     private void showExitDialog() {
@@ -217,16 +207,12 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
                 .show();
     }
 
-    @Override
-    public void onBackStackChanged() {
-        if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            toolbar.setNavigationOnClickListener(v -> onBackPressed());
-        } else {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-            toggle.syncState();
-            toolbar.setNavigationOnClickListener(v -> drawerLayout.open());
+    private void clearBottomNavSelection() {
+        bottomNavigationView.getMenu().setGroupCheckable(0, true, false);
+        for (int i = 0; i < bottomNavigationView.getMenu().size(); i++) {
+            bottomNavigationView.getMenu().getItem(i).setChecked(false);
         }
+        bottomNavigationView.getMenu().setGroupCheckable(0, true, true);
     }
 
     private void updateNavHeader() {
@@ -301,12 +287,9 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         return super.onOptionsItemSelected(item);
     }
 
-    private void setCurrentFragment(Fragment fragment, boolean addToBackStack) {
+    private void setCurrentFragment(Fragment fragment) {
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.replace(R.id.main, fragment);
-        if (addToBackStack) {
-            transaction.addToBackStack(null);
-        }
         transaction.commit();
     }
 
