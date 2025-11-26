@@ -208,6 +208,9 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         } else if (itemId == R.id.air_quality) {
             setCurrentFragment(new AirQualityFragment(), false);
             getSupportActionBar().setTitle(R.string.air_quality);
+        } else if (itemId == R.id.bi_directional) {
+            setCurrentFragment(new BiDirectionalFragment(), false);
+            getSupportActionBar().setTitle("Bi-Directional");
         } else if (itemId == R.id.light) {
             setCurrentFragment(new LightFragment(), false);
             getSupportActionBar().setTitle(R.string.light);
@@ -254,6 +257,8 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
             bottomNavigationView.setSelectedItemId(R.id.dashboard);
         } else if (currentFragment instanceof AirQualityFragment) {
             bottomNavigationView.setSelectedItemId(R.id.air_quality);
+        } else if (currentFragment instanceof BiDirectionalFragment) {
+            bottomNavigationView.setSelectedItemId(R.id.bi_directional);
         } else if (currentFragment instanceof LightFragment) {
             bottomNavigationView.setSelectedItemId(R.id.light);
         } else if (currentFragment instanceof PresenceFragment) {
