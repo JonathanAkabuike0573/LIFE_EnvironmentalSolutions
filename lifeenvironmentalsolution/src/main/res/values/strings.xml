@@ -212,6 +212,7 @@ CENG-322-OCC,  Software Project -->
     <string name="profile_photo">Profile Photo</string>
     <string name="change_photo">Change Photo</string>
     <string name="change_password">Change Password</string>
+    <string name="bi_directional">Bi-Directional</string>
 
 
 </resources>
