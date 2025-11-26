@@ -1,6 +1,5 @@
 package ca.light.indoorair.freshness.energy.it.life.environmental.solution;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
@@ -90,7 +89,7 @@ public class LightFragment extends Fragment {
         lightLevelProgress = view.findViewById(R.id.light_level_progress);
         statusIndicator = view.findViewById(R.id.status_indicator);
         lightBrightnessChipGroup = view.findViewById(R.id.chip_group_light_brightness);
-        autoBrightnessSwitch = view.findViewById(R.id.switch_light_control);
+        autoBrightnessSwitch = view.findViewById(R.id.power_on);
         brightnessSlider = view.findViewById(R.id.slider_brightness);
     }
 
