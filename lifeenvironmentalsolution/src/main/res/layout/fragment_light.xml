@@ -137,7 +137,7 @@
                 android:padding="20dp">
 
                 <com.google.android.material.switchmaterial.SwitchMaterial
-                    android:id="@+id/switch_light_control"
+                    android:id="@+id/power_on"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/auto_brightness"
