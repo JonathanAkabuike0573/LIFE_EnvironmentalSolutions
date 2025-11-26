@@ -21,6 +21,10 @@
                 android:title="Help"
                 app:showAsAction="ifRoom" />
             <item
+                android:id="@+id/action_aboutus"
+                android:title="About Us"
+                app:showAsAction="ifRoom" />
+            <item
                 android:id="@+id/action_togglemode"
                 android:title="Theme"
                 app:showAsAction="ifRoom" />
