@@ -6,11 +6,11 @@
         <item
             android:id="@+id/nav_home"
             android:title="@string/dashboard"
-            android:icon="@drawable/home_foreground"/>
+            android:icon="@drawable/homeiconn"/>
         <item
-            android:id="@+id/nav_about"
-            android:title="@string/about_us"
-            android:icon="@drawable/settings_foreground" />
+            android:id="@+id/nav_profile"
+            android:title="Profile"
+            android:icon="@drawable/usericon"/>
         <item
             android:id="@+id/nav_purchase"
             android:title="@string/purchases"
@@ -22,12 +22,12 @@
         <item
             android:id="@+id/nav_settings"
             android:title="@string/settings"
-            android:icon="@drawable/settings_foreground"/>
+            android:icon="@drawable/settings_icon"/>
     </group>
     <group android:id="@+id/group_bottom">
         <item
             android:id="@+id/nav_sign_out"
             android:title="@string/sign_out"
-            android:icon="@drawable/logout_foreground" />
+            android:icon="@drawable/signout_icon" />
     </group>
 </menu>

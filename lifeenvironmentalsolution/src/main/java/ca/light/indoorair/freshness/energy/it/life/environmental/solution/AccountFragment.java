@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -40,7 +41,7 @@ import java.util.Map;
 public class AccountFragment extends Fragment {
 
     private TextInputEditText fullNameEditText, emailEditText, phoneNumberEditText;
-    private Button saveChangesButton;
+    private Button saveChangesButton, changePasswordButton;
     private TextView emailStatus;
     private ImageView logo;
     private TextView changePhotoText;
@@ -107,6 +108,7 @@ public class AccountFragment extends Fragment {
             loadUserProfile();
             setupTextWatchers();
             saveChangesButton.setOnClickListener(v -> saveUserProfile());
+            changePasswordButton.setOnClickListener(v -> showChangePasswordDialog());
         }
 
         changePhotoText.setOnClickListener(v -> showPhotoSourceDialog());
@@ -149,6 +151,7 @@ public class AccountFragment extends Fragment {
         emailEditText = view.findViewById(R.id.email_edit_text);
         phoneNumberEditText = view.findViewById(R.id.phone_number_edit_text);
         saveChangesButton = view.findViewById(R.id.save_changes_button);
+        changePasswordButton = view.findViewById(R.id.change_password_button);
         emailStatus = view.findViewById(R.id.email_status);
         logo = view.findViewById(R.id.logo);
         changePhotoText = view.findViewById(R.id.change_photo_text);
@@ -184,10 +187,10 @@ public class AccountFragment extends Fragment {
     private void updateEmailVerificationStatus(boolean isVerified) {
         if (isVerified) {
             emailStatus.setText(R.string.verified);
-            emailStatus.setBackgroundResource(R.drawable.verified_background); // Create a green background
+            emailStatus.setBackgroundResource(R.drawable.verified_background);
         } else {
             emailStatus.setText(R.string.unverified);
-            emailStatus.setBackgroundResource(R.drawable.unverified_background); // Create an orange background
+            emailStatus.setBackgroundResource(R.drawable.unverified_background);
         }
     }
 
@@ -226,5 +229,50 @@ public class AccountFragment extends Fragment {
                     saveChangesButton.setEnabled(false);
                 })
                 .addOnFailureListener(e -> Toast.makeText(getContext(), "Failed to update profile", Toast.LENGTH_SHORT).show());
+    }
+
+    private void showChangePasswordDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setTitle("Change Password");
+
+        View viewInflated = LayoutInflater.from(getContext()).inflate(R.layout.dialog_change_password, (ViewGroup) getView(), false);
+        final EditText newPasswordEditText = viewInflated.findViewById(R.id.new_password_edit_text);
+        final EditText confirmPasswordEditText = viewInflated.findViewById(R.id.confirm_password_edit_text);
+
+        builder.setView(viewInflated);
+
+        builder.setPositiveButton("Confirm", (dialog, which) -> {
+            String newPassword = newPasswordEditText.getText().toString().trim();
+            String confirmPassword = confirmPasswordEditText.getText().toString().trim();
+
+            if (newPassword.length() < 6) {
+                Toast.makeText(getContext(), "Password must be at least 6 characters", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (!newPassword.equals(confirmPassword)) {
+                Toast.makeText(getContext(), "Passwords do not match", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            changePassword(newPassword);
+        });
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
+
+        builder.show();
+    }
+
+    private void changePassword(String newPassword) {
+        FirebaseUser user = mAuth.getCurrentUser();
+        if (user != null) {
+            user.updatePassword(newPassword)
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            Toast.makeText(getContext(), "Password updated successfully", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(getContext(), "Failed to update password", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+        }
     }
 }
