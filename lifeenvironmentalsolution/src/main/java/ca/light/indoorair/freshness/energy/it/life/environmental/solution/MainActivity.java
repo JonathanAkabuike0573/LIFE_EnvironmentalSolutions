@@ -49,11 +49,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-public class MainActivity extends AppCompatActivity {
+// Implement OnBackStackChangedListener to react to navigation changes
+public class MainActivity extends AppCompatActivity implements FragmentManager.OnBackStackChangedListener {
 
     private FragmentManager fragmentManager;
     private FirebaseAuth auth;
-    private ActionBar actionBar;
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
@@ -82,12 +82,15 @@ public class MainActivity extends AppCompatActivity {
 
         auth = FirebaseAuth.getInstance();
         fragmentManager = getSupportFragmentManager();
+        // **CRITICAL: Listen for back stack changes**
+        fragmentManager.addOnBackStackChangedListener(this);
 
         setupTheme();
         setupNavigation();
 
         if (savedInstanceState == null) {
-            setCurrentFragment(new DashBoardFragment());
+            // Use new setCurrentFragment method
+            setCurrentFragment(new DashBoardFragment(), false);
             getSupportActionBar().setTitle(getString(R.string.dashboard));
         }
     }
@@ -104,10 +107,9 @@ public class MainActivity extends AppCompatActivity {
     private void setupToolbar() {
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        actionBar = getSupportActionBar();
+        ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayShowTitleEnabled(true);
-            actionBar.setDisplayHomeAsUpEnabled(false);
         }
     }
 
@@ -140,12 +142,21 @@ public class MainActivity extends AppCompatActivity {
         });
 
         updateNavHeader();
+        // **IMPROVED: Centralized back press logic**
+        setupBackButton();
+    }
+
+    private void setupBackButton() {
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
                 if (drawerLayout.isDrawerOpen(navigationView)) {
                     drawerLayout.closeDrawers();
+                } else if (fragmentManager.getBackStackEntryCount() > 0) {
+
+                    fragmentManager.popBackStack();
                 } else {
+
                     showExitDialog();
                 }
             }
@@ -153,49 +164,103 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void handleDrawerNavigation(int itemId) {
+
+        bottomNavigationView.setVisibility(View.GONE);
+
         if (itemId == R.id.nav_home) {
-            setCurrentFragment(new DashBoardFragment());
+
+            bottomNavigationView.setVisibility(View.VISIBLE);
+            clearBackStack();
+            setCurrentFragment(new DashBoardFragment(), false);
             getSupportActionBar().setTitle(R.string.dashboard);
             bottomNavigationView.setSelectedItemId(R.id.dashboard);
         } else if (itemId == R.id.nav_sign_out) {
             signOut();
         } else {
-            clearBottomNavSelection();
+
             if (itemId == R.id.nav_profile) {
-                setCurrentFragment(new AccountFragment());
+                setCurrentFragment(new AccountFragment(), true);
                 getSupportActionBar().setTitle("Profile");
             } else if (itemId == R.id.nav_settings) {
-                setCurrentFragment(new SettingsFragment());
+                setCurrentFragment(new SettingsFragment(), true);
                 getSupportActionBar().setTitle(getString(R.string.settings));
             } else if (itemId == R.id.nav_purchase) {
-                setCurrentFragment(new PurchasesFragment());
+                setCurrentFragment(new PurchasesFragment(), true);
                 getSupportActionBar().setTitle(getString(R.string.purchases));
             } else if (itemId == R.id.nav_feedback) {
-                setCurrentFragment(new FeedBackPage());
+                setCurrentFragment(new FeedBackPage(), true);
                 getSupportActionBar().setTitle(getString(R.string.feedback));
-            } else if (itemId == R.id.nav_about) {
-                setCurrentFragment(new AboutUsFragment());
-                getSupportActionBar().setTitle(getString(R.string.about_us));
             }
         }
     }
 
     private void handleBottomNavigation(int itemId) {
-        bottomNavigationView.getMenu().findItem(itemId).setChecked(true);
+
+        bottomNavigationView.setVisibility(View.VISIBLE);
+
+
+        clearBackStack();
+
+
         if (itemId == R.id.dashboard) {
-            setCurrentFragment(new DashBoardFragment());
+            setCurrentFragment(new DashBoardFragment(), false);
             getSupportActionBar().setTitle(R.string.dashboard);
         } else if (itemId == R.id.air_quality) {
-            setCurrentFragment(new AirQualityFragment());
+            setCurrentFragment(new AirQualityFragment(), false);
             getSupportActionBar().setTitle(R.string.air_quality);
         } else if (itemId == R.id.light) {
-            setCurrentFragment(new LightFragment());
+            setCurrentFragment(new LightFragment(), false);
             getSupportActionBar().setTitle(R.string.light);
         } else if (itemId == R.id.presence) {
-            setCurrentFragment(new PresenceFragment());
+            setCurrentFragment(new PresenceFragment(), false);
             getSupportActionBar().setTitle(R.string.presence);
         }
     }
+
+
+    private void clearBackStack() {
+        if (fragmentManager.getBackStackEntryCount() > 0) {
+            FragmentManager.BackStackEntry entry = fragmentManager.getBackStackEntryAt(0);
+            fragmentManager.popBackStack(entry.getId(), FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        }
+    }
+
+    // **NEW: This method now controls the hamburger/back icon and bottom nav visibility**
+    @Override
+    public void onBackStackChanged() {
+        boolean hasBackStack = fragmentManager.getBackStackEntryCount() > 0;
+
+        // Show back arrow if there's a back stack, otherwise show hamburger
+        getSupportActionBar().setDisplayHomeAsUpEnabled(hasBackStack);
+
+        if (hasBackStack) {
+            // If in a detail screen (like Settings), hide bottom nav and handle back press
+            bottomNavigationView.setVisibility(View.GONE);
+            toolbar.setNavigationOnClickListener(v -> onBackPressed());
+        } else {
+            // If at a main screen, show bottom nav and set up the drawer toggle
+            bottomNavigationView.setVisibility(View.VISIBLE);
+            toggle.syncState();
+            toolbar.setNavigationOnClickListener(v -> drawerLayout.open());
+            // Sync bottom nav with current fragment
+            syncBottomNavSelection();
+        }
+    }
+
+    // **NEW: Helper to sync bottom nav when returning from back stack**
+    private void syncBottomNavSelection() {
+        Fragment currentFragment = fragmentManager.findFragmentById(R.id.main);
+        if (currentFragment instanceof DashBoardFragment) {
+            bottomNavigationView.setSelectedItemId(R.id.dashboard);
+        } else if (currentFragment instanceof AirQualityFragment) {
+            bottomNavigationView.setSelectedItemId(R.id.air_quality);
+        } else if (currentFragment instanceof LightFragment) {
+            bottomNavigationView.setSelectedItemId(R.id.light);
+        } else if (currentFragment instanceof PresenceFragment) {
+            bottomNavigationView.setSelectedItemId(R.id.presence);
+        }
+    }
+
 
     private void showExitDialog() {
         new AlertDialog.Builder(this)
@@ -205,14 +270,6 @@ public class MainActivity extends AppCompatActivity {
                 .setPositiveButton(R.string.yes, (dialog, which) -> finish())
                 .setNegativeButton(R.string.no, null)
                 .show();
-    }
-
-    private void clearBottomNavSelection() {
-        bottomNavigationView.getMenu().setGroupCheckable(0, true, false);
-        for (int i = 0; i < bottomNavigationView.getMenu().size(); i++) {
-            bottomNavigationView.getMenu().getItem(i).setChecked(false);
-        }
-        bottomNavigationView.getMenu().setGroupCheckable(0, true, true);
     }
 
     private void updateNavHeader() {
@@ -256,8 +313,9 @@ public class MainActivity extends AppCompatActivity {
     public boolean onPrepareOptionsMenu(Menu menu) {
         SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         boolean isDarkMode = sharedPreferences.getBoolean(THEME_KEY, false);
-        int color = ContextCompat.getColor(this, isDarkMode ? android.R.color.white : android.R.color.black);
+        int color = ContextCompat.getColor(this, isDarkMode ? android.R.color.white : R.color.black);
 
+        // The main menu text should be black when not in dark mode.
         for (int i = 0; i < menu.size(); i++) {
             applyMenuItemColor(menu.getItem(i), color);
         }
@@ -272,10 +330,17 @@ public class MainActivity extends AppCompatActivity {
         SpannableString spannableString = new SpannableString(menuItem.getTitle());
         spannableString.setSpan(new ForegroundColorSpan(color), 0, spannableString.length(), 0);
         menuItem.setTitle(spannableString);
+
+        if (menuItem.hasSubMenu()) {
+            for (int j = 0; j < menuItem.getSubMenu().size(); j++) {
+                applyMenuItemColor(menuItem.getSubMenu().getItem(j), color);
+            }
+        }
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        // Let the toggle handle drawer events first
         if (toggle.onOptionsItemSelected(item)) {
             return true;
         }
@@ -283,13 +348,20 @@ public class MainActivity extends AppCompatActivity {
         if (itemId == R.id.action_notification) {
             askNotificationPermission();
             return true;
+        } else if (itemId == R.id.action_aboutus) {
+            setCurrentFragment(new AboutUsFragment(), true);
+            getSupportActionBar().setTitle(getString(R.string.about_us));
         }
         return super.onOptionsItemSelected(item);
     }
 
-    private void setCurrentFragment(Fragment fragment) {
+    // **UPDATED: setCurrentFragment now supports adding to back stack**
+    private void setCurrentFragment(Fragment fragment, boolean addToBackStack) {
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.replace(R.id.main, fragment);
+        if (addToBackStack) {
+            transaction.addToBackStack(null);
+        }
         transaction.commit();
     }
 
@@ -297,8 +369,11 @@ public class MainActivity extends AppCompatActivity {
         auth.signOut();
         Identity.getSignInClient(this).signOut().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
+                // Correctly redirect to SignInActivity
                 startActivity(new Intent(MainActivity.this, LoginActivity.class));
                 finish();
+            } else {
+                Toast.makeText(MainActivity.this, "Sign out failed.", Toast.LENGTH_SHORT).show();
             }
         });
     }
