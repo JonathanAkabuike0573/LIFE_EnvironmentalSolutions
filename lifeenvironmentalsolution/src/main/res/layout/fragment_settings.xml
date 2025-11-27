@@ -37,70 +37,6 @@
                 android:orientation="vertical"
                 android:padding="@dimen/space_m">
 
-                <!-- Section: Account -->
-                <TextView
-                    android:id="@+id/section_account"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingTop="@dimen/space_s"
-                    android:paddingBottom="@dimen/space_s"
-                    android:text="@string/account"
-                    android:textColor="@color/primary"
-                    android:textStyle="bold" />
-
-                <!-- Setting: Account Management (Using RelativeLayout) -->
-                <RelativeLayout
-                    android:id="@+id/row_account"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingTop="@dimen/space_s"
-                    android:paddingBottom="@dimen/space_s">
-
-                    <ImageView
-                        android:id="@+id/iv_account_arrow"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentEnd="true"
-                        android:layout_centerVertical="true"
-                        android:src="@drawable/chevron_righticon" />
-
-                    <TextView
-                        android:id="@+id/tv_account_title"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:layout_toStartOf="@id/iv_account_arrow"
-                        android:text="@string/profile_management"
-                        android:textColor="@color/on_surface"
-                        android:textSize="@dimen/text_m" />
-                </RelativeLayout>
-
-
-                <!-- Setting: Change Password (Using RelativeLayout) -->
-                <RelativeLayout
-                    android:id="@+id/row_change_password"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingTop="@dimen/space_s"
-                    android:paddingBottom="@dimen/space_s">
-
-                    <ImageView
-                        android:id="@+id/iv_change_password_arrow"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentEnd="true"
-                        android:layout_centerVertical="true"
-                        android:src="@drawable/chevron_righticon" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:layout_toStartOf="@id/iv_change_password_arrow"
-                        android:text="Change Password"
-                        android:textColor="@color/on_surface"
-                        android:textSize="@dimen/text_m" />
-                </RelativeLayout>
 
                 <!-- Section: Preferences -->
                 <TextView
@@ -113,6 +49,52 @@
                     android:text="@string/preferences"
                     android:textColor="@color/primary"
                     android:textStyle="bold" />
+
+                <!-- Setting: Dark Mode (Using RelativeLayout) -->
+                <RelativeLayout
+                    android:id="@+id/row_dark_mode"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="@dimen/space_s"
+                    android:paddingBottom="@dimen/space_s">
+
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/sw_dark_mode"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true" />
+
+                    <LinearLayout
+                        android:id="@+id/dark_mode_texts"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toStartOf="@id/sw_dark_mode"
+                        android:orientation="vertical"
+                        android:paddingEnd="@dimen/space_m">
+
+                        <TextView
+                            android:id="@+id/tv_dark_mode_title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/enable_dark_mode"
+                            android:textColor="@color/on_surface"
+                            android:textSize="@dimen/text_m" />
+
+                        <TextView
+                            android:id="@+id/tv_dark_mode_sub"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/dark_mode_desc"
+                            android:textColor="@color/text_field_hint"
+                            android:textSize="@dimen/text_s" />
+                    </LinearLayout>
+                </RelativeLayout>
+
+                <com.google.android.material.divider.MaterialDivider
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
 
                 <!-- Setting: Lock to Portrait Mode (Using RelativeLayout) -->
                 <RelativeLayout
@@ -134,7 +116,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
-                        android:layout_toStartOf="@id/sw_portrait"
+                        android.layout_toStartOf="@id/sw_portrait"
                         android:orientation="vertical"
                         android:paddingEnd="@dimen/space_m">
 

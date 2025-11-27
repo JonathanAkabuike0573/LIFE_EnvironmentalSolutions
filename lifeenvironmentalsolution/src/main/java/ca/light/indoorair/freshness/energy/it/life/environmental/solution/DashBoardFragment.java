@@ -28,6 +28,7 @@ import java.util.List;
 
 public class DashBoardFragment extends Fragment {
 
+    public Object dataProvider;
     // UI Elements
     private TextView userGreeting, temperatureText, comfortLevelText;
 
@@ -227,5 +228,9 @@ public class DashBoardFragment extends Fragment {
         if (userGreeting != null) {
             userGreeting.setText(fullGreeting);
         }
+    }
+
+    public void setDataProvider(FakeUserDataProvider provider) {
+        this.dataProvider = provider;
     }
 }

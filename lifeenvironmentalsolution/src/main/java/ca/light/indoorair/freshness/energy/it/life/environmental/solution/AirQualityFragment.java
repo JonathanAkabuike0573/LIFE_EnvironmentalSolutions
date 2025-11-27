@@ -226,14 +226,18 @@ public class AirQualityFragment extends Fragment {
         });
 
         switchAutoVentilation.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            sharedPreferences.edit().putBoolean(KEY_AUTO_VENT, isChecked).apply();
-            Toast.makeText(getContext(), "Auto Ventilation " + (isChecked ? "ON" : "OFF"), Toast.LENGTH_SHORT).show();
+            if (buttonView.isPressed()) {
+                sharedPreferences.edit().putBoolean(KEY_AUTO_VENT, isChecked).apply();
+                Toast.makeText(getContext(), "Auto Ventilation " + (isChecked ? "ON" : "OFF"), Toast.LENGTH_SHORT).show();
+            }
         });
 
         switchPurifierPower.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            sharedPreferences.edit().putBoolean(KEY_PURIFIER_POWER, isChecked).apply();
-            sliderPurifierIntensity.setEnabled(isChecked);
-            Toast.makeText(getContext(), "Air Purifier " + (isChecked ? "ON" : "OFF"), Toast.LENGTH_SHORT).show();
+            if (buttonView.isPressed()) {
+                sharedPreferences.edit().putBoolean(KEY_PURIFIER_POWER, isChecked).apply();
+                sliderPurifierIntensity.setEnabled(isChecked);
+                Toast.makeText(getContext(), "Air Purifier " + (isChecked ? "ON" : "OFF"), Toast.LENGTH_SHORT).show();
+            }
         });
 
         sliderPurifierIntensity.addOnChangeListener((slider, value, fromUser) -> {
