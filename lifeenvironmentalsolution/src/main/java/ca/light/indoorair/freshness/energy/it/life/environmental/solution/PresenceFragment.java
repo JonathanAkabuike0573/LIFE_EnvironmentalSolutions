@@ -9,6 +9,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,6 +19,9 @@ import androidx.fragment.app.Fragment;
 import androidx.preference.PreferenceManager;
 
 import com.google.android.material.switchmaterial.SwitchMaterial;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.timepicker.MaterialTimePicker;
+import com.google.android.material.timepicker.TimeFormat;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -37,8 +41,10 @@ public class PresenceFragment extends Fragment {
     private View statusIndicator;
     private SwitchMaterial presenceDetectionSwitch;
     private Button markOccupiedButton, markEmptyButton;
-    private CheckBox autoLightsOffCheckbox;
+    private CheckBox autoLightsOffCheckbox, alertAfterHoursCheckbox;
     private Spinner autoOffTimeSpinner;
+    private LinearLayout timeRangePickerContainer;
+    private TextInputEditText startTimeInput, endTimeInput;
 
     // Firebase
     private DatabaseReference presenceRef;
@@ -84,6 +90,10 @@ public class PresenceFragment extends Fragment {
         autoLightsOffCheckbox = view.findViewById(R.id.checkbox_auto_lights_off);
         labelAutoOffTime = view.findViewById(R.id.label_auto_off_time);
         autoOffTimeSpinner = view.findViewById(R.id.spinner_auto_off_time);
+        alertAfterHoursCheckbox = view.findViewById(R.id.checkbox_alert_after_hours);
+        timeRangePickerContainer = view.findViewById(R.id.time_range_picker_container);
+        startTimeInput = view.findViewById(R.id.start_time_input);
+        endTimeInput = view.findViewById(R.id.end_time_input);
     }
 
     private void initializeFirebase() {
@@ -132,6 +142,13 @@ public class PresenceFragment extends Fragment {
             autoOffTimeSpinner.setVisibility(isChecked ? View.VISIBLE : View.GONE);
         });
 
+        alertAfterHoursCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            timeRangePickerContainer.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+        });
+
+        startTimeInput.setOnClickListener(v -> showTimePicker(true));
+        endTimeInput.setOnClickListener(v -> showTimePicker(false));
+
         markOccupiedButton.setOnClickListener(v -> manualOverride("Occupied"));
         markEmptyButton.setOnClickListener(v -> manualOverride("Empty"));
 
@@ -141,6 +158,28 @@ public class PresenceFragment extends Fragment {
                 syncSwitchState();
             }
         };
+    }
+
+    private void showTimePicker(boolean isStartTime) {
+        MaterialTimePicker picker = new MaterialTimePicker.Builder()
+                .setTimeFormat(TimeFormat.CLOCK_12H)
+                .setHour(12)
+                .setMinute(0)
+                .setTitleText("Select Time")
+                .build();
+
+        picker.addOnPositiveButtonClickListener(v -> {
+            int hour = picker.getHour();
+            int minute = picker.getMinute();
+            String formattedTime = String.format(Locale.getDefault(), "%02d:%02d", hour, minute);
+            if (isStartTime) {
+                startTimeInput.setText(formattedTime);
+            } else {
+                endTimeInput.setText(formattedTime);
+            }
+        });
+
+        picker.show(getParentFragmentManager(), "timePicker");
     }
 
     private void setupSpinner() {
