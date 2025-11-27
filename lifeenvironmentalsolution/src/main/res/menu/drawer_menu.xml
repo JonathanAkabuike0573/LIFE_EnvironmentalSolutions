@@ -9,7 +9,7 @@
             android:icon="@drawable/homeiconn"/>
         <item
             android:id="@+id/nav_profile"
-            android:title="Profile"
+            android:title="@string/profile"
             android:icon="@drawable/usericon"/>
         <item
             android:id="@+id/nav_purchase"
