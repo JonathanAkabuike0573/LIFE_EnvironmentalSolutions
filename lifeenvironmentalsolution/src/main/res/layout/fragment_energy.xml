@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F0F4F8"
-    tools:context=".LightFragment">
+    tools:context=".EnergyFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -31,11 +31,11 @@
                     android:id="@+id/light_level_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/light_intensity"
+                    android:text="Power Consumption"
                     android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
                     android:textColor="?android:attr/textColorPrimary"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintStart_toStartOf="parent" />
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <View
                     android:id="@+id/status_indicator"
@@ -140,17 +140,17 @@
                     android:id="@+id/power_on"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/auto_brightness"
                     android:checked="true"
-                    android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"/>
+                    android:text="Show Power"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1" />
 
                 <View android:layout_width="match_parent" android:layout_height="1dp" android:background="?android:attr/listDivider" android:layout_marginTop="16dp" android:layout_marginBottom="16dp"/>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/brightness"
-                    android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"/>
+                    android:text="Scale"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1" />
 
                 <com.google.android.material.slider.Slider
                     android:id="@+id/slider_brightness"
@@ -166,45 +166,46 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/color_temperature"
-                    android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"/>
+                    android:text="Show As"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1" />
 
-                 <com.google.android.material.chip.ChipGroup
-                        android:id="@+id/chip_group_light_brightness"
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/chip_group_sensor_type"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:singleSelection="true"
+                    app:selectionRequired="true">
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chip_power"
+                        style="@style/Widget.MaterialComponents.Chip.Choice"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        app:singleSelection="true"
-                        app:selectionRequired="true">
+                        android:text="@string/power"
+                        android:checked="true"/>
 
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/chip_warm"
-                            style="@style/Widget.MaterialComponents.Chip.Choice"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Warm" />
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chip_voltage"
+                        style="@style/Widget.MaterialComponents.Chip.Choice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Voltage" />
 
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/chip_neutral"
-                            style="@style/Widget.MaterialComponents.Chip.Choice"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Neutral" />
-
-                        <com.google.android.material.chip.Chip
-                            android:id="@+id/chip_cool"
-                            style="@style/Widget.MaterialComponents.Chip.Choice"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Cool" />
-                    </com.google.android.material.chip.ChipGroup>
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chip_current"
+                        style="@style/Widget.MaterialComponents.Chip.Choice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Current" />
+                </com.google.android.material.chip.ChipGroup>
 
                 <View android:layout_width="match_parent" android:layout_height="1dp" android:background="?android:attr/listDivider" android:layout_marginTop="16dp" android:layout_marginBottom="16dp"/>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/mood_presets"
-                    android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"/>
+                    android:text="Show As"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1" />
 
                 <com.google.android.material.chip.ChipGroup
                     android:id="@+id/chip_group_presets"
@@ -218,21 +219,16 @@
                         style="@style/Widget.MaterialComponents.Chip.Choice"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/focus" />
+                        android:text="Positive" />
 
                     <com.google.android.material.chip.Chip
                         android:id="@+id/chip_relax"
                         style="@style/Widget.MaterialComponents.Chip.Choice"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/relax" />
+                        android:text="Negative" />
 
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/chip_nightlight"
-                        style="@style/Widget.MaterialComponents.Chip.Choice"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/nightlight" />
+
 
                 </com.google.android.material.chip.ChipGroup>
 
