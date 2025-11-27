@@ -16,13 +16,14 @@
                 android:id="@+id/action_notification"
                 android:title="@string/notification"
                 app:showAsAction="never" />
+
             <item
-                android:id="@+id/action_help"
-                android:title="Help"
+                android:id="@+id/action_aboutus"
+                android:title="@string/about_us"
                 app:showAsAction="ifRoom" />
             <item
                 android:id="@+id/action_togglemode"
-                android:title="Theme"
+                android:title="@string/theme"
                 app:showAsAction="ifRoom" />
 
 
