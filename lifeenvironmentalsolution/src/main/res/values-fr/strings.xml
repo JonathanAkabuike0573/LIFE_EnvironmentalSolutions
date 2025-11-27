@@ -158,4 +158,8 @@ CENG-322-OCC,  Software Project -->
     <string name="the_day_s_forcast_received_at_7am">Les prévisions du jour reçues à 7h</string>
     <string name="evening_reports">Rapports du soir</string>
     <string name="the_day_s_forcast_received_at_7pm">Les prévisions du jour reçues à 19h</string>
+    <string name="bi_directional">Bidirectionnel</string>
+    <string name="theme">Thème</string>
+    <string name="profile">Profil</string>
+
 </resources>

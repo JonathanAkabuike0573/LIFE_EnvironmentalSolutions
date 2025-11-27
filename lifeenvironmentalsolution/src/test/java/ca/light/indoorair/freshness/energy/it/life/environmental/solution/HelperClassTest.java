@@ -66,4 +66,29 @@ public class HelperClassTest {
         assertEquals("charlie@mail.com", helper.getEmail());
         assertEquals("1112223333", helper.getPhoneNumber());
     }
-}
+
+    // 8 - Test that name is not null by default when using parameterized constructor
+    @Test
+    public void testNameNotNull() {
+        HelperClass helper = new HelperClass("Dave", "dave@example.com", "123");
+        assertNotNull(helper.getName());
+    }
+
+    // 9 - Test that email is not null by default when using parameterized constructor
+    @Test
+    public void testEmailNotNull() {
+        HelperClass helper = new HelperClass("Eve", "eve@example.com", "456");
+        assertNotNull(helper.getEmail());
+    }
+
+    // 10 - Test that updating one field does not affect others
+    @Test
+    public void testSetEmailDoesNotChangeName() {
+        HelperClass helper = new HelperClass("Frank", "frank@example.com", "789");
+        helper.setEmail("newfrank@example.com");
+        
+        // Email should change
+        assertEquals("newfrank@example.com", helper.getEmail());
+        // Name should remain the same
+        assertEquals("Frank", helper.getName());
+    } }
