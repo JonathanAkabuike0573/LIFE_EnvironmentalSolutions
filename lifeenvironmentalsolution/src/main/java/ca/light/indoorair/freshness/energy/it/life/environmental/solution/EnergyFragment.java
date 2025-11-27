@@ -1,4 +1,5 @@
 package ca.light.indoorair.freshness.energy.it.life.environmental.solution;
+
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -7,38 +8,40 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+
 import com.google.android.material.chip.ChipGroup;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+
+import java.util.List;
 import java.util.Locale;
 
 public class EnergyFragment extends Fragment {
 
     // --- UI Variables ---
-    private TextView lightLevelTitle; // The title text (e.g., "Power Consumption")
-    private TextView lightLevelText; // Top Right Status Text (e.g., "High")
-    private View statusIndicator; // Top Right Status Indicator (Red/Green Dot)
-    private ProgressBar lightLevelProgress; // The Circular Progress Bar
-    private TextView lightLevelValueText; // The big number in the center (e.g., "1010")
-    private TextView lightLevelUnitText; // The unit below the number (e.g., "W")
-    private TextView lastUpdatedTime; // The timestamp at the bottom
+    private TextView lightLevelTitle;
+    private TextView lightLevelText;
+    private View statusIndicator;
+    private ProgressBar lightLevelProgress;
+    private TextView lightLevelValueText;
+    private TextView lightLevelUnitText;
+    private TextView lastUpdatedTime;
     private ChipGroup chipGroupSensorType;
 
     // --- Firebase Variables ---
     private Query sensorQuery;
     private ValueEventListener sensorListener;
-    // Data model to store the latest readings
-    private SensorData latestSensorData = new SensorData();
+    private final SensorData latestSensorData = new SensorData();
 
-    // --- State Variable ---
-    // Enum or simple integer to track the currently selected sensor type
+    // --- State Variables ---
     private static final int TYPE_POWER = 0;
     private static final int TYPE_CURRENT = 1;
     private static final int TYPE_VOLTAGE = 2;
@@ -48,19 +51,17 @@ public class EnergyFragment extends Fragment {
         // Required empty public constructor
     }
 
-    // New inner class to hold all sensor readings
     private static class SensorData {
         public double current_ma = 0.0;
         public double power_w = 0.0;
-        public double shunt_v = 0.0;
         public double vin_plus_v = 0.0; // Bus Voltage (V_in+)
-        public double vin_minus_v = 0.0; // Shunt Voltage (V_in-)
         public Long timestamp = 0L;
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_energy, container, false);
     }
 
@@ -68,7 +69,20 @@ public class EnergyFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Initialize the views
+        // --- 1. Find all views ---
+        initializeViews(view);
+
+        // --- 2. Set up UI Listeners ---
+        setupChipGroupListener();
+
+        // --- 3. Set an initial loading state ---
+        setInitialLoadingState();
+
+        // --- 4. Set up Firebase Query and Listener ---
+        setupFirebaseListener();
+    }
+
+    private void initializeViews(View view) {
         lightLevelTitle = view.findViewById(R.id.light_level_title);
         lightLevelText = view.findViewById(R.id.light_level_text);
         statusIndicator = view.findViewById(R.id.status_indicator);
@@ -76,26 +90,41 @@ public class EnergyFragment extends Fragment {
         lightLevelValueText = view.findViewById(R.id.light_level_value_text);
         lightLevelUnitText = view.findViewById(R.id.light_level_unit_text);
         lastUpdatedTime = view.findViewById(R.id.last_updated_time);
-
-        // Find the new ChipGroup
         chipGroupSensorType = view.findViewById(R.id.chip_group_sensor_type);
+    }
 
-        // --- Initialize UI and Listeners ---
-        updateUI(currentDisplayType); // Set initial UI (Power)
-
+    private void setupChipGroupListener() {
         chipGroupSensorType.setOnCheckedStateChangeListener((group, checkedIds) -> {
-            if (checkedIds.contains(R.id.chip_power)) {
+            // Get the first ID from the list of checked IDs.
+            // For a single-selection group, this list will have at most one element.
+            List<Integer> ids = group.getCheckedChipIds();
+            if (ids.isEmpty()) return; // Do nothing if no chip is selected
+
+            int checkedId = ids.get(0);
+
+            if (checkedId == R.id.chip_power) {
                 currentDisplayType = TYPE_POWER;
-            } else if (checkedIds.contains(R.id.chip_current)) {
+            } else if (checkedId == R.id.chip_current) {
                 currentDisplayType = TYPE_CURRENT;
-            } else if (checkedIds.contains(R.id.chip_voltage)) {
+            } else if (checkedId == R.id.chip_voltage) {
                 currentDisplayType = TYPE_VOLTAGE;
             }
-            // Update the UI immediately with the new selection and the latest data
+            // Update the UI immediately with the new selection and the latest stored data
             updateUI(currentDisplayType);
         });
+    }
 
-        // Set up the Query to fetch the LAST 1 entry under "ina219_readings"
+    private void setInitialLoadingState() {
+        lightLevelTitle.setText("Power Consumption");
+        lightLevelUnitText.setText("W");
+        lightLevelValueText.setText("...");
+        lightLevelText.setText("Loading...");
+        statusIndicator.getBackground().setTint(Color.GRAY);
+        lastUpdatedTime.setText("--:--");
+        lightLevelProgress.setProgress(0);
+    }
+
+    private void setupFirebaseListener() {
         sensorQuery = FirebaseDatabase.getInstance()
                 .getReference("ina219_readings")
                 .limitToLast(1);
@@ -105,50 +134,58 @@ public class EnergyFragment extends Fragment {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists() && snapshot.getChildrenCount() > 0) {
                     for (DataSnapshot childSnapshot : snapshot.getChildren()) {
-                        // --- Store ALL values from the database into the data model ---
-
-                        // Note: The INA219 readings are:
-                        // current_ma (Current in mA)
-                        // power_w (Power in W)
-                        // vin_plus_v (Bus Voltage V_in+)
-
-                        // Use getValue(Double.class) for all sensor readings
                         Double currentMaValue = childSnapshot.child("current_ma").getValue(Double.class);
                         Double powerWValue = childSnapshot.child("power_w").getValue(Double.class);
                         Double vinPlusVValue = childSnapshot.child("vin_plus_v").getValue(Double.class);
-                        Long timestampValue = childSnapshot.child("timestamp").getValue(Long.class);
 
-                        // Update the latestSensorData object
+                        Object timestampObject = childSnapshot.child("timestamp").getValue();
+                        Long timestampValue = 0L; // Default to 0
+
+                        if (timestampObject instanceof Long) {
+                            // If it's already a number (Long), use it directly.
+                            timestampValue = (Long) timestampObject;
+                        } else if (timestampObject instanceof String) {
+                            // If it's a String, try to parse it into a Long.
+                            try {
+                                timestampValue = Long.parseLong((String) timestampObject);
+                            } catch (NumberFormatException e) {
+                                // Could not parse the string, log the error and keep timestamp as 0.
+                                System.err.println("Firebase timestamp was a non-numeric string: " + timestampObject);
+                            }
+                        }
+
+
                         latestSensorData.current_ma = (currentMaValue != null) ? currentMaValue : 0.0;
                         latestSensorData.power_w = (powerWValue != null) ? powerWValue : 0.0;
                         latestSensorData.vin_plus_v = (vinPlusVValue != null) ? vinPlusVValue : 0.0;
-                        latestSensorData.timestamp = (timestampValue != null) ? timestampValue : 0L;
+                        latestSensorData.timestamp = timestampValue; // Use the safely parsed value
 
-                        // Now update the UI with the latest data and the current selection
                         updateUI(currentDisplayType);
 
-                        break; // Stop after the first (most recent) child
+                        break;
                     }
                 } else {
-                    // Handle no data case
-                    lightLevelValueText.setText("--");
-                    lightLevelProgress.setProgress(0);
-                    lightLevelText.setText("No Data");
-                    lastUpdatedTime.setText("--:--");
+                    updateUIForNoData();
                 }
             }
+
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 if (getContext() != null) {
                     Toast.makeText(getContext(), "Failed to load data: " + error.getMessage(), Toast.LENGTH_SHORT).show();
                 }
+                updateUIForNoData();
             }
         };
     }
 
-    // New method to update the UI based on the selected type and stored data
     private void updateUI(int displayType) {
+        if (!isAdded()) {
+            // Ensure fragment is still attached to an activity before proceeding
+            return;
+        }
+
         double displayValue;
         String title;
         String unit;
@@ -156,60 +193,44 @@ public class EnergyFragment extends Fragment {
 
         switch (displayType) {
             case TYPE_CURRENT:
-                // Convert mA to Amperes (A) for display
                 displayValue = latestSensorData.current_ma / 1000.0;
                 title = "Current";
-                unit = "A"; // Amperes
-                // Set a reasonable max for the progress bar (e.g., 2 Amperes)
-                maxProgress = 2;
+                unit = "A";
+                maxProgress = 2; // Max 2 Amperes
                 break;
             case TYPE_VOLTAGE:
-                displayValue = latestSensorData.vin_plus_v; // Bus Voltage
+                displayValue = latestSensorData.vin_plus_v;
                 title = "Bus Voltage";
-                unit = "V"; // Volts
-                // Set a reasonable max for the progress bar (e.g., 6 Volts)
-                maxProgress = 6;
+                unit = "V";
+                maxProgress = 6; // Max 6 Volts
                 break;
             case TYPE_POWER:
             default:
-                displayValue = latestSensorData.power_w; // Power in Watts
+                displayValue = latestSensorData.power_w;
                 title = "Power Consumption";
-                unit = "W"; // Watts
-                // Use the max set in XML for Power (2000)
-                maxProgress = 2000;
+                unit = "W";
+                maxProgress = 2000; // As defined in XML
                 break;
         }
 
-        // --- Update Title and Unit ---
         lightLevelTitle.setText(title);
         lightLevelUnitText.setText(unit);
-
-        // Set the max of the progress bar based on the selected type
         lightLevelProgress.setMax(maxProgress);
 
-        // --- Update Value ---
         String formattedValue = String.format(Locale.getDefault(), "%.2f", displayValue);
         lightLevelValueText.setText(formattedValue);
 
-        // --- Update Progress Bar ---
-        // Use an integer representation for the progress (may require scaling for current/voltage)
         int progressValue;
         if (displayType == TYPE_CURRENT) {
-            // For a Max of 2A, scale the progress (e.g., 0.5A -> 500)
-            progressValue = (int) Math.round(displayValue * 1000);
+            progressValue = (int) Math.round(displayValue * 1000); // Scale for progress bar
         } else if (displayType == TYPE_VOLTAGE) {
-            // For a Max of 6V, scale the progress (e.g., 3V -> 500)
-            progressValue = (int) Math.round(displayValue * 100);
+            progressValue = (int) Math.round(displayValue * 100); // Scale for progress bar
         } else {
             progressValue = (int) Math.round(displayValue);
         }
-
-        // Ensure progress doesn't exceed the set max
         lightLevelProgress.setProgress(Math.min(progressValue, maxProgress));
 
-        // --- Update Status Text and Indicator (Logic based on Power) ---
-        // You may want to create separate status logic for Voltage/Current later, but for now,
-        // let's keep the existing logic based on Power for a quick fix.
+        // --- Update Status Text and Indicator (based on power) ---
         int powerInt = (int) Math.round(latestSensorData.power_w);
         String status;
         int indicatorColor;
@@ -228,11 +249,6 @@ public class EnergyFragment extends Fragment {
             indicatorColor = red;
         }
 
-        // If the displayed value is NOT power, clarify the status text (optional)
-        if (displayType != TYPE_POWER) {
-            status += " (Power Idle)"; // or remove this if only displaying Power's status
-        }
-
         lightLevelText.setText(status);
         statusIndicator.getBackground().setTint(indicatorColor);
 
@@ -245,10 +261,19 @@ public class EnergyFragment extends Fragment {
         }
     }
 
+    private void updateUIForNoData() {
+        if (!isAdded()) return;
+        lightLevelValueText.setText("--");
+        lightLevelProgress.setProgress(0);
+        lightLevelText.setText("No Data");
+        statusIndicator.getBackground().setTint(Color.GRAY);
+        lastUpdatedTime.setText("--:--");
+    }
 
     @Override
     public void onResume() {
         super.onResume();
+        // Start listening for data when the fragment becomes visible
         if (sensorQuery != null && sensorListener != null) {
             sensorQuery.addValueEventListener(sensorListener);
         }
@@ -257,6 +282,7 @@ public class EnergyFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
+        // Stop listening when the fragment is no longer visible to save resources
         if (sensorQuery != null && sensorListener != null) {
             sensorQuery.removeEventListener(sensorListener);
         }
