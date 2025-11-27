@@ -133,6 +133,22 @@
                     android:layout_marginTop="8dp"
                     android:text="@string/turn_off_lights_when_room_is_empty" />
 
+                <TextView
+                    android:id="@+id/label_auto_off_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    android:text="Turn off lights after:"
+                    android:visibility="gone" />
+
+                <Spinner
+                    android:id="@+id/spinner_auto_off_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:visibility="gone" />
+
                 <CheckBox
                     android:id="@+id/checkbox_alert_after_hours"
                     android:layout_width="wrap_content"
@@ -226,7 +242,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Today\'s Activity"
+                    android:text="Today's Activity"
                     android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6" />
 
                 <LinearLayout

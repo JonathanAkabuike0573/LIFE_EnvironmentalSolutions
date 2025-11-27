@@ -5,8 +5,11 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
@@ -29,11 +32,13 @@ import java.util.Locale;
 public class PresenceFragment extends Fragment {
 
     // UI Elements
-    private TextView presenceStatusText, lastUpdatedTimeText, sessionDurationText, totalDetectionsText;
+    private TextView presenceStatusText, lastUpdatedTimeText, sessionDurationText, totalDetectionsText, labelAutoOffTime;
     private ImageView presenceIcon;
     private View statusIndicator;
     private SwitchMaterial presenceDetectionSwitch;
     private Button markOccupiedButton, markEmptyButton;
+    private CheckBox autoLightsOffCheckbox;
+    private Spinner autoOffTimeSpinner;
 
     // Firebase
     private DatabaseReference presenceRef;
@@ -63,6 +68,7 @@ public class PresenceFragment extends Fragment {
         initializeViews(view);
         initializeFirebase();
         setupListeners();
+        setupSpinner();
     }
 
     private void initializeViews(View view) {
@@ -75,6 +81,9 @@ public class PresenceFragment extends Fragment {
         totalDetectionsText = view.findViewById(R.id.total_detections_text);
         markOccupiedButton = view.findViewById(R.id.button_mark_occupied);
         markEmptyButton = view.findViewById(R.id.button_mark_empty);
+        autoLightsOffCheckbox = view.findViewById(R.id.checkbox_auto_lights_off);
+        labelAutoOffTime = view.findViewById(R.id.label_auto_off_time);
+        autoOffTimeSpinner = view.findViewById(R.id.spinner_auto_off_time);
     }
 
     private void initializeFirebase() {
@@ -118,6 +127,11 @@ public class PresenceFragment extends Fragment {
             }
         });
 
+        autoLightsOffCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            labelAutoOffTime.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+            autoOffTimeSpinner.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+        });
+
         markOccupiedButton.setOnClickListener(v -> manualOverride("Occupied"));
         markEmptyButton.setOnClickListener(v -> manualOverride("Empty"));
 
@@ -127,6 +141,13 @@ public class PresenceFragment extends Fragment {
                 syncSwitchState();
             }
         };
+    }
+
+    private void setupSpinner() {
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
+                R.array.auto_off_time_options, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        autoOffTimeSpinner.setAdapter(adapter);
     }
 
     private void manualOverride(String status) {
