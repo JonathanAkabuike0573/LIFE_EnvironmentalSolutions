@@ -1,6 +1,5 @@
 package ca.light.indoorair.freshness.energy.it.life.environmental.solution;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
@@ -90,14 +89,14 @@ public class LightFragment extends Fragment {
         lightLevelProgress = view.findViewById(R.id.light_level_progress);
         statusIndicator = view.findViewById(R.id.status_indicator);
         lightBrightnessChipGroup = view.findViewById(R.id.chip_group_light_brightness);
-        autoBrightnessSwitch = view.findViewById(R.id.switch_light_control);
+        autoBrightnessSwitch = view.findViewById(R.id.power_on);
         brightnessSlider = view.findViewById(R.id.slider_brightness);
     }
 
     private void setupListeners() {
         lightBrightnessChipGroup.setOnCheckedChangeListener((group, checkedId) -> {
             Chip selectedChip = group.findViewById(checkedId);
-            if (selectedChip != null) {
+            if (selectedChip != null && selectedChip.isPressed()) {
                 String selectedBrightness = selectedChip.getText().toString();
                 lightSensorDbRef.child("brightness").setValue(selectedBrightness);
                 Toast.makeText(getContext(), selectedBrightness + " selected", Toast.LENGTH_SHORT).show();
@@ -105,11 +104,13 @@ public class LightFragment extends Fragment {
         });
 
         autoBrightnessSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            sharedPreferences.edit().putBoolean(AUTO_BRIGHTNESS_KEY, isChecked).apply();
-            brightnessSlider.setEnabled(!isChecked);
-            String message = isChecked ? "Auto brightness enabled" : "Auto brightness disabled";
-            Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
-            lightSensorDbRef.child("autoBrightness").setValue(isChecked);
+            if (buttonView.isPressed()) {
+                sharedPreferences.edit().putBoolean(AUTO_BRIGHTNESS_KEY, isChecked).apply();
+                brightnessSlider.setEnabled(!isChecked);
+                String message = isChecked ? "Auto brightness enabled" : "Auto brightness disabled";
+                Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+                lightSensorDbRef.child("autoBrightness").setValue(isChecked);
+            }
         });
 
         preferenceChangeListener = (prefs, key) -> {

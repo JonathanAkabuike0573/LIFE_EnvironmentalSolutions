@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - Life Environmental Solution</title>
+
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #F5F5F5;
+            color: #333;
+            line-height: 1.7;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        h1, h2 {
+            color: #1A73E8; /* Brand Blue */
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            font-size: 20px;
+            margin-top: 25px;
+        }
+
+        p {
+            margin-bottom: 14px;
+        }
+
+        .card {
+            background: #FFF;
+            padding: 20px;
+            border-radius: 14px;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+            transition: background-color 0.3s, box-shadow 0.3s, color 0.3s;
+        }
+
+        .footer {
+            margin-top: 30px;
+            font-size: 14px;
+            color: #777;
+            text-align: center;
+        }
+
+        a {
+            color: #1A73E8;
+            text-decoration: none;
+        }
+
+        /* Dark Theme */
+        body.dark-theme {
+            background-color: #121212 !important;
+            color: #E0E0E0 !important;
+        }
+
+        body.dark-theme h1,
+        body.dark-theme h2 {
+            color: #81D4FA !important; /* Lighter blue for dark mode */
+        }
+
+        body.dark-theme .card {
+            background: #1E1E1E !important;
+            color: #E0E0E0 !important; /* Explicitly set text color */
+            box-shadow: 0 3px 8px rgba(0,0,0,0.4) !important;
+        }
+
+        body.dark-theme .footer {
+            color: #999 !important;
+        }
+
+        body.dark-theme a {
+            color: #81D4FA !important;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="card">
+    <h1>About Us</h1>
+    <p><strong>Life Environmental Solution</strong> is dedicated to creating smarter, cleaner, and more energy-efficient living environments. We combine innovative sensor technology with intelligent automation to help users save energy, improve air quality, and live more sustainably.</p>
+</div>
+
+<div class="card">
+    <h2>What We Do</h2>
+    <p>Our system uses advanced sensors to monitor and optimize your home:</p>
+    <ul>
+        <li><strong>Presence Sensors</strong> – detect movement and reduce unnecessary energy use.</li>
+        <li><strong>Air Quality Monitoring</strong> – tracks indoor conditions and alerts you when ventilation is needed.</li>
+        <li><strong>Ambient Light Sensors</strong> – automatically adjust lighting for comfort and efficiency.</li>
+    </ul>
+</div>
+
+<div class="card">
+    <h2>Our Mission</h2>
+    <p>We aim to empower every household to reduce waste, improve indoor conditions, and save money through simple, accessible technology. Sustainable living should be effortless—and we make that possible.</p>
+</div>
+
+<div class="card">
+    <h2>Why It Matters</h2>
+    <p>Energy waste, poor air circulation, and unmanaged lighting increase costs and affect your health. Life Environmental Solution addresses these issues through real-time automation, helping you create a healthier home while protecting the environment.</p>
+</div>
+
+<div class="card">
+    <h2>Contact Us</h2>
+    <p>Have questions or feedback? We’re here to help.</p>
+    <p>Email: <a href="mailto:support@lifeenvironmentalsolution.com">support@lifeenvironmentalsolution.com</a></p>
+</div>
+
+<p class="footer">Life Environmental Solution © 2025</p>
+
+<script>
+    function applyTheme(theme) {
+        if (theme === 'dark') {
+            document.body.classList.add('dark-theme');
+        } else {
+            document.body.classList.remove('dark-theme');
+        }
+    }
+</script>
+
+</body>
+</html>
