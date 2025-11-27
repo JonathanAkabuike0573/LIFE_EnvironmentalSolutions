@@ -7,48 +7,76 @@
 """Nov 18/25"""
 
 import time
-
 import board
+from datetime import datetime
+
+# --- START FIREBASE IMPORTS ---
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import db
+# --- END FIREBASE IMPORTS ---
 
 from adafruit_ina219 import INA219, ADCResolution, BusVoltageRange
 
-i2c_bus = board.I2C()  # uses board.SCL and board.SDA
-# i2c_bus = board.STEMMA_I2C()  # For using the built-in STEMMA QT connector on a microcontroller
+# --- START FIREBASE SETUP ---
+cred = credentials.Certificate("serviceAccountKey.json")
+firebase_admin.initialize_app(cred, {
+    'databaseURL': 'https://life-environmentalsolution-default-rtdb.firebaseio.com/'
+})
+ref = db.reference('/')
+# --- END FIREBASE SETUP ---
 
+i2c_bus = board.I2C()  # uses board.SCL and board.SDA
 ina219 = INA219(i2c_bus)
 
 print("ina219 test")
 
-# display some of the advanced field (just to test)
-print("Config register:")
-print("  bus_voltage_range:    0x%1X" % ina219.bus_voltage_range)
-print("  gain:                 0x%1X" % ina219.gain)
-print("  bus_adc_resolution:   0x%1X" % ina219.bus_adc_resolution)
-print("  shunt_adc_resolution: 0x%1X" % ina219.shunt_adc_resolution)
-print("  mode:                 0x%1X" % ina219.mode)
-print("")
-
-# optional : change configuration to use 32 samples averaging for both bus voltage and shunt voltage
+# Optional: change configuration to use 32 samples averaging for both bus voltage and shunt voltage
 ina219.bus_adc_resolution = ADCResolution.ADCRES_12BIT_32S
 ina219.shunt_adc_resolution = ADCResolution.ADCRES_12BIT_32S
-# optional : change voltage range to 16V
 ina219.bus_voltage_range = BusVoltageRange.RANGE_16V
 
-# measure and display loop
 while True:
     bus_voltage = ina219.bus_voltage  # voltage on V- (load side)
     shunt_voltage = ina219.shunt_voltage  # voltage between V+ and V- across the shunt
     current = ina219.current  # current in mA
     power = ina219.power  # power in watts
 
-    # INA219 measure bus voltage on the load side. So PSU voltage = bus_voltage + shunt_voltage
-    print(f"Voltage (VIN+) : {bus_voltage + shunt_voltage:6.3f}   V")
+    # Calculate source voltage (VIN+)
+    source_voltage = bus_voltage + shunt_voltage
+
+    print(f"Voltage (VIN+) : {source_voltage:6.3f}   V")
     print(f"Voltage (VIN-) : {bus_voltage:6.3f}   V")
     print(f"Shunt Voltage  : {shunt_voltage:8.5f} V")
     print(f"Shunt Current  : {current / 1000:7.4f}  A")
     print(f"Power Calc.    : {bus_voltage * (current / 1000):8.5f} W")
     print(f"Power Register : {power:6.3f}   W")
     print("")
+
+    # --- START FIREBASE DATA PUSH ---
+    try:
+        # Get the current time as a Unix timestamp
+        unix_timestamp = time.time()
+
+        # Convert to ISO 8601 string, this will reflect the exact date and time the code runs
+        timestamp_iso = datetime.utcfromtimestamp(unix_timestamp).isoformat()
+
+        # Create a dictionary of the data you want to send
+        sensor_data = {
+            'timestamp': timestamp_iso,  # ISO 8601 formatted timestamp
+            'vin_plus_v': source_voltage,
+            'vin_minus_v': bus_voltage,
+            'shunt_v': shunt_voltage,
+            'current_ma': current,
+            'power_w': power
+        }
+
+        # Push the data to the 'ina219_readings' node
+        ref.child('ina219_readings').push(sensor_data)
+        print("Data successfully sent to Firebase under 'ina219_readings'.")
+    except Exception as e:
+        print(f"Error sending data to Firebase: {e}")
+    # --- END FIREBASE DATA PUSH ---
 
     # Check internal calculations haven't overflowed (doesn't detect ADC overflows)
     if ina219.overflow:
