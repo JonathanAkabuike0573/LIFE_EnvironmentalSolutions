@@ -15,7 +15,7 @@
     <item
         android:id="@+id/bi_directional"
         android:icon="@drawable/power"
-        android:title="@string/bi_directional" />
+        android:title="@string/Energy" />
     <item
         android:id="@+id/light"
         android:icon="@drawable/smartlighticon"

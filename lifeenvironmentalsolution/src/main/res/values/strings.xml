@@ -215,6 +215,8 @@ CENG-322-OCC,  Software Project -->
     <string name="bi_directional">Bi-Directional</string>
     <string name="theme">Theme</string>
     <string name="profile">Profile</string>
+    <string name="energy">energy</string>
+    <string name="Energy">Energy</string>
 
 
 </resources>
