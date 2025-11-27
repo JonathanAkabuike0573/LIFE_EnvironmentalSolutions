@@ -19,7 +19,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import java.util.Locale;
 
-public class BiDirectionalFragment extends Fragment {
+public class EnergyFragment extends Fragment {
 
     // --- UI Variables ---
     private TextView lightLevelTitle; // The title text (e.g., "Power Consumption")
@@ -44,7 +44,7 @@ public class BiDirectionalFragment extends Fragment {
     private static final int TYPE_VOLTAGE = 2;
     private int currentDisplayType = TYPE_POWER; // Default to Power
 
-    public BiDirectionalFragment() {
+    public EnergyFragment() {
         // Required empty public constructor
     }
 
@@ -61,7 +61,7 @@ public class BiDirectionalFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_bi_directional, container, false);
+        return inflater.inflate(R.layout.fragment_energy, container, false);
     }
 
     @Override
