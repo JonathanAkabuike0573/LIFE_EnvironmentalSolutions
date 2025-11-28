@@ -1,4 +1,5 @@
 package ca.light.indoorair.freshness.energy.it.life.environmental.solution;
+
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -12,10 +13,12 @@ import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.text.NumberFormat;
 import java.util.Locale;
+
 public class PurchasesFragment extends Fragment {
 
     // UI Components
@@ -28,7 +31,7 @@ public class PurchasesFragment extends Fragment {
     private Button confirmAndPayButton;
 
     // Data and Constants
-    private static final double TAX_RATE = 0.07; // 7% tax rate
+    private static final double TAX_RATE = 0.13; // ⚠️ UPDATED: 13% tax rate (was 0.07)
     private double currentSubtotal = 0.0;
     private String selectedPaymentMethod = "";
 
@@ -37,10 +40,11 @@ public class PurchasesFragment extends Fragment {
 
     public PurchasesFragment() {
         // Initialize upgrade prices
-        upgradePrices.put("Select Upgrade", 0.00); // Default selection
+        upgradePrices.put("Select Upgrade", 0.00);
         upgradePrices.put("Basic Plan (Monthly)", 9.99);
         upgradePrices.put("Pro Plan (Quarterly)", 24.99);
         upgradePrices.put("Premium (Annual)", 79.99);
+        upgradePrices.put("Lifetime Access", 199.99);
     }
 
     public static PurchasesFragment newInstance() {
@@ -70,16 +74,30 @@ public class PurchasesFragment extends Fragment {
         totalTextView = view.findViewById(R.id.text_total);
         confirmAndPayButton = view.findViewById(R.id.button_confirm_and_pay);
 
-        setupSpinners(view);
+        setupSpinners();
         setupClickListeners(view);
-        // Initial price calculation
-        updatePriceDisplay(0.00);
+    }
+
+    /**
+     * Extracts the original map key by stripping the appended price from the formatted spinner text.
+     * e.g., "Pro Plan (Quarterly) ($24.99)" becomes "Pro Plan (Quarterly)"
+     */
+    private String getOriginalKey(String selectedItemText) {
+        // Find the index of the string " ($" which marks the start of the appended price.
+        int priceStart = selectedItemText.lastIndexOf(" ($");
+
+        if (priceStart > 0) {
+            // If the price marker is found, return the substring before it.
+            return selectedItemText.substring(0, priceStart);
+        }
+        // If it's the "Select Upgrade" option (which has no price), return the text as is.
+        return selectedItemText;
     }
 
     /**
      * Sets up the data and listeners for the three Spinner dropdowns.
      */
-    private void setupSpinners(@NonNull View view) {
+    private void setupSpinners() {
         // 1. Free Items Spinner
         String[] freeItems = {"None", "Feature X (Lifetime)", "Feature Y (3-months)"};
         ArrayAdapter<String> freeAdapter = new ArrayAdapter<>(getContext(),
@@ -95,18 +113,43 @@ public class PurchasesFragment extends Fragment {
         ArrayAdapter<String> upgradeAdapter = new ArrayAdapter<>(getContext(),
                 android.R.layout.simple_spinner_dropdown_item, upgradeOptions);
         upgradesSpinner.setAdapter(upgradeAdapter);
+
+        // --- Set Default Selection and Calculate Price Immediately ---
+
+        // Use index 1 as the default paid option (e.g., "Basic Plan")
+        final int defaultSelectionIndex = 1;
+
+        // Use a post() runnable to ensure setting selection happens after the adapter is fully initialized
+        upgradesSpinner.post(() -> {
+            upgradesSpinner.setSelection(defaultSelectionIndex);
+
+            // Manually trigger the price calculation for the initial selection
+            String selectedItemText = (String) upgradesSpinner.getItemAtPosition(defaultSelectionIndex);
+
+            // Use the corrected logic to get the original key
+            String originalKey = getOriginalKey(selectedItemText);
+
+            if (upgradePrices.containsKey(originalKey)) {
+                currentSubtotal = upgradePrices.get(originalKey);
+            }
+            updatePriceDisplay(currentSubtotal);
+        });
+
+        // --- Listener for subsequent selections ---
         upgradesSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                // Get the base price from the selected item's original key
                 String selectedItemText = parent.getItemAtPosition(position).toString();
-                String originalKey = selectedItemText.split(" \\(")[0]; // Remove price formatting for map lookup
+
+                // Use the corrected logic to get the original key
+                String originalKey = getOriginalKey(selectedItemText);
 
                 if (upgradePrices.containsKey(originalKey)) {
                     currentSubtotal = upgradePrices.get(originalKey);
                 } else {
                     currentSubtotal = 0.00; // Fallback
                 }
+                // This call updates the Subtotal, Tax, Total, and the Button text.
                 updatePriceDisplay(currentSubtotal);
             }
 
@@ -129,7 +172,10 @@ public class PurchasesFragment extends Fragment {
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                selectedPaymentMethod = paymentTypes[0]; // Default to first item
+                // Default to the first item if nothing is selected
+                if (parent.getCount() > 0) {
+                    selectedPaymentMethod = parent.getItemAtPosition(0).toString();
+                }
             }
         });
     }
@@ -145,6 +191,7 @@ public class PurchasesFragment extends Fragment {
         NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(Locale.getDefault());
 
         subtotalTextView.setText("Subtotal: " + currencyFormat.format(subtotal));
+        // The display text for tax now shows 13%
         taxTextView.setText("Tax (" + String.format(Locale.getDefault(), "%.0f%%", TAX_RATE * 100) + "): " + currencyFormat.format(tax));
         totalTextView.setText("Total: " + currencyFormat.format(total));
 
