@@ -1,4 +1,4 @@
-package ca.light.indoorair.freshness.energy.it.life.environmental.solution;
+package ca.light.indoorair.freshness.energy.it.life.environmental.solution.ui;
 
 import android.graphics.Color;
 import android.os.Bundle;
@@ -23,6 +23,8 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.List;
 import java.util.Locale;
+
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.R;
 
 public class EnergyFragment extends Fragment {
 

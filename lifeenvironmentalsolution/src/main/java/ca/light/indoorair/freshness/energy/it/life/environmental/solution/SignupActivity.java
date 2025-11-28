@@ -11,6 +11,9 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.auth.AuthProvider;
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.auth.FirebaseAuthProvider;
+
 public class SignupActivity extends AppCompatActivity {
 
     private EditText name, phoneNumber, email, password, confirmPassword;

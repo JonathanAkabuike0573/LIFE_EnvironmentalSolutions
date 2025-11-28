@@ -2,7 +2,7 @@
 
 //Mohamed Ali  N01440760, Jonathan Akabuike N01510573, Kieran Sharma N01548225, Farhan Habibza N01610299
 //CENG-322-OCC,  Software Project
-package ca.light.indoorair.freshness.energy.it.life.environmental.solution;
+package ca.light.indoorair.freshness.energy.it.life.environmental.solution.ui;
 
 import android.Manifest;
 import android.app.Activity;
@@ -25,6 +25,8 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.materialswitch.MaterialSwitch;
+
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.R;
 
 // Removed unused imports for profile management
 // import android.widget.RelativeLayout;

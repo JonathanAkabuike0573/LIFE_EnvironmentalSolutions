@@ -1,4 +1,4 @@
-package ca.light.indoorair.freshness.energy.it.life.environmental.solution;
+package ca.light.indoorair.freshness.energy.it.life.environmental.solution.ui;
 
 import android.Manifest;
 import android.app.Activity;
@@ -37,6 +37,8 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.R;
 
 public class AccountFragment extends Fragment {
 

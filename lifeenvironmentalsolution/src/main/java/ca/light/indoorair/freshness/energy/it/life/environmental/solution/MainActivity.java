@@ -44,6 +44,18 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.auth.HelperClass;
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.ui.AboutUsFragment;
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.ui.AccountFragment;
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.ui.AirQualityFragment;
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.ui.EnergyFragment;
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.ui.FeedBackPage;
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.ui.LightFragment;
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.ui.NotificationFragment;
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.ui.PresenceFragment;
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.ui.PurchasesFragment;
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.ui.SettingsFragment;
+
 // Implement OnBackStackChangedListener to react to navigation changes
 public class MainActivity extends AppCompatActivity implements FragmentManager.OnBackStackChangedListener {
 
