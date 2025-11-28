@@ -1,15 +1,12 @@
 package ca.light.indoorair.freshness.energy.it.life.environmental.solution;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
-import android.content.pm.PackageManager;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
@@ -20,8 +17,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -62,14 +57,6 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
 
     private static final String PREFS_NAME = "MyPrefsFile";
     private static final String THEME_KEY = "ThemeKey";
-
-    private final ActivityResultLauncher<String> requestPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
-        if (isGranted) {
-            Toast.makeText(this, R.string.permission_granted, Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(this, R.string.permission_denied, Toast.LENGTH_SHORT).show();
-        }
-    });
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -351,7 +338,8 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         }
         int itemId = item.getItemId();
         if (itemId == R.id.action_notification) {
-            askNotificationPermission();
+            setCurrentFragment(new NotificationFragment(), true);
+            getSupportActionBar().setTitle(getString(R.string.notification));
             return true;
         } else if (itemId == R.id.action_aboutus) {
             setCurrentFragment(new AboutUsFragment(), true);
@@ -383,15 +371,4 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         });
     }
 
-    private void askNotificationPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
-            } else {
-                Toast.makeText(this, R.string.permission_already_granted, Toast.LENGTH_SHORT).show();
-            }
-        } else {
-            Toast.makeText(this, "Notification permission not required on this Android version.", Toast.LENGTH_SHORT).show();
-        }
-    }
 }
