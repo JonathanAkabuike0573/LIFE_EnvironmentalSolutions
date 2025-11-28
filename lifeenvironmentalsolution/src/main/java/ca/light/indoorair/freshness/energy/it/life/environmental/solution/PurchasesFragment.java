@@ -4,6 +4,8 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.appcompat.app.AlertDialog;
+import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,9 +31,10 @@ public class PurchasesFragment extends Fragment {
     private TextView taxTextView;
     private TextView totalTextView;
     private Button confirmAndPayButton;
+    private TextView cancelSubscriptionLink;
 
     // Data and Constants
-    private static final double TAX_RATE = 0.13; // ⚠️ UPDATED: 13% tax rate (was 0.07)
+    private static final double TAX_RATE = 0.13; // 13% tax rate
     private double currentSubtotal = 0.0;
     private String selectedPaymentMethod = "";
 
@@ -73,6 +76,7 @@ public class PurchasesFragment extends Fragment {
         taxTextView = view.findViewById(R.id.text_tax);
         totalTextView = view.findViewById(R.id.text_total);
         confirmAndPayButton = view.findViewById(R.id.button_confirm_and_pay);
+        cancelSubscriptionLink = view.findViewById(R.id.text_cancel_subscription_link);
 
         setupSpinners();
         setupClickListeners(view);
@@ -80,7 +84,6 @@ public class PurchasesFragment extends Fragment {
 
     /**
      * Extracts the original map key by stripping the appended price from the formatted spinner text.
-     * e.g., "Pro Plan (Quarterly) ($24.99)" becomes "Pro Plan (Quarterly)"
      */
     private String getOriginalKey(String selectedItemText) {
         // Find the index of the string " ($" which marks the start of the appended price.
@@ -105,7 +108,6 @@ public class PurchasesFragment extends Fragment {
         freeItemsSpinner.setAdapter(freeAdapter);
 
         // 2. Upgrades Spinner (with Price)
-        // Format the upgrade list to include the base price (e.g., "Basic Plan ($9.99)")
         String[] upgradeOptions = upgradePrices.keySet().stream()
                 .map(key -> key + (upgradePrices.get(key) > 0 ? " ($" + String.format(Locale.getDefault(), "%.2f", upgradePrices.get(key)) + ")" : ""))
                 .toArray(String[]::new);
@@ -115,18 +117,12 @@ public class PurchasesFragment extends Fragment {
         upgradesSpinner.setAdapter(upgradeAdapter);
 
         // --- Set Default Selection and Calculate Price Immediately ---
-
-        // Use index 1 as the default paid option (e.g., "Basic Plan")
         final int defaultSelectionIndex = 1;
 
-        // Use a post() runnable to ensure setting selection happens after the adapter is fully initialized
         upgradesSpinner.post(() -> {
             upgradesSpinner.setSelection(defaultSelectionIndex);
 
-            // Manually trigger the price calculation for the initial selection
             String selectedItemText = (String) upgradesSpinner.getItemAtPosition(defaultSelectionIndex);
-
-            // Use the corrected logic to get the original key
             String originalKey = getOriginalKey(selectedItemText);
 
             if (upgradePrices.containsKey(originalKey)) {
@@ -140,16 +136,13 @@ public class PurchasesFragment extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String selectedItemText = parent.getItemAtPosition(position).toString();
-
-                // Use the corrected logic to get the original key
                 String originalKey = getOriginalKey(selectedItemText);
 
                 if (upgradePrices.containsKey(originalKey)) {
                     currentSubtotal = upgradePrices.get(originalKey);
                 } else {
-                    currentSubtotal = 0.00; // Fallback
+                    currentSubtotal = 0.00;
                 }
-                // This call updates the Subtotal, Tax, Total, and the Button text.
                 updatePriceDisplay(currentSubtotal);
             }
 
@@ -172,7 +165,6 @@ public class PurchasesFragment extends Fragment {
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                // Default to the first item if nothing is selected
                 if (parent.getCount() > 0) {
                     selectedPaymentMethod = parent.getItemAtPosition(0).toString();
                 }
@@ -191,7 +183,6 @@ public class PurchasesFragment extends Fragment {
         NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(Locale.getDefault());
 
         subtotalTextView.setText("Subtotal: " + currencyFormat.format(subtotal));
-        // The display text for tax now shows 13%
         taxTextView.setText("Tax (" + String.format(Locale.getDefault(), "%.0f%%", TAX_RATE * 100) + "): " + currencyFormat.format(tax));
         totalTextView.setText("Total: " + currencyFormat.format(total));
 
@@ -200,7 +191,34 @@ public class PurchasesFragment extends Fragment {
     }
 
     /**
-     * Sets up click listeners for the button and the receipts link.
+     * Displays an AlertDialog to confirm upgrade cancellation.
+     */
+    private void showCancelDialog() {
+        if (getContext() == null) return;
+
+        new AlertDialog.Builder(getContext())
+                .setTitle("Cancel Upgrade")
+                .setMessage("Do you want to cancel your upgrade?")
+                .setPositiveButton("Yes, Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // User clicked Yes, handle cancellation logic
+                        Toast.makeText(getContext(), "Your Upgrade will be canceled in 10 business days.", Toast.LENGTH_LONG).show();
+                        // You might want to update the UI or navigate away here
+                    }
+                })
+                .setNegativeButton("No, Keep It", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // User clicked No, the dialog is dismissed, and they return to the payment page.
+                        Toast.makeText(getContext(), "Upgrade maintained.", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                // ⭐ UPDATED ICON: Using R.drawable.logolife
+                .setIcon(R.drawable.logolife)
+                .show();
+    }
+
+    /**
+     * Sets up click listeners for the buttons and links.
      */
     private void setupClickListeners(@NonNull View view) {
         // "Confirm and Pay" button
@@ -221,6 +239,13 @@ public class PurchasesFragment extends Fragment {
         if (viewReceiptsLink != null) {
             viewReceiptsLink.setOnClickListener(v -> {
                 Toast.makeText(getContext(), "Navigating to Receipts History Screen...", Toast.LENGTH_SHORT).show();
+            });
+        }
+
+        // "Cancel Upgrade" link
+        if (cancelSubscriptionLink != null) {
+            cancelSubscriptionLink.setOnClickListener(v -> {
+                showCancelDialog();
             });
         }
     }
