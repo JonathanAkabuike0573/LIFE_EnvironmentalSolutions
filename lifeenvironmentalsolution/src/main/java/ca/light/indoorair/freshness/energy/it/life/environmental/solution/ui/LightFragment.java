@@ -1,4 +1,4 @@
-package ca.light.indoorair.freshness.energy.it.life.environmental.solution;
+package ca.light.indoorair.freshness.energy.it.life.environmental.solution.ui;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -30,6 +30,8 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
+
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.R;
 
 public class LightFragment extends Fragment {
 

@@ -14,6 +14,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.auth.AuthProvider;
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.auth.FirebaseAuthProvider;
+
 // No longer importing com.google.firebase.auth.FirebaseAuthProvider
 // No longer importing static androidx.core.app.PendingIntentCompat.getActivity
 

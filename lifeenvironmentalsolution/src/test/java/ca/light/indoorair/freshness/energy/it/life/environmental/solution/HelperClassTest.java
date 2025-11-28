@@ -3,6 +3,8 @@ package ca.light.indoorair.freshness.energy.it.life.environmental.solution;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.auth.HelperClass;
+
 public class HelperClassTest {
 
     // 1 - Test constructor initializes values correctly
