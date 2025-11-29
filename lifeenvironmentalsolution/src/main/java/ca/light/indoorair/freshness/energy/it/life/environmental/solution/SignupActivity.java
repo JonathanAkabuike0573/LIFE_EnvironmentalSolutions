@@ -2,8 +2,6 @@ package ca.light.indoorair.freshness.energy.it.life.environmental.solution;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.TextUtils;
-import android.util.Patterns;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -13,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import ca.light.indoorair.freshness.energy.it.life.environmental.solution.auth.AuthProvider;
 import ca.light.indoorair.freshness.energy.it.life.environmental.solution.auth.FirebaseAuthProvider;
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.validation.InputValidation;
 
 public class SignupActivity extends AppCompatActivity {
 
@@ -28,7 +27,7 @@ public class SignupActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.signup);
 
-        // METHOD INJECTION: We create the concrete provider here.
+
         this.authProvider = new FirebaseAuthProvider(this);
 
         bindViews();
@@ -50,7 +49,7 @@ public class SignupActivity extends AppCompatActivity {
         authProvider.signUpWithEmail(emailStr, passwordStr, nameStr, phoneStr, new AuthProvider.AuthCallback() {
             @Override
             public void onSuccess() {
-                Toast.makeText(SignupActivity.this, "Sign Up Successful!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(SignupActivity.this, R.string.sign_up_successful, Toast.LENGTH_SHORT).show();
                 // Send user to main activity, as they are now signed up and logged in.
                 Intent intent = new Intent(SignupActivity.this, MainActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -85,20 +84,24 @@ public class SignupActivity extends AppCompatActivity {
     }
 
     private boolean validateInputs(String name, String phone, String email, String password, String confirmPassword) {
-        if (TextUtils.isEmpty(name) || TextUtils.isEmpty(phone) || TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
-            Toast.makeText(this, "All fields are required", Toast.LENGTH_SHORT).show();
+        if (!InputValidation.isValidName(name)) {
+            this.name.setError(getString(R.string.please_enter_a_valid_name));
             return false;
         }
-        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            this.email.setError("Please enter a valid email address");
+        if (!InputValidation.isValidPhone(phone)) {
+            this.phoneNumber.setError(getString(R.string.please_enter_a_valid_phone_number));
             return false;
         }
-        if (password.length() < 6) {
-            this.password.setError("Password must be at least 6 characters");
+        if (!InputValidation.isValidEmail(email)) {
+            this.email.setError(getString(R.string.please_enter_a_valid_email_address));
+            return false;
+        }
+        if (!InputValidation.isValidPassword(password)) {
+            this.password.setError(getString(R.string.password_must_be_at_least_6_characters));
             return false;
         }
         if (!password.equals(confirmPassword)) {
-            this.confirmPassword.setError("Passwords do not match");
+            this.confirmPassword.setError(getString(R.string.passwords_do_not_match));
             return false;
         }
         return true;
