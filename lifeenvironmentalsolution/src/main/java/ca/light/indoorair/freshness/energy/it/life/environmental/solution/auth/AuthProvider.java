@@ -1,4 +1,4 @@
-package ca.light.indoorair.freshness.energy.it.life.environmental.solution;
+package ca.light.indoorair.freshness.energy.it.life.environmental.solution.auth;
 
 /**
  * Defines the contract for authentication operations, abstracting the underlying implementation.

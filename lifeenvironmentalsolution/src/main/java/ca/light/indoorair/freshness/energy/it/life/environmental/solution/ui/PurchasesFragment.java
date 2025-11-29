@@ -1,4 +1,4 @@
-package ca.light.indoorair.freshness.energy.it.life.environmental.solution;
+package ca.light.indoorair.freshness.energy.it.life.environmental.solution.ui;
 
 import android.os.Bundle;
 import androidx.annotation.NonNull;
@@ -20,6 +20,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.text.NumberFormat;
 import java.util.Locale;
+
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.R;
 
 public class PurchasesFragment extends Fragment {
 

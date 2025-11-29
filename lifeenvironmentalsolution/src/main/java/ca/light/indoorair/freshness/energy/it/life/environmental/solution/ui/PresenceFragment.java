@@ -1,4 +1,4 @@
-package ca.light.indoorair.freshness.energy.it.life.environmental.solution;
+package ca.light.indoorair.freshness.energy.it.life.environmental.solution.ui;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -32,6 +32,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.R;
 
 public class PresenceFragment extends Fragment {
 
