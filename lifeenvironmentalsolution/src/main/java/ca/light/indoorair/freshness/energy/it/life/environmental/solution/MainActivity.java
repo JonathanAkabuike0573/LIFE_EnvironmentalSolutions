@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
 
         auth = FirebaseAuth.getInstance();
         fragmentManager = getSupportFragmentManager();
-        // **CRITICAL: Listen for back stack changes**
+
         fragmentManager.addOnBackStackChangedListener(this);
 
         setupTheme();
@@ -141,7 +141,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         });
 
         updateNavHeader();
-        // **IMPROVED: Centralized back press logic**
+
         setupBackButton();
     }
 
@@ -227,7 +227,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         }
     }
 
-    // **NEW: This method now controls the hamburger/back icon and bottom nav visibility**
+
     @Override
     public void onBackStackChanged() {
         boolean hasBackStack = fragmentManager.getBackStackEntryCount() > 0;
@@ -249,7 +249,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         }
     }
 
-    // **NEW: Helper to sync bottom nav when returning from back stack**
+
     private void syncBottomNavSelection() {
         Fragment currentFragment = fragmentManager.findFragmentById(R.id.main);
         if (currentFragment instanceof DashBoardFragment) {
@@ -360,7 +360,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         return super.onOptionsItemSelected(item);
     }
 
-    // **UPDATED: setCurrentFragment now supports adding to back stack**
+
     private void setCurrentFragment(Fragment fragment, boolean addToBackStack) {
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.replace(R.id.main, fragment);
