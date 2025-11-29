@@ -9,9 +9,7 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Looper;
-import android.text.TextUtils;
 import android.util.Log;
-import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,6 +30,7 @@ import java.util.HashMap;
 import java.util.Locale;
 
 import ca.light.indoorair.freshness.energy.it.life.environmental.solution.R;
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.validation.InputValidation;
 
 public class FeedBackPage extends Fragment {
 
@@ -118,12 +117,54 @@ public class FeedBackPage extends Fragment {
         }.start();
     }
 
+    private boolean validateInputs(String name, String email, String phone, String feedback, float rating) {
+        if (!InputValidation.isValidName(name)) {
+            etName.setError("Please enter your name.");
+            etName.requestFocus();
+            return false;
+        }
+
+        if (!InputValidation.isValidEmail(email)) {
+            etEmail.setError("Please enter a valid email address.");
+            etEmail.requestFocus();
+            return false;
+        }
+
+        if (!InputValidation.isValidPhone(phone)) {
+            etPhone.setError("Please enter a valid phone number.");
+            etPhone.requestFocus();
+            return false;
+        }
+
+        if (!InputValidation.isValidFeedback(feedback)) {
+            etFeedback.setError("Please provide your feedback.");
+            etFeedback.requestFocus();
+            return false;
+        }
+
+        if (rating == 0) {
+            new AlertDialog.Builder(requireContext())
+                    .setTitle("Incomplete Form")
+                    .setMessage("Please provide a rating.")
+                    .setPositiveButton(android.R.string.ok, null)
+                    .show();
+            return false;
+        }
+
+        return true;
+    }
+
+
     private void submitFeedback() {
         String name = etName.getText().toString().trim();
         String email = etEmail.getText().toString().trim();
         String phone = etPhone.getText().toString().trim();
         String feedback = etFeedback.getText().toString().trim();
         float rating = ratingBar.getRating();
+
+        if (!validateInputs(name, email, phone, feedback, rating)) {
+            return;
+        }
 
         // Programmatically get the device model
         String deviceModel = Build.MANUFACTURER + " " + Build.MODEL;
@@ -137,28 +178,6 @@ public class FeedBackPage extends Fragment {
         Log.d(TAG, "Feedback: " + feedback);
         Log.d(TAG, "Rating: " + rating);
 
-
-        if (TextUtils.isEmpty(name) || TextUtils.isEmpty(email) || TextUtils.isEmpty(phone) ||
-                TextUtils.isEmpty(feedback) || rating == 0) {
-            new AlertDialog.Builder(requireContext())
-                    .setTitle("Incomplete Form")
-                    .setMessage("Please fill all fields and provide a rating.")
-                    .setPositiveButton(android.R.string.ok, null)
-                    .show();
-            Log.w(TAG, "Submission failed: Not all fields were filled.");
-            return;
-        }
-
-        // Validate email format
-        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            etEmail.setError("Please enter a valid email address");
-            return;
-        }
-        // Validate phone number length (must be at least 10 digits)
-        if (phone.length() < 10) {
-            etPhone.setError("Please enter a complete phone number (at least 10 digits)");
-            return;
-        }
         String feedbackId = feedbackDbRef.push().getKey();
 
         HashMap<String, Object> feedbackMap = new HashMap<>();
