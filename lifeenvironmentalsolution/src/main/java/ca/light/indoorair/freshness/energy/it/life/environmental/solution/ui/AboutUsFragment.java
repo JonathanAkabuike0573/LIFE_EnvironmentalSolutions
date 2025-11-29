@@ -1,4 +1,4 @@
-package ca.light.indoorair.freshness.energy.it.life.environmental.solution;
+package ca.light.indoorair.freshness.energy.it.life.environmental.solution.ui;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -13,6 +13,8 @@ import android.webkit.WebViewClient;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.R;
 
 public class AboutUsFragment extends Fragment {
 

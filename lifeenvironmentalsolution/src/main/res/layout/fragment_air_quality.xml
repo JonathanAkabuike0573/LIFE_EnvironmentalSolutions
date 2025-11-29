@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="#F0F4F8"
     android:fillViewport="true"
-    tools:context=".AirQualityFragment">
+    tools:context=".ui.AirQualityFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"

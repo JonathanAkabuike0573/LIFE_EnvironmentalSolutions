@@ -3,7 +3,6 @@ package ca.light.indoorair.freshness.energy.it.life.environmental.solution;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Patterns;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TextView;
@@ -13,6 +12,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
+
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.auth.AuthProvider;
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.auth.FirebaseAuthProvider;
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.validation.InputValidation;
 
 // No longer importing com.google.firebase.auth.FirebaseAuthProvider
 // No longer importing static androidx.core.app.PendingIntentCompat.getActivity
@@ -41,7 +44,7 @@ public class LoginActivity extends AppCompatActivity {
 
         setContentView(R.layout.login_page);
         bindViews();
-        // Correctly instantiate our custom provider, passing the activity context.
+
         this.authProvider = new FirebaseAuthProvider(this);
         wireClickListeners();
         loadSavedCredentials();
@@ -97,12 +100,12 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private boolean validateInputs(String email, String password) {
-        if (email.isEmpty() || !Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+        if (!InputValidation.isValidEmail(email)) {
             emailEditText.setError(getString(R.string.please_enter_a_valid_email));
             emailEditText.requestFocus();
             return false;
         }
-        if (password.isEmpty()) {
+        if (!InputValidation.isValidPassword(password)) {
             passwordEditText.setError(getString(R.string.password_cannot_be_empty));
             passwordEditText.requestFocus();
             return false;

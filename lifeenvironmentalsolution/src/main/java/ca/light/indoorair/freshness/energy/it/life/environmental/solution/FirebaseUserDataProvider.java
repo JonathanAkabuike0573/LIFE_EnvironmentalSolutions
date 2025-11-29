@@ -9,6 +9,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.auth.HelperClass;
+
 // This is our concrete implementation that uses Firebase to get user data.
 public class FirebaseUserDataProvider implements UserDataProvider {
 
