@@ -44,7 +44,7 @@ public class LoginActivity extends AppCompatActivity {
 
         setContentView(R.layout.login_page);
         bindViews();
-        // Correctly instantiate our custom provider, passing the activity context.
+
         this.authProvider = new FirebaseAuthProvider(this);
         wireClickListeners();
         loadSavedCredentials();

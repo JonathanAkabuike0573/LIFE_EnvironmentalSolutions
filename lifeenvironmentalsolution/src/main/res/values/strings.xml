@@ -235,6 +235,11 @@ CENG-322-OCC,  Software Project -->
     <string name="cancel">Cancel</string>
     <string name="password_updated_successfully">Password updated successfully</string>
     <string name="failed_to_update_password">Failed to update password</string>
+    <string name="failed_to_submit_feedback_please_check_your_network_connection_and_try_again">Failed to submit feedback. Please check your network connection and try again.</string>
+    <string name="devicemodel">deviceModel</string>
+    <string name="rating">rating</string>
+    <string name="message">message</string>
+    <string name="you_can_submit_again_in_02d_02d_02d">You can submit again in: %02d:%02d:%02d</string>
 
     <string-array name="auto_off_time_options">
         <item>5 minutes</item>
