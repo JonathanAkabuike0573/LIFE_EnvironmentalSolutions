@@ -14,6 +14,9 @@ import androidx.fragment.app.Fragment;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 import java.util.List;
 
 import ca.light.indoorair.freshness.energy.it.life.environmental.solution.ui.AirQualityFragment;
@@ -27,6 +30,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyViewHolder> {
     List<item> list;
     RoomSelectionProvider roomSelectionProvider;
 
+    // Interface to get the current room from DashboardFragment
     public interface RoomSelectionProvider {
         String getSelectedRoom();
     }
@@ -50,15 +54,12 @@ public class MyAdapter extends RecyclerView.Adapter<MyViewHolder> {
         holder.device_name.setText(currentItem.getName());
         holder.device_status.setText(currentItem.getStatus());
 
+        // --- 1. CLICK LISTENER (OPEN FRAGMENT) ---
         holder.itemView.setOnClickListener(v -> {
             Fragment fragment = null;
-
-            // CRITICAL FIX: Get the CURRENT room selection at click time
             String selectedRoom = roomSelectionProvider.getSelectedRoom();
 
-            // Debug: Show which room is being passed
-            Toast.makeText(context, "Opening " + currentItem.getName() + " for: " + selectedRoom, Toast.LENGTH_SHORT).show();
-
+            // Pass the selected room to the new fragment
             Bundle args = new Bundle();
             args.putString("SELECTED_ROOM_KEY", selectedRoom);
 
@@ -86,6 +87,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyViewHolder> {
             }
         });
 
+        // --- 2. SETUP TOGGLE SWITCH ---
         if (!currentItem.isShowToggle()) {
             holder.device_toggle.setVisibility(View.GONE);
             holder.device_icon.setImageResource(currentItem.getImages());
@@ -94,52 +96,54 @@ public class MyAdapter extends RecyclerView.Adapter<MyViewHolder> {
 
         holder.device_toggle.setVisibility(View.VISIBLE);
 
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-
-        // --- Initial State Setup ---
-        boolean isInitiallyOn;
-        if ("Presence Sensor".equals(currentItem.getName())) {
-            isInitiallyOn = prefs.getBoolean("presence_detection_enabled", true);
-        } else {
-            isInitiallyOn = currentItem.isDeviceOn();
-        }
-
-        // Update the model and UI without triggering the listener
+        // Remove previous listener to avoid triggering it during recycling
         holder.device_toggle.setOnCheckedChangeListener(null);
-        holder.device_toggle.setChecked(isInitiallyOn);
-        currentItem.setDeviceOn(isInitiallyOn);
 
-        String initialStatus;
-        if ("Presence Sensor".equals(currentItem.getName())) {
-            initialStatus = isInitiallyOn ? "On" : "Off";
-        } else {
-            initialStatus = isInitiallyOn ? "On" : "Off";
-        }
-        if(!"Air Quality".equals(currentItem.getName())) {
-            holder.device_status.setText(initialStatus);
-            currentItem.setStatus(initialStatus);
-        }
-        updateIcon(holder, currentItem, isInitiallyOn);
+        // Set the current visual state
+        holder.device_toggle.setChecked(currentItem.isDeviceOn());
+        updateIcon(holder, currentItem, currentItem.isDeviceOn());
 
-        // --- Listener Setup ---
+        // --- 3. TOGGLE CLICK LISTENER (THE FIX) ---
         holder.device_toggle.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            String status;
-            if ("Presence Sensor".equals(currentItem.getName())) {
-                status = isChecked ? "On" : "Off";
-                // Save state for presence sensor
-                prefs.edit().putBoolean("presence_detection_enabled", isChecked).apply();
-            } else {
-                status = isChecked ? "On" : "Off";
-            }
 
-            String message = currentItem.getName() + " is " + status;
-            Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
-
-            // Update model and UI
+            // A. Immediate Local UI Update (Responsiveness)
             currentItem.setDeviceOn(isChecked);
+            String status = isChecked ? "On" : "Off";
             currentItem.setStatus(status);
             holder.device_status.setText(status);
             updateIcon(holder, currentItem, isChecked);
+
+            // B. Write to Firebase (Control Logic)
+            if ("Smart Light".equals(currentItem.getName())) {
+                // 1. Get Current Room
+                String roomName = roomSelectionProvider.getSelectedRoom();
+
+                // 2. Determine Firebase Path
+                DatabaseReference lightRef;
+                if ("Main Office".equals(roomName)) {
+                    lightRef = FirebaseDatabase.getInstance().getReference("sensorData").child("light");
+                } else {
+                    lightRef = FirebaseDatabase.getInstance().getReference("rooms").child(roomName).child("light");
+                }
+
+                // 3. Write to 'powerOn' node (Controls LightFragment & Simulation)
+                lightRef.child("powerOn").setValue(isChecked)
+                        .addOnFailureListener(e -> {
+                            // Revert UI if write fails
+                            Toast.makeText(context, "Failed to switch light", Toast.LENGTH_SHORT).show();
+                            holder.device_toggle.setChecked(!isChecked);
+                        });
+
+            } else if ("Presence Sensor".equals(currentItem.getName())) {
+                // Presence Sensor Logic (SharedPrefs)
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+                prefs.edit().putBoolean("presence_detection_enabled", isChecked).apply();
+                Toast.makeText(context, "Presence Sensor is " + status, Toast.LENGTH_SHORT).show();
+
+            } else {
+
+                Toast.makeText(context, currentItem.getName() + " is " + status, Toast.LENGTH_SHORT).show();
+            }
         });
     }
 

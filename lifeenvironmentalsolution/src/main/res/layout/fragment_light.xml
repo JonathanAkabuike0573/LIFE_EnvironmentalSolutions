@@ -148,6 +148,17 @@
                 android:padding="20dp">
 
                 <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/light_switch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Power"
+                android:checked="true"
+                android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"/>
+
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="?android:attr/listDivider" android:layout_marginTop="16dp" android:layout_marginBottom="16dp"/>
+
+
+                <com.google.android.material.switchmaterial.SwitchMaterial
                     android:id="@+id/power_on"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

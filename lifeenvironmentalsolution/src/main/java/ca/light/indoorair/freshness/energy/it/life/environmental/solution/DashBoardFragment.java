@@ -2,9 +2,6 @@ package ca.light.indoorair.freshness.energy.it.life.environmental.solution;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
-
-import androidx.lifecycle.ViewModelProvider;
-import androidx.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,23 +16,26 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
 import ca.light.indoorair.freshness.energy.it.life.environmental.solution.ui.FeedBackPage;
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.viewmodel.LightViewModel;
 import ca.light.indoorair.freshness.energy.it.life.environmental.solution.viewmodel.SharedRoomViewModel;
 
 public class DashBoardFragment extends Fragment {
@@ -46,17 +46,26 @@ public class DashBoardFragment extends Fragment {
     private ImageView settingsIcon;
     private Spinner roomSpinner;
 
-    // Firebase
+
     private FirebaseAuth mAuth;
     private DatabaseReference roomsRef;
     private ValueEventListener roomsListener;
+
+
     private DatabaseReference selectedRoomRef;
     private ValueEventListener selectedRoomListener;
+
+    private LightViewModel lightViewModel;
     private DatabaseReference airQualityRef;
     private ValueEventListener airQualityListener;
+
+
+    private DatabaseReference lightRef;
+    private ValueEventListener lightListener;
+
     private String currentSelectedRoom;
 
-    // SharedPreferences
+    // SharedPreferences & Adapter
     private SharedPreferences sharedPreferences;
     private SharedPreferences.OnSharedPreferenceChangeListener preferenceChangeListener;
     private MyAdapter adapter;
@@ -73,6 +82,7 @@ public class DashBoardFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_dash_board, container, false);
 
+
         allItems = new ArrayList<>();
         allItems.add(new item("Air Quality", "Good", R.drawable.air_qualityicon, true, false));
         allItems.add(new item("Smart Light", "Off", R.drawable.lightofficon, false, true));
@@ -86,7 +96,6 @@ public class DashBoardFragment extends Fragment {
 
 
         roomSpinner = view.findViewById(R.id.room_spinner);
-
         RecyclerView recycler = view.findViewById(R.id.recyclerView);
         recycler.setLayoutManager(new GridLayoutManager(getContext(), 2));
 
@@ -102,9 +111,11 @@ public class DashBoardFragment extends Fragment {
         });
         recycler.setAdapter(adapter);
 
+
         roomAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, roomNames);
         roomAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         roomSpinner.setAdapter(roomAdapter);
+
 
         FloatingActionButton fab = view.findViewById(R.id.fab_open_feedback);
         fab.setOnClickListener(v -> {
@@ -122,6 +133,16 @@ public class DashBoardFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        lightViewModel = new ViewModelProvider(requireActivity()).get(LightViewModel.class);
+
+
+        SharedRoomViewModel sharedRoomViewModel = new ViewModelProvider(requireActivity()).get(SharedRoomViewModel.class);
+        sharedRoomViewModel.getCurrentRoom().observe(getViewLifecycleOwner(), roomName -> {
+            if (roomName != null && !roomName.isEmpty()) {
+                lightViewModel.init(roomName);
+            }
+        });
 
         initializeViews(view);
         mAuth = FirebaseAuth.getInstance();
@@ -142,7 +163,6 @@ public class DashBoardFragment extends Fragment {
         temperatureText = view.findViewById(R.id.temperature_text);
         comfortLevelText = view.findViewById(R.id.weather_description);
         settingsIcon = view.findViewById(R.id.settings_icon);
-
     }
 
     private void showSettingsDialog() {
@@ -170,7 +190,6 @@ public class DashBoardFragment extends Fragment {
         });
 
         builder.setNegativeButton("Cancel", null);
-
         AlertDialog dialog = builder.create();
         dialog.show();
     }
@@ -196,13 +215,14 @@ public class DashBoardFragment extends Fragment {
                     roomNames.add(roomSnapshot.getKey());
                 }
                 roomAdapter.notifyDataSetChanged();
+
+                // Restore last selected room
                 if (!roomNames.isEmpty()) {
                     String lastSelectedRoom = sharedPreferences.getString("last_selected_room", roomNames.get(0));
                     int spinnerPosition = roomAdapter.getPosition(lastSelectedRoom);
                     if (spinnerPosition >= 0) {
                         roomSpinner.setSelection(spinnerPosition);
                     } else {
-
                         roomSpinner.setSelection(0);
                     }
                 }
@@ -214,29 +234,22 @@ public class DashBoardFragment extends Fragment {
             }
         };
 
-
         roomSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String selectedRoom = (String) parent.getItemAtPosition(position);
                 sharedPreferences.edit().putString("last_selected_room", selectedRoom).apply();
 
-
                 SharedRoomViewModel sharedRoomViewModel = new ViewModelProvider(requireActivity()).get(SharedRoomViewModel.class);
                 sharedRoomViewModel.setCurrentRoom(selectedRoom);
 
                 attachRoomListener(selectedRoom);
-
-
                 Toast.makeText(getContext(), "Loading data for: " + selectedRoom, Toast.LENGTH_SHORT).show();
             }
 
             @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
+            public void onNothingSelected(AdapterView<?> parent) { }
         });
-
 
         roomsRef.addValueEventListener(roomsListener);
     }
@@ -251,14 +264,19 @@ public class DashBoardFragment extends Fragment {
         if (airQualityRef != null && airQualityListener != null) {
             airQualityRef.removeEventListener(airQualityListener);
         }
+        if (lightRef != null && lightListener != null) {
+            lightRef.removeEventListener(lightListener);
+        }
 
-        // Set up references based on room selection
+
         if ("Main Office".equals(roomName)) {
             selectedRoomRef = FirebaseDatabase.getInstance().getReference("room_occupancy");
             airQualityRef = FirebaseDatabase.getInstance().getReference("sgp30_readings");
+            lightRef = FirebaseDatabase.getInstance().getReference("sensorData").child("light");
         } else {
             selectedRoomRef = FirebaseDatabase.getInstance().getReference("rooms").child(roomName).child("room_occupancy");
             airQualityRef = FirebaseDatabase.getInstance().getReference("rooms").child(roomName).child("air_quality_readings");
+            lightRef = FirebaseDatabase.getInstance().getReference("rooms").child(roomName).child("light");
         }
 
 
@@ -267,6 +285,7 @@ public class DashBoardFragment extends Fragment {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
                     DataSnapshot lastReading = null;
+
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                         lastReading = snapshot;
                     }
@@ -279,15 +298,12 @@ public class DashBoardFragment extends Fragment {
                         if (tempC != null || tempF != null) {
                             updateWeatherCard(tempC, tempF, comfortLevel);
                         } else {
-
                             updateWeatherCard(null, null, "No data");
                         }
                     } else {
-
                         updateWeatherCard(null, null, "No data");
                     }
                 } else {
-
                     updateWeatherCard(null, null, "No data");
                 }
             }
@@ -328,18 +344,55 @@ public class DashBoardFragment extends Fragment {
             }
         };
         airQualityRef.limitToLast(1).addValueEventListener(airQualityListener);
+
+
+        lightListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                Boolean powerOnValue = dataSnapshot.child("powerOn").getValue(Boolean.class);
+                boolean isOn = powerOnValue != null && powerOnValue;
+                updateSmartLightStatus(isOn);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) { }
+        };
+        lightRef.addValueEventListener(lightListener);
     }
+
 
     private void updateAirQualityStatus(String airQualityDescription) {
         if (adapter != null && allItems != null) {
             for (item i : allItems) {
                 if (i.getName().equals("Air Quality")) {
                     i.setStatus(airQualityDescription != null ? airQualityDescription : "Good");
-
-
                     for (item visibleItem : visibleItems) {
                         if (visibleItem.getName().equals("Air Quality")) {
                             visibleItem.setStatus(airQualityDescription != null ? airQualityDescription : "Good");
+                            break;
+                        }
+                    }
+                    adapter.notifyDataSetChanged();
+                    break;
+                }
+            }
+        }
+    }
+
+
+    private void updateSmartLightStatus(boolean isOn) {
+        String status = isOn ? "On" : "Off";
+        if (adapter != null && allItems != null) {
+            for (item i : allItems) {
+                if (i.getName().equals("Smart Light")) {
+                    i.setStatus(status);
+                    i.setDeviceOn(isOn); // Important: Syncs the toggle state
+
+                    for (item visibleItem : visibleItems) {
+                        if (visibleItem.getName().equals("Smart Light")) {
+                            visibleItem.setStatus(status);
+                            visibleItem.setDeviceOn(isOn);
                             break;
                         }
                     }
@@ -360,6 +413,7 @@ public class DashBoardFragment extends Fragment {
     @Override
     public void onStop() {
         super.onStop();
+
         if (roomsRef != null && roomsListener != null) {
             roomsRef.removeEventListener(roomsListener);
         }
@@ -368,6 +422,9 @@ public class DashBoardFragment extends Fragment {
         }
         if (airQualityRef != null && airQualityListener != null) {
             airQualityRef.removeEventListener(airQualityListener);
+        }
+        if (lightRef != null && lightListener != null) {
+            lightRef.removeEventListener(lightListener);
         }
         if (sharedPreferences != null && preferenceChangeListener != null) {
             sharedPreferences.unregisterOnSharedPreferenceChangeListener(preferenceChangeListener);
@@ -384,7 +441,6 @@ public class DashBoardFragment extends Fragment {
         String unit = sharedPreferences != null ? sharedPreferences.getString("units", "Metric (°C)") : "Metric (°C)";
 
         if (tempC == null && tempF == null) {
-
             temperatureText.setText("--°");
             comfortLevelText.setText(comfortLevel != null ? comfortLevel : "No data");
             return;
@@ -440,7 +496,6 @@ public class DashBoardFragment extends Fragment {
 
     String generateGreetingMessage(String name, Calendar calendar) {
         int hourOfDay = calendar.get(Calendar.HOUR_OF_DAY);
-
         String greeting;
         if (hourOfDay >= 0 && hourOfDay < 12) {
             greeting = "Good morning";
@@ -449,7 +504,6 @@ public class DashBoardFragment extends Fragment {
         } else {
             greeting = "Good evening";
         }
-
         return greeting + ", " + name;
     }
 
