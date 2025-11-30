@@ -19,6 +19,11 @@ public class LightRepository {
     private final Random random = new Random();
     private static final int SIMULATION_INTERVAL = 4000;
 
+    // Simulation state
+    private boolean autoBrightnessEnabled = true;
+    private int sliderBrightnessValue = 50; // 0-100
+    private android.os.Handler simulationHandler;
+
     private void setupFirebaseReference(String roomName) {
         if ("Main Office".equals(roomName)) {
             lightSensorDbRef = FirebaseDatabase.getInstance().getReference("sensorData").child("light");
@@ -32,7 +37,7 @@ public class LightRepository {
         setupFirebaseReference(roomName);
         lightValueEventListener = listener;
         lightSensorDbRef.addValueEventListener(listener);
-        startSimulation();
+        startSmartSimulation();
     }
 
     public void stopListening() {
@@ -40,6 +45,17 @@ public class LightRepository {
             lightSensorDbRef.removeEventListener(lightValueEventListener);
             lightValueEventListener = null;
         }
+        stopSimulation();
+    }
+
+    public void setAutoBrightness(boolean enabled) {
+        autoBrightnessEnabled = enabled;
+        if (lightSensorDbRef != null) {
+            lightSensorDbRef.child("autoBrightness").setValue(enabled);
+        }
+        // Restart simulation with new mode
+        stopSimulation();
+        startSmartSimulation();
     }
 
     public void setBrightness(String brightness) {
@@ -48,25 +64,50 @@ public class LightRepository {
         }
     }
 
-    public void setAutoBrightness(boolean enabled) {
-        if (lightSensorDbRef != null) {
-            lightSensorDbRef.child("autoBrightness").setValue(enabled);
+    public void setSliderBrightness(int sliderValue) { // 0-100
+        sliderBrightnessValue = sliderValue;
+        // Only affect simulation if auto brightness is OFF
+        if (!autoBrightnessEnabled) {
+            stopSimulation();
+            startSmartSimulation();
         }
     }
 
-    private void startSimulation() {
-        new android.os.Handler(android.os.Looper.getMainLooper()).post(new Runnable() {
-            @Override
-            public void run() {
-                int currentLux = 50 + random.nextInt(1950);
-                Map<String, Object> sensorData = new HashMap<>();
-                sensorData.put("lux", currentLux);
-                sensorData.put("timestamp", System.currentTimeMillis());
-                lightSensorDbRef.updateChildren(sensorData);
-
-                new android.os.Handler(android.os.Looper.getMainLooper())
-                        .postDelayed(this, SIMULATION_INTERVAL);
-            }
-        });
+    private void startSmartSimulation() {
+        simulationHandler = new android.os.Handler(android.os.Looper.getMainLooper());
+        simulationHandler.post(smartSimulationRunnable);
     }
+
+    private void stopSimulation() {
+        if (simulationHandler != null) {
+            simulationHandler.removeCallbacks(smartSimulationRunnable);
+        }
+    }
+
+    private final Runnable smartSimulationRunnable = new Runnable() {
+        @Override
+        public void run() {
+            int luxValue;
+
+            if (autoBrightnessEnabled) {
+                // AUTO MODE: Random fluctuation (50-2000 lux)
+                luxValue = 50 + random.nextInt(1950);
+            } else {
+                // SLIDER MODE: Follow slider value (convert 0-100 → 0-2000 lux)
+                int baseLux = (int) ((sliderBrightnessValue / 100.0) * 2000);
+                // Small fluctuation ±10% around slider value
+                int fluctuation = (int) (baseLux * 0.1 * (random.nextFloat() - 0.5));
+                luxValue = Math.max(0, Math.min(2000, baseLux + fluctuation));
+            }
+
+            Map<String, Object> sensorData = new HashMap<>();
+            sensorData.put("lux", luxValue);
+            sensorData.put("timestamp", System.currentTimeMillis());
+
+            lightSensorDbRef.updateChildren(sensorData);
+
+            // Schedule next update
+            simulationHandler.postDelayed(this, SIMULATION_INTERVAL);
+        }
+    };
 }

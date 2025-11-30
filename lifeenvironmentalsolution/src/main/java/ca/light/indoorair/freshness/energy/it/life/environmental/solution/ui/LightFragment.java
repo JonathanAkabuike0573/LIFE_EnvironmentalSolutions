@@ -24,13 +24,15 @@ import ca.light.indoorair.freshness.energy.it.life.environmental.solution.viewmo
 
 public class LightFragment extends Fragment {
 
+    // UI Elements
     private TextView lightLevelValueText, lightLevelText, lastUpdatedTimeText, currentRoomText;
     private ProgressBar lightLevelProgress;
     private View statusIndicator;
-    private ChipGroup lightBrightnessChipGroup;
+    private ChipGroup lightBrightnessChipGroup, lightPresetsChipGroup;
     private SwitchMaterial autoBrightnessSwitch;
     private Slider brightnessSlider;
 
+    // ViewModels
     private LightViewModel viewModel;
     private SharedRoomViewModel sharedRoomViewModel;
 
@@ -45,6 +47,7 @@ public class LightFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        // Initialize ViewModels FIRST
         viewModel = new ViewModelProvider(this).get(LightViewModel.class);
         sharedRoomViewModel = new ViewModelProvider(requireActivity()).get(SharedRoomViewModel.class);
 
@@ -58,12 +61,13 @@ public class LightFragment extends Fragment {
         lightLevelValueText = view.findViewById(R.id.light_level_value_text);
         lightLevelText = view.findViewById(R.id.light_level_text);
         lastUpdatedTimeText = view.findViewById(R.id.last_updated_time);
-        currentRoomText = view.findViewById(R.id.current_room_text); // Add this to layout
+        currentRoomText = view.findViewById(R.id.current_room_text);
         lightLevelProgress = view.findViewById(R.id.light_level_progress);
         statusIndicator = view.findViewById(R.id.status_indicator);
         lightBrightnessChipGroup = view.findViewById(R.id.chip_group_light_brightness);
         autoBrightnessSwitch = view.findViewById(R.id.power_on);
         brightnessSlider = view.findViewById(R.id.slider_brightness);
+        lightPresetsChipGroup = view.findViewById(R.id.chip_group_presets);
     }
 
     private void setupRoomSync() {
@@ -71,74 +75,125 @@ public class LightFragment extends Fragment {
             if (roomName != null && !roomName.isEmpty() && currentRoomText != null) {
                 currentRoomText.setText(roomName);
                 viewModel.init(roomName);
+                safeToast("Light: Switched to " + roomName);
             }
         });
     }
 
     private void setupListeners() {
-        lightBrightnessChipGroup.setOnCheckedChangeListener((group, checkedId) -> {
-            Chip selectedChip = group.findViewById(checkedId);
-            if (selectedChip != null) {
-                viewModel.setBrightness(selectedChip.getText().toString());
-                Toast.makeText(getContext(), selectedChip.getText() + " selected", Toast.LENGTH_SHORT).show();
-            }
-        });
+        // Color temperature chips
+        if (lightBrightnessChipGroup != null) {
+            lightBrightnessChipGroup.setOnCheckedChangeListener((group, checkedId) -> {
+                Chip selectedChip = group.findViewById(checkedId);
+                if (selectedChip != null) {
+                    viewModel.setBrightness(selectedChip.getText().toString());
+                    safeToast(selectedChip.getText() + " selected");
+                }
+            });
+        }
 
+        // Auto brightness switch
         if (autoBrightnessSwitch != null) {
             autoBrightnessSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 if (buttonView.isPressed()) {
                     viewModel.setAutoBrightness(isChecked);
-                    brightnessSlider.setEnabled(!isChecked);
-                    Toast.makeText(getContext(), isChecked ? "Auto brightness enabled" : "Auto brightness disabled", Toast.LENGTH_SHORT).show();
+                    if (brightnessSlider != null) {
+                        brightnessSlider.setEnabled(!isChecked);
+                    }
+                    safeToast(isChecked ? "Auto brightness enabled" : "Auto brightness disabled");
+                }
+            });
+        }
+
+        // BRIGHTNESS SLIDER - Controls simulation when auto is OFF
+        if (brightnessSlider != null) {
+            brightnessSlider.addOnChangeListener((slider, value, fromUser) -> {
+                if (fromUser) {
+                    viewModel.setSliderBrightness((int) value);  // 0-100
+                }
+            });
+        }
+
+        // Mood presets (bonus functionality)
+        if (lightPresetsChipGroup != null) {
+            lightPresetsChipGroup.setOnCheckedChangeListener((group, checkedId) -> {
+                Chip selectedChip = group.findViewById(checkedId);
+                if (selectedChip != null) {
+                    safeToast("Preset: " + selectedChip.getText());
+                    // Future: Implement preset logic
                 }
             });
         }
     }
 
     private void observeViewModel() {
+        // Light level value and progress
         viewModel.lux.observe(getViewLifecycleOwner(), lux -> {
-            if (lux != null) {
+            if (lux != null && lightLevelValueText != null && lightLevelProgress != null) {
                 lightLevelValueText.setText(String.valueOf(lux));
                 lightLevelProgress.setProgress(lux);
             }
         });
 
+        // Light level text (Dim/Normal/Bright)
         viewModel.lightLevelText.observe(getViewLifecycleOwner(), text -> {
-            if (text != null) lightLevelText.setText(text);
+            if (text != null && lightLevelText != null) {
+                lightLevelText.setText(text);
+            }
         });
 
+        // Last updated time
         viewModel.lastUpdatedTime.observe(getViewLifecycleOwner(), time -> {
-            if (time != null) lastUpdatedTimeText.setText(time);
+            if (time != null && lastUpdatedTimeText != null) {
+                lastUpdatedTimeText.setText(time);
+            }
         });
 
+        // Status indicator color
         viewModel.statusColor.observe(getViewLifecycleOwner(), color -> {
             if (color != null && statusIndicator != null) {
                 statusIndicator.setBackgroundResource(color);
             }
         });
 
+        // Brightness selection (Warm/Neutral/Cool)
         viewModel.brightness.observe(getViewLifecycleOwner(), brightness -> {
             if (brightness != null) {
                 updateBrightnessSelection(brightness);
             }
         });
 
+        // Auto brightness state
         viewModel.autoBrightness.observe(getViewLifecycleOwner(), enabled -> {
-            if (enabled != null && autoBrightnessSwitch != null) {
-                autoBrightnessSwitch.setChecked(enabled);
-                if (brightnessSlider != null) {
-                    brightnessSlider.setEnabled(!enabled);
-                }
+            if (enabled != null) {
+                updateAutoBrightnessState(enabled);
             }
         });
     }
 
     private void updateBrightnessSelection(String brightness) {
+        if (lightBrightnessChipGroup == null) return;
+
         int chipId = R.id.chip_neutral;
         if ("Warm".equals(brightness)) chipId = R.id.chip_warm;
         else if ("Neutral".equals(brightness)) chipId = R.id.chip_neutral;
         else if ("Cool".equals(brightness)) chipId = R.id.chip_cool;
 
         lightBrightnessChipGroup.check(chipId);
+    }
+
+    private void updateAutoBrightnessState(boolean enabled) {
+        if (autoBrightnessSwitch != null) {
+            autoBrightnessSwitch.setChecked(enabled);
+        }
+        if (brightnessSlider != null) {
+            brightnessSlider.setEnabled(!enabled);
+        }
+    }
+
+    private void safeToast(String message) {
+        if (getContext() != null) {
+            Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+        }
     }
 }
