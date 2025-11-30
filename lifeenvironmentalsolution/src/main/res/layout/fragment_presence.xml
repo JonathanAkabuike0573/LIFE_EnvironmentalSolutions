@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F0F4F8"
-    tools:context=".PresenceFragment">
+    tools:context=".ui.PresenceFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -133,12 +133,70 @@
                     android:layout_marginTop="8dp"
                     android:text="@string/turn_off_lights_when_room_is_empty" />
 
+                <TextView
+                    android:id="@+id/label_auto_off_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    android:text="Turn off lights after:"
+                    android:visibility="gone" />
+
+                <Spinner
+                    android:id="@+id/spinner_auto_off_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:entries="@array/auto_off_time_options"
+                    android:visibility="gone" />
+
                 <CheckBox
                     android:id="@+id/checkbox_alert_after_hours"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/trigger_alert_if_movement_detected_after_hours" />
 
+                <LinearLayout
+                    android:id="@+id/time_range_picker_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="8dp">
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:hint="Start Time">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/start_time_input"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:focusable="false" />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="8dp"
+                            android:hint="End Time">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/end_time_input"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:focusable="false" />
+                        </com.google.android.material.textfield.TextInputLayout>
+                    </LinearLayout>
+                </LinearLayout>
 
                 <View android:layout_width="match_parent" android:layout_height="1dp" android:background="?android:attr/listDivider" android:layout_marginTop="16dp" android:layout_marginBottom="16dp"/>
 

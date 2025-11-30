@@ -217,6 +217,35 @@ CENG-322-OCC,  Software Project -->
     <string name="profile">Profile</string>
     <string name="energy">energy</string>
     <string name="Energy">Energy</string>
+    <string name="profile_photo_updated_save_changes_to_make_it_permanent">Profile photo updated. Save changes to make it permanent.</string>
+    <string name="please_enter_a_valid_name">Please enter a valid name</string>
+    <string name="please_enter_a_valid_phone_number">Please enter a valid phone number</string>
+    <string name="please_enter_a_valid_email_address">Please enter a valid email address</string>
+    <string name="password_must_be_at_least_6_characters">Password must be at least 6 characters</string>
+    <string name="passwords_do_not_match">Passwords do not match</string>
+    <string name="sign_up_successful">Sign Up Successful!</string>
+    <string name="change_profile_photo">Change Profile Photo</string>
+    <string name="take_photo">Take Photo</string>
+    <string name="choose_from_gallery">Choose from Gallery</string>
+    <string name="failed_to_load_profile">Failed to load profile.</string>
+    <string name="profile_updated_successfully">Profile updated successfully</string>
+    <string name="failed_to_update_profile">Failed to update profile</string>
+    <string name="confirm">Confirm</string>
+    <string name="password_does_not_meet_requirements">Password does not meet requirements.</string>
+    <string name="cancel">Cancel</string>
+    <string name="password_updated_successfully">Password updated successfully</string>
+    <string name="failed_to_update_password">Failed to update password</string>
+    <string name="failed_to_submit_feedback_please_check_your_network_connection_and_try_again">Failed to submit feedback. Please check your network connection and try again.</string>
+    <string name="devicemodel">deviceModel</string>
+    <string name="rating">rating</string>
+    <string name="message">message</string>
+    <string name="you_can_submit_again_in_02d_02d_02d">You can submit again in: %02d:%02d:%02d</string>
 
+    <string-array name="auto_off_time_options">
+        <item>5 minutes</item>
+        <item>10 minutes</item>
+        <item>15 minutes</item>
+        <item>20 minutes</item>
+    </string-array>
 
 </resources>
