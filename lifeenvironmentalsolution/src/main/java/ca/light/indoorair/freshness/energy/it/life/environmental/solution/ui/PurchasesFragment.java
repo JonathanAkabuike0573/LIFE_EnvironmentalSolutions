@@ -37,18 +37,18 @@ public class PurchasesFragment extends Fragment {
     private Button confirmAndPayButton;
     private TextView cancelSubscriptionLink;
 
-    // *** UI Components for Payment Details ***
+    // UI Components for Payment Details
     private LinearLayout paymentDetailsLayout;
     private EditText cardNameEditText;
     private EditText cardNumberEditText;
-    // **********************************************
 
     // Data and Constants
     private static final double TAX_RATE = 0.13; // 13% tax rate
     private double currentSubtotal = 0.0;
     private String selectedPaymentMethod = "";
 
-    private static final int MAX_DEVICES_ALLOWED = 6;
+    // *** Plan Limits Map ***
+    private final Map<String, Integer> planDeviceLimits = new HashMap<>();
 
     // Map to store upgrade names and their base prices
     private final Map<String, Double> upgradePrices = new HashMap<>();
@@ -58,22 +58,26 @@ public class PurchasesFragment extends Fragment {
             "Air Quality", "Smart Light", "Thermostat", "Air Conditioner", "Presence Sensor", "Smart TV"
     );
 
-    private final List<String> bankOptions = Arrays.asList( // ADDED LIST OF BANKS
+    private final List<String> bankOptions = Arrays.asList(
             "CIBC", "TD", "RBC", "Scotiabank", "BMO"
     );
 
-    // This list will hold the options *displayed* in the spinner, allowing us to change the text
+    // This list will hold the options *displayed* in the spinner
     private List<String> currentUpgradeDisplayOptions;
     private ArrayAdapter<String> upgradeAdapter;
 
 
     public PurchasesFragment() {
+        // *** MODIFIED: Removed "Select Upgrade" and "Lifetime Access" ***
         // Initialize upgrade prices
-        upgradePrices.put("Select Upgrade", 0.00);
         upgradePrices.put("Basic Plan (Monthly)", 9.99);
         upgradePrices.put("Pro Plan (Quarterly)", 24.99);
         upgradePrices.put("Premium (Annual)", 79.99);
-        upgradePrices.put("Lifetime Access", 199.99);
+
+        // *** NEW: Initialize plan device limits ***
+        planDeviceLimits.put("Basic Plan (Monthly)", 2);
+        planDeviceLimits.put("Pro Plan (Quarterly)", 4);
+        planDeviceLimits.put("Premium (Annual)", 6);
     }
 
     public static PurchasesFragment newInstance() {
@@ -134,20 +138,24 @@ public class PurchasesFragment extends Fragment {
      */
     private void setupSpinners() {
         // 1. Upgrades Spinner (with Price)
+        // Only include options that have a price (all remaining options do)
         currentUpgradeDisplayOptions = upgradePrices.keySet().stream()
-                .map(key -> key + (upgradePrices.get(key) > 0 ? " ($" + String.format(Locale.getDefault(), "%.2f", upgradePrices.get(key)) + ")" : ""))
+                .map(key -> key + " ($" + String.format(Locale.getDefault(), "%.2f", upgradePrices.get(key)) + ")")
                 .collect(ArrayList::new, List::add, List::addAll);
 
         upgradeAdapter = new ArrayAdapter<>(getContext(),
                 android.R.layout.simple_spinner_dropdown_item, currentUpgradeDisplayOptions);
         upgradesSpinner.setAdapter(upgradeAdapter);
 
-        // Set Default Selection and Calculate Price Immediately
-        final int defaultSelectionIndex = 0; // "Select Upgrade" index
+        // *** MODIFIED: Set Default Selection to the first plan (Basic Plan) ***
+        final int defaultSelectionIndex = 0;
 
         upgradesSpinner.post(() -> {
             upgradesSpinner.setSelection(defaultSelectionIndex);
-            updatePriceDisplay(0.00);
+            // Calculate price for the first plan immediately
+            double initialPrice = upgradePrices.get(getOriginalKey(currentUpgradeDisplayOptions.get(defaultSelectionIndex)));
+            currentSubtotal = initialPrice;
+            updatePriceDisplay(currentSubtotal);
         });
 
         // --- Listener for subsequent selections ---
@@ -160,14 +168,20 @@ public class PurchasesFragment extends Fragment {
 
                 if (isInitialLoad && position == defaultSelectionIndex) {
                     isInitialLoad = false;
+                    // Skip showing dialog on initial load, but update price
+                    double initialPrice = upgradePrices.getOrDefault(originalKey, 0.00);
+                    currentSubtotal = initialPrice;
+                    updatePriceDisplay(currentSubtotal);
                     return;
                 }
 
                 double planPrice = upgradePrices.getOrDefault(originalKey, 0.00);
+                int maxDevices = planDeviceLimits.getOrDefault(originalKey, 0); // Get dynamic limit
 
                 if (planPrice > 0.00) {
-                    currentSubtotal = planPrice; // Set subtotal to the plan price
-                    showDeviceSelectionDialog(originalKey, position);
+                    currentSubtotal = planPrice;
+                    // Show the device selection dialog with the specific max limit
+                    showDeviceSelectionDialog(originalKey, position, maxDevices);
                 } else {
                     currentSubtotal = 0.00;
                     updatePriceDisplay(currentSubtotal);
@@ -193,14 +207,10 @@ public class PurchasesFragment extends Fragment {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 selectedPaymentMethod = parent.getItemAtPosition(position).toString();
 
-                // *** MODIFIED LOGIC: Check for Visa/Mastercard selection ***
                 if (selectedPaymentMethod.equals("Visa/Mastercard")) {
-                    // Show bank selection dialog, which will then show the details layout
                     showBankSelectionDialog();
-                    // Keep layout hidden until bank is selected in the dialog
                     paymentDetailsLayout.setVisibility(View.GONE);
                 } else if (position > 0) { // If any other payment method is selected (Amex, PayPal, Google Pay)
-                    // Set selected method and show details immediately
                     paymentDetailsLayout.setVisibility(View.VISIBLE);
                 } else { // "Select Payment Type"
                     paymentDetailsLayout.setVisibility(View.GONE);
@@ -215,70 +225,34 @@ public class PurchasesFragment extends Fragment {
     }
 
     /**
-     * Shows a dialog for the user to select one of the five banks.
+     * Shows a multi-choice dialog for the user to select devices, respecting a max limit.
+     * @param originalPlanName The name of the selected plan.
+     * @param originalPosition The position of the selected plan in the spinner.
+     * @param maxDevices The maximum number of devices allowed for this plan.
      */
-    private void showBankSelectionDialog() {
-        if (getContext() == null) return;
-
-        final CharSequence[] banks = bankOptions.toArray(new CharSequence[0]);
-
-        new AlertDialog.Builder(getContext())
-                .setTitle("Select Your Issuing Bank")
-                .setItems(banks, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // User selected a bank
-                        String selectedBank = bankOptions.get(which);
-
-                        // Update the overall selected method with the bank name
-                        selectedPaymentMethod = "Visa/Mastercard (" + selectedBank + ")";
-
-                        // Show the payment input fields
-                        paymentDetailsLayout.setVisibility(View.VISIBLE);
-
-                        Toast.makeText(getContext(),
-                                selectedBank + " Card selected. Enter details below.",
-                                Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // Reset the spinner selection if the user cancels bank selection
-                        paymentTypeSpinner.setSelection(0);
-                        paymentDetailsLayout.setVisibility(View.GONE);
-                        selectedPaymentMethod = "";
-                    }
-                })
-                .setCancelable(false) // Force the user to choose or cancel
-                .show();
-    }
-
-    // Remaining methods (showDeviceSelectionDialog, updateUpgradeSpinnerDisplay,
-    // updatePriceDisplay, showCancelDialog, showEmailReceiptDialog,
-    // showPaymentSuccessfulDialog, setupClickListeners) are unchanged
-    // from the previous iteration, but included here for completeness:
-
-    /**
-     * Shows a multi-choice dialog for the user to select up to 6 devices.
-     */
-    private void showDeviceSelectionDialog(String originalPlanName, int originalPosition) {
+    private void showDeviceSelectionDialog(String originalPlanName, int originalPosition, int maxDevices) {
         if (getContext() == null) return;
 
         final CharSequence[] items = deviceOptions.toArray(new CharSequence[0]);
+        // Re-initialize checkedItems based on the current display text if possible,
+        // but for simplicity here, we'll start with an empty selection on every dialog open.
         final boolean[] checkedItems = new boolean[deviceOptions.size()];
         final List<String> selectedDevices = new ArrayList<>();
 
         new AlertDialog.Builder(getContext())
-                .setTitle("Select Devices (Max " + MAX_DEVICES_ALLOWED + ")")
+                // ⭐ UPDATED: Title reflects the plan-specific max devices
+                .setTitle(originalPlanName + " Devices (Max " + maxDevices + ")")
                 .setMultiChoiceItems(items, checkedItems, new DialogInterface.OnMultiChoiceClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which, boolean isChecked) {
                         if (isChecked) {
-                            if (selectedDevices.size() >= MAX_DEVICES_ALLOWED) {
+                            // *** NEW LOGIC: Check if plan-specific max limit is reached ***
+                            if (selectedDevices.size() >= maxDevices) {
+                                // If max reached, display custom message and uncheck visually
                                 checkedItems[which] = false;
                                 ((AlertDialog) dialog).getListView().setItemChecked(which, false);
-                                Toast.makeText(getContext(), "Maximum of " + MAX_DEVICES_ALLOWED + " devices allowed.", Toast.LENGTH_SHORT).show();
+                                // Show dialog message: "can't select, max is reached"
+                                showMaxDeviceReachedDialog(maxDevices);
                             } else {
                                 selectedDevices.add(deviceOptions.get(which));
                             }
@@ -297,15 +271,62 @@ public class PurchasesFragment extends Fragment {
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        upgradesSpinner.setSelection(0);
-                        currentSubtotal = 0.00;
-                        updatePriceDisplay(currentSubtotal);
+                        // Reset selection to the current plan to maintain context
+                        // Note: If the user previously had 3 devices selected and cancels,
+                        // this simply keeps the current plan selected but doesn't retain device state.
+                        upgradesSpinner.setSelection(originalPosition);
                         dialog.dismiss();
                     }
                 })
                 .setCancelable(true)
                 .show();
     }
+
+    /**
+     * Shows the dialog when the device selection limit is reached.
+     */
+    private void showMaxDeviceReachedDialog(int maxDevices) {
+        if (getContext() == null) return;
+        new AlertDialog.Builder(getContext())
+                .setTitle("Device Limit Reached")
+                .setMessage("Can't select more devices. The limit for this plan is **" + maxDevices + "** devices.")
+                .setPositiveButton("OK", null)
+                .show();
+    }
+
+    /**
+     * Shows a dialog for the user to select one of the five banks. (Unchanged)
+     */
+    private void showBankSelectionDialog() {
+        if (getContext() == null) return;
+
+        final CharSequence[] banks = bankOptions.toArray(new CharSequence[0]);
+
+        new AlertDialog.Builder(getContext())
+                .setTitle("Select Your Issuing Bank")
+                .setItems(banks, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String selectedBank = bankOptions.get(which);
+                        selectedPaymentMethod = "Visa/Mastercard (" + selectedBank + ")";
+                        paymentDetailsLayout.setVisibility(View.VISIBLE);
+                        Toast.makeText(getContext(),
+                                selectedBank + " Card selected. Enter details below.",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        paymentTypeSpinner.setSelection(0);
+                        paymentDetailsLayout.setVisibility(View.GONE);
+                        selectedPaymentMethod = "";
+                    }
+                })
+                .setCancelable(false)
+                .show();
+    }
+
 
     /**
      * Updates the Spinner's displayed text after devices are selected.
@@ -419,7 +440,6 @@ public class PurchasesFragment extends Fragment {
                 Toast.makeText(getContext(), "Please select a payment type to continue.", Toast.LENGTH_LONG).show();
                 return;
             }
-            // In a real app, you would also validate the EditText fields here.
 
             // 1. Display Toast: "payment is in process"
             Toast.makeText(getContext(),
