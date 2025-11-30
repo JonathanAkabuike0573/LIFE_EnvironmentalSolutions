@@ -119,7 +119,13 @@ public class LightViewModel extends AndroidViewModel {
     public void setPowerOn(boolean enabled) {
         _powerOn.setValue(enabled);
         lightRepository.setPowerOn(enabled);
+
+        // RESET SLIDER TO 0 when turning OFF
+        if (!enabled) {
+            _sliderPosition.setValue(0f);
+        }
     }
+
 
 
     public void setBrightness(String brightness) {
