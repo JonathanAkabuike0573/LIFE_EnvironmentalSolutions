@@ -58,7 +58,7 @@ public class AccountFragment extends Fragment {
                 if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
                     Uri imageUri = result.getData().getData();
                     logo.setImageURI(imageUri);
-                    Toast.makeText(getContext(), R.string.profile_photo_updated_save_changes_to_make_it_permanent, Toast.LENGTH_LONG).show();
+                    Toast.makeText(getContext(), "Profile photo updated. Save changes to make it permanent.", Toast.LENGTH_LONG).show();
                     saveChangesButton.setEnabled(true);
                 }
             }
@@ -71,7 +71,7 @@ public class AccountFragment extends Fragment {
                     Bundle extras = result.getData().getExtras();
                     if (extras != null) {
                         logo.setImageBitmap((android.graphics.Bitmap) extras.get("data"));
-                        Toast.makeText(getContext(), R.string.profile_photo_updated_save_changes_to_make_it_permanent, Toast.LENGTH_LONG).show();
+                        Toast.makeText(getContext(), "Profile photo updated. Save changes to make it permanent.", Toast.LENGTH_LONG).show();
                         saveChangesButton.setEnabled(true);
                     }
                 }
@@ -120,8 +120,8 @@ public class AccountFragment extends Fragment {
 
     private void showPhotoSourceDialog() {
         new AlertDialog.Builder(requireContext())
-                .setTitle(R.string.change_profile_photo )
-                .setItems(new CharSequence[]{getString(R.string.take_photo), getString(R.string.choose_from_gallery)}, (dialog, which) -> {
+                .setTitle("Change Profile Photo")
+                .setItems(new CharSequence[]{"Take Photo", "Choose from Gallery"}, (dialog, which) -> {
                     if (which == 0) {
                         checkCameraPermissionAndLaunch();
                     } else {
@@ -182,7 +182,7 @@ public class AccountFragment extends Fragment {
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                Toast.makeText(getContext(), R.string.failed_to_load_profile, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Failed to load profile.", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -228,15 +228,15 @@ public class AccountFragment extends Fragment {
 
         userRef.updateChildren(updates)
                 .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(getContext(), R.string.profile_updated_successfully , Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Profile updated successfully", Toast.LENGTH_SHORT).show();
                     saveChangesButton.setEnabled(false);
                 })
-                .addOnFailureListener(e -> Toast.makeText(getContext(), R.string.failed_to_update_profile, Toast.LENGTH_SHORT).show());
+                .addOnFailureListener(e -> Toast.makeText(getContext(), "Failed to update profile", Toast.LENGTH_SHORT).show());
     }
 
     private void showChangePasswordDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-        builder.setTitle(R.string.change_password);
+        builder.setTitle("Change Password");
 
         View viewInflated = LayoutInflater.from(getContext()).inflate(R.layout.dialog_change_password, (ViewGroup) getView(), false);
         final EditText newPasswordEditText = viewInflated.findViewById(R.id.new_password_edit_text);
@@ -244,23 +244,23 @@ public class AccountFragment extends Fragment {
 
         builder.setView(viewInflated);
 
-        builder.setPositiveButton(R.string.confirm, (dialog, which) -> {
+        builder.setPositiveButton("Confirm", (dialog, which) -> {
             String newPassword = newPasswordEditText.getText().toString();
             String confirmPassword = confirmPasswordEditText.getText().toString();
 
             if (!InputValidation.isValidPassword(newPassword)) {
-                newPasswordEditText.setError(getString(R.string.password_does_not_meet_requirements));
+                newPasswordEditText.setError("Password does not meet requirements.");
                 return;
             }
 
             if (!newPassword.equals(confirmPassword)) {
-                confirmPasswordEditText.setError(getString(R.string.passwords_do_not_match));
+                confirmPasswordEditText.setError("Passwords do not match.");
                 return;
             }
 
             changePassword(newPassword);
         });
-        builder.setNegativeButton(R.string.cancel, (dialog, which) -> dialog.cancel());
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
 
         builder.show();
     }
@@ -271,9 +271,9 @@ public class AccountFragment extends Fragment {
             user.updatePassword(newPassword)
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
-                            Toast.makeText(getContext(), R.string.password_updated_successfully, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), "Password updated successfully", Toast.LENGTH_SHORT).show();
                         } else {
-                            Toast.makeText(getContext(), R.string.failed_to_update_password, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), "Failed to update password", Toast.LENGTH_SHORT).show();
                         }
                     });
         }
