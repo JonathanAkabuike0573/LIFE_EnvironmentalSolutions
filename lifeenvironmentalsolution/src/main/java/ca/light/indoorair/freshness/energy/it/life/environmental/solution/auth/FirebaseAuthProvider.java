@@ -1,4 +1,4 @@
-package ca.light.indoorair.freshness.energy.it.life.environmental.solution;
+package ca.light.indoorair.freshness.energy.it.life.environmental.solution.auth;
 
 import android.app.Activity;
 import android.content.Context;
@@ -19,8 +19,9 @@ import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.database.DatabaseReference;
-import androidx.credentials.CredentialManager;
 import com.google.firebase.database.FirebaseDatabase;
+
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.R;
 
 /**
  * A concrete implementation of the {@link AuthProvider} interface that uses Firebase
