@@ -1,6 +1,5 @@
 package ca.light.indoorair.freshness.energy.it.life.environmental.solution.ui;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,27 +12,21 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.preference.PreferenceManager;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.timepicker.MaterialTimePicker;
 import com.google.android.material.timepicker.TimeFormat;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Locale;
 
 import ca.light.indoorair.freshness.energy.it.life.environmental.solution.R;
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.viewmodel.PresenceViewModel;
 
 public class PresenceFragment extends Fragment {
 
@@ -48,14 +41,8 @@ public class PresenceFragment extends Fragment {
     private LinearLayout timeRangePickerContainer;
     private TextInputEditText startTimeInput, endTimeInput;
 
-    // Firebase
-    private DatabaseReference presenceRef;
-    private ValueEventListener presenceListener;
-
-    // SharedPreferences
-    private SharedPreferences sharedPreferences;
-    private SharedPreferences.OnSharedPreferenceChangeListener preferenceChangeListener;
-
+    // ViewModel
+    private PresenceViewModel viewModel;
 
     public PresenceFragment() {
         // Required empty public constructor
@@ -69,14 +56,15 @@ public class PresenceFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        if (getContext() != null) {
-            sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-        }
+
+        viewModel = new ViewModelProvider(this).get(PresenceViewModel.class);
 
         initializeViews(view);
-        initializeFirebase();
         setupListeners();
         setupSpinner();
+        observeViewModel();
+
+        viewModel.init();
     }
 
     private void initializeViews(View view) {
@@ -98,44 +86,11 @@ public class PresenceFragment extends Fragment {
         endTimeInput = view.findViewById(R.id.end_time_input);
     }
 
-    private void initializeFirebase() {
-        presenceRef = FirebaseDatabase.getInstance().getReference("room_occupancy");
-        presenceListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists() && presenceDetectionSwitch.isChecked()) {
-                    DataSnapshot lastReading = dataSnapshot.getChildren().iterator().next();
-                    String roomStatus = lastReading.child("room_status").getValue(String.class);
-                    String timestamp = lastReading.child("timestamp").getValue(String.class);
-                    Long sessionDuration = lastReading.child("session_duration_seconds").getValue(Long.class);
-                    Long totalDetections = lastReading.child("total_detections_today").getValue(Long.class);
-
-                    updatePresenceUI(roomStatus, timestamp, sessionDuration, totalDetections);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                if (getContext() != null) {
-                    Toast.makeText(getContext(), "Firebase Error: " + databaseError.getMessage(), Toast.LENGTH_LONG).show();
-                }
-                resetUI();
-            }
-        };
-    }
-
     private void setupListeners() {
         presenceDetectionSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (buttonView.isPressed()) {
-                sharedPreferences.edit().putBoolean("presence_detection_enabled", isChecked).apply();
-
-                if (isChecked) {
-                    startListeningForPresence();
-                    Toast.makeText(getContext(), "Presence detection enabled", Toast.LENGTH_SHORT).show();
-                } else {
-                    stopListeningForPresence();
-                    Toast.makeText(getContext(), "Presence detection disabled", Toast.LENGTH_SHORT).show();
-                }
+                viewModel.setPresenceDetectionEnabled(isChecked);
+                Toast.makeText(getContext(), isChecked ? "Presence detection enabled" : "Presence detection disabled", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -145,21 +100,65 @@ public class PresenceFragment extends Fragment {
         });
 
         alertAfterHoursCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            viewModel.setAlertsEnabled(isChecked);
             timeRangePickerContainer.setVisibility(isChecked ? View.VISIBLE : View.GONE);
         });
 
         startTimeInput.setOnClickListener(v -> showTimePicker(true));
         endTimeInput.setOnClickListener(v -> showTimePicker(false));
 
-        markOccupiedButton.setOnClickListener(v -> manualOverride("Occupied"));
-        markEmptyButton.setOnClickListener(v -> manualOverride("Empty"));
+        markOccupiedButton.setOnClickListener(v -> viewModel.manualOverride("Occupied"));
+        markEmptyButton.setOnClickListener(v -> viewModel.manualOverride("Empty"));
+    }
 
-        // Listener for changes from other sources (like the dashboard)
-        preferenceChangeListener = (prefs, key) -> {
-            if (key.equals("presence_detection_enabled")) {
-                syncSwitchState();
+    private void observeViewModel() {
+        viewModel.presenceDetectionEnabled.observe(getViewLifecycleOwner(), isEnabled -> {
+            presenceDetectionSwitch.setChecked(isEnabled);
+        });
+
+        viewModel.presenceStatus.observe(getViewLifecycleOwner(), status -> {
+            updatePresenceUI(status);
+        });
+
+        viewModel.lastUpdatedTime.observe(getViewLifecycleOwner(), time -> {
+            lastUpdatedTimeText.setText(time);
+        });
+
+        viewModel.sessionDuration.observe(getViewLifecycleOwner(), duration -> {
+            if (duration != null) {
+                sessionDurationText.setText(String.format(Locale.getDefault(), "%d seconds", duration));
+            } else {
+                sessionDurationText.setText("--");
             }
-        };
+        });
+
+        viewModel.totalDetections.observe(getViewLifecycleOwner(), detections -> {
+            if (detections != null) {
+                totalDetectionsText.setText(String.valueOf(detections));
+            } else {
+                totalDetectionsText.setText("--");
+            }
+        });
+
+        viewModel.error.observe(getViewLifecycleOwner(), error -> {
+            if (error != null) {
+                Toast.makeText(getContext(), error, Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private void updatePresenceUI(String status) {
+        boolean occupied = "occupied".equalsIgnoreCase(status);
+
+        if (occupied) {
+            presenceStatusText.setText(R.string.occupied);
+            presenceIcon.setImageResource(R.drawable.ic_room_occupied);
+            statusIndicator.setBackgroundResource(R.drawable.circle_indicator_green);
+        } else {
+            presenceStatusText.setText(R.string.empty);
+            presenceIcon.setImageResource(R.drawable.ic_room_empty);
+            statusIndicator.setBackgroundResource(R.drawable.circle_indicator_red);
+        }
     }
 
     private void showTimePicker(boolean isStartTime) {
@@ -176,8 +175,10 @@ public class PresenceFragment extends Fragment {
             String formattedTime = String.format(Locale.getDefault(), "%02d:%02d", hour, minute);
             if (isStartTime) {
                 startTimeInput.setText(formattedTime);
+                viewModel.setAlertStartTime(formattedTime);
             } else {
                 endTimeInput.setText(formattedTime);
+                viewModel.setAlertEndTime(formattedTime);
             }
         });
 
@@ -189,114 +190,5 @@ public class PresenceFragment extends Fragment {
                 R.array.auto_off_time_options, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         autoOffTimeSpinner.setAdapter(adapter);
-    }
-
-    private void manualOverride(String status) {
-        presenceDetectionSwitch.setChecked(false);
-        sharedPreferences.edit().putBoolean("presence_detection_enabled", false).apply();
-        updatePresenceUI(status, "Manual Override", 0L, 0L);
-        Toast.makeText(getContext(), "Manual override set to " + status, Toast.LENGTH_SHORT).show();
-    }
-
-    private void startListeningForPresence() {
-        if (presenceRef != null && presenceListener != null) {
-            presenceRef.limitToLast(1).addValueEventListener(presenceListener);
-        }
-    }
-
-    private void stopListeningForPresence() {
-        if (presenceRef != null && presenceListener != null) {
-            presenceRef.removeEventListener(presenceListener);
-        }
-        resetUI();
-    }
-
-    private void syncSwitchState() {
-        boolean isEnabled = sharedPreferences.getBoolean("presence_detection_enabled", true);
-        presenceDetectionSwitch.setChecked(isEnabled);
-        if (isEnabled) {
-            startListeningForPresence();
-        } else {
-            stopListeningForPresence();
-        }
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        syncSwitchState();
-        sharedPreferences.registerOnSharedPreferenceChangeListener(preferenceChangeListener);
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        sharedPreferences.unregisterOnSharedPreferenceChangeListener(preferenceChangeListener);
-        if (presenceRef != null && presenceListener != null) {
-            presenceRef.removeEventListener(presenceListener);
-        }
-    }
-
-    private void resetUI() {
-        presenceStatusText.setText(R.string.not_monitoring);
-        lastUpdatedTimeText.setText("--:--");
-        presenceIcon.setImageResource(android.R.color.transparent);
-        statusIndicator.setBackgroundResource(R.drawable.circle_indicator_gray);
-        sessionDurationText.setText("--");
-        totalDetectionsText.setText("--");
-    }
-
-    private void updatePresenceUI(String status, String timestamp, Long sessionDuration, Long totalDetections) {
-        boolean occupied = "occupied".equalsIgnoreCase(status);
-
-        if (occupied) {
-            presenceStatusText.setText(R.string.occupied);
-            presenceIcon.setImageResource(R.drawable.ic_room_occupied);
-            statusIndicator.setBackgroundResource(R.drawable.circle_indicator_green);
-        } else {
-            presenceStatusText.setText(R.string.empty);
-            presenceIcon.setImageResource(R.drawable.ic_room_empty);
-            statusIndicator.setBackgroundResource(R.drawable.circle_indicator_red);
-        }
-
-        if (timestamp != null) {
-            if (timestamp.equals("Manual Override")) {
-                lastUpdatedTimeText.setText(timestamp);
-            } else {
-                try {
-                    SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSS", Locale.getDefault());
-                    Date date = isoFormat.parse(timestamp);
-                    SimpleDateFormat displayFormat = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
-                    lastUpdatedTimeText.setText(displayFormat.format(date));
-                } catch (ParseException e) {
-                    try {
-                        SimpleDateFormat isoFormatWithoutMicros = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault());
-                        Date date = isoFormatWithoutMicros.parse(timestamp);
-                        SimpleDateFormat displayFormat = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
-                        lastUpdatedTimeText.setText(displayFormat.format(date));
-                    } catch (ParseException e2) {
-                        if (timestamp.contains("T") && timestamp.contains(".")) {
-                            lastUpdatedTimeText.setText(timestamp.substring(timestamp.indexOf('T') + 1, timestamp.indexOf('.')));
-                        } else {
-                            lastUpdatedTimeText.setText(timestamp);
-                        }
-                    }
-                }
-            }
-        } else {
-            lastUpdatedTimeText.setText(R.string.n_a);
-        }
-
-        if (sessionDuration != null) {
-            sessionDurationText.setText(String.format(Locale.getDefault(), "%d seconds", sessionDuration));
-        } else {
-            sessionDurationText.setText("--");
-        }
-
-        if (totalDetections != null) {
-            totalDetectionsText.setText(String.valueOf(totalDetections));
-        } else {
-            totalDetectionsText.setText("--");
-        }
     }
 }
