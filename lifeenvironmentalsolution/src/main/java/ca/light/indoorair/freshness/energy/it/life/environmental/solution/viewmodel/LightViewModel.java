@@ -11,8 +11,12 @@ import androidx.preference.PreferenceManager;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 
-import ca.light.indoorair.freshness.energy.it.life.environmental.solution.R;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 import ca.light.indoorair.freshness.energy.it.life.environmental.solution.data.LightRepository;
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.R;
 
 public class LightViewModel extends AndroidViewModel {
 
@@ -33,11 +37,18 @@ public class LightViewModel extends AndroidViewModel {
     private final MutableLiveData<Integer> _statusColor = new MutableLiveData<>(R.drawable.circle_indicator_yellow);
     public final LiveData<Integer> statusColor = _statusColor;
 
+    private final MutableLiveData<Integer> _cardGlowColor = new MutableLiveData<>(R.color.card_glow_neutral);
+    public final LiveData<Integer> cardGlowColor = _cardGlowColor;
+
     private final MutableLiveData<String> _brightness = new MutableLiveData<>("Neutral");
     public final LiveData<String> brightness = _brightness;
 
     private final MutableLiveData<Boolean> _autoBrightness = new MutableLiveData<>(true);
     public final LiveData<Boolean> autoBrightness = _autoBrightness;
+
+    // SLIDER SYNC
+    private final MutableLiveData<Float> _sliderPosition = new MutableLiveData<>(50f);
+    public final LiveData<Float> sliderPosition = _sliderPosition;
 
     // Thresholds
     private static final int LUX_DIM_THRESHOLD = 200;
@@ -48,12 +59,6 @@ public class LightViewModel extends AndroidViewModel {
         lightRepository = new LightRepository();
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(application);
     }
-
-
-    public void setSliderBrightness(int sliderValue) {
-        lightRepository.setSliderBrightness(sliderValue);
-    }
-
 
     public void init(String roomName) {
         this.currentRoom = roomName;
@@ -77,6 +82,7 @@ public class LightViewModel extends AndroidViewModel {
 
                     if (brightnessValue != null) {
                         _brightness.setValue(brightnessValue);
+                        _cardGlowColor.setValue(getCardGlowColor(brightnessValue));
                     }
 
                     if (autoBrightnessValue != null) {
@@ -101,6 +107,27 @@ public class LightViewModel extends AndroidViewModel {
         lightRepository.setAutoBrightness(enabled);
     }
 
+    public void setSliderBrightness(int sliderValue) {
+        lightRepository.setSliderBrightness(sliderValue);
+        _sliderPosition.setValue((float) sliderValue);  // SYNC SLIDER UI
+    }
+
+    // PERFECT PRESETS
+    public void setPreset(String preset) {
+        switch (preset.toLowerCase()) {
+            case "focus":
+                setBrightness("Neutral");
+                setSliderBrightness(80);      // Slider → 80%
+                setAutoBrightness(false);
+                break;
+            case "relax":
+                setBrightness("Cool");
+                setSliderBrightness(40);      // Slider → 40%
+                setAutoBrightness(false);
+                break;
+        }
+    }
+
     private void updateLightLevelUI(int lux) {
         String levelText;
         int colorRes;
@@ -118,13 +145,22 @@ public class LightViewModel extends AndroidViewModel {
 
         _lightLevelText.setValue(levelText);
         _statusColor.setValue(colorRes);
-        _lastUpdatedTime.setValue(new java.text.SimpleDateFormat("HH:mm:ss", java.util.Locale.getDefault())
-                .format(new java.util.Date()));
+        _lastUpdatedTime.setValue(new SimpleDateFormat("HH:mm:ss", Locale.getDefault())
+                .format(new Date()));
+    }
+
+    private int getCardGlowColor(String brightness) {
+        switch (brightness != null ? brightness.toLowerCase() : "neutral") {
+            case "warm": return R.color.card_glow_warm;
+            case "cool": return R.color.card_glow_cool;
+            default: return R.color.card_glow_neutral;
+        }
     }
 
     private void loadSettings() {
         boolean autoEnabled = sharedPreferences.getBoolean("auto_brightness_enabled", true);
         _autoBrightness.setValue(autoEnabled);
+        _sliderPosition.setValue(50f);  // Default slider position
     }
 
     @Override
