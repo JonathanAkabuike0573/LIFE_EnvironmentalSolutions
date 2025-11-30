@@ -23,6 +23,7 @@ import java.util.Locale;
 
 import ca.light.indoorair.freshness.energy.it.life.environmental.solution.R;
 import ca.light.indoorair.freshness.energy.it.life.environmental.solution.viewmodel.AirQualityViewModel;
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.viewmodel.SharedRoomViewModel;
 
 public class AirQualityFragment extends Fragment {
 
@@ -38,9 +39,11 @@ public class AirQualityFragment extends Fragment {
     private SwitchMaterial switchAutoVentilation;
     private SwitchMaterial switchPurifierPower;
     private Slider sliderPurifierIntensity;
+    private TextView roomNameText;
 
-    // --- ViewModel ---
+    //  ViewModel
     private AirQualityViewModel viewModel;
+    private String currentRoom;
 
     public AirQualityFragment() {
         // Required empty public constructor
@@ -49,7 +52,6 @@ public class AirQualityFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_air_quality, container, false);
     }
 
@@ -57,14 +59,38 @@ public class AirQualityFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        initializeViews(view);
         viewModel = new ViewModelProvider(this).get(AirQualityViewModel.class);
 
-        initializeViews(view);
+
+        SharedRoomViewModel sharedRoomViewModel = new ViewModelProvider(requireActivity()).get(SharedRoomViewModel.class);
+
+
+        sharedRoomViewModel.getCurrentRoom().observe(getViewLifecycleOwner(), roomName -> {
+            if (roomName != null && !roomName.isEmpty()) {
+                currentRoom = roomName;
+                roomNameText.setText(roomName);
+
+
+                viewModel.init(roomName);
+
+
+                Toast.makeText(getContext(), "Switched to: " + roomName, Toast.LENGTH_SHORT).show();
+            }
+        });
+
         setupControlListeners();
         observeViewModel();
-
-        viewModel.init();
         loadSettings();
+    }
+
+
+    private String getSelectedRoomFromArguments() {
+        Bundle args = getArguments();
+        if (args != null && args.containsKey("SELECTED_ROOM_KEY")) {
+            return args.getString("SELECTED_ROOM_KEY", "Main Office");
+        }
+        return "Main Office";
     }
 
     private void initializeViews(View view) {
@@ -79,91 +105,132 @@ public class AirQualityFragment extends Fragment {
         switchAutoVentilation = view.findViewById(R.id.switch_auto_ventilation);
         switchPurifierPower = view.findViewById(R.id.switch_purifier_power);
         sliderPurifierIntensity = view.findViewById(R.id.slider_purifier_intensity);
+        roomNameText = view.findViewById(R.id.room_name_text);
     }
 
     private void observeViewModel() {
         viewModel.airQualityValue.observe(getViewLifecycleOwner(), value -> {
-            airQualityProgress.setProgress(value);
-            airQualityValueText.setText(String.valueOf(value));
+            if (value != null && airQualityProgress != null && airQualityValueText != null) {
+                airQualityProgress.setProgress(value);
+                airQualityValueText.setText(String.valueOf(value));
+            }
         });
 
         viewModel.airQualityLevel.observe(getViewLifecycleOwner(), level -> {
-            airQualityLevelText.setText(level);
+            if (level != null && airQualityLevelText != null) {
+                airQualityLevelText.setText(level);
+            }
         });
 
         viewModel.lastUpdatedTime.observe(getViewLifecycleOwner(), time -> {
-            lastUpdatedTime.setText(time);
+            if (time != null && lastUpdatedTime != null) {
+                lastUpdatedTime.setText(time);
+            }
         });
 
         viewModel.statusColor.observe(getViewLifecycleOwner(), colorResId -> {
-            if (getContext() != null) {
-                int color = ContextCompat.getColor(getContext(), colorResId);
-                ((GradientDrawable) statusIndicator.getBackground()).setColor(color);
+            if (getContext() != null && colorResId != null && statusIndicator != null) {
+                try {
+                    int color = ContextCompat.getColor(getContext(), colorResId);
+                    if (statusIndicator.getBackground() instanceof GradientDrawable) {
+                        ((GradientDrawable) statusIndicator.getBackground()).setColor(color);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         });
 
         viewModel.isRefreshing.observe(getViewLifecycleOwner(), isRefreshing -> {
-            buttonRefresh.setEnabled(!isRefreshing);
-            if (isRefreshing) {
-                Toast.makeText(getContext(), "Refreshing data...", Toast.LENGTH_SHORT).show();
+            if (buttonRefresh != null) {
+                buttonRefresh.setEnabled(!Boolean.TRUE.equals(isRefreshing));
+            }
+            if (Boolean.TRUE.equals(isRefreshing)) {
+                Toast.makeText(getContext(), "Refreshing " + currentRoom + " data...", Toast.LENGTH_SHORT).show();
             }
         });
 
         viewModel.error.observe(getViewLifecycleOwner(), error -> {
-            if (error != null) {
+            if (error != null && !error.isEmpty()) {
                 Toast.makeText(getContext(), error, Toast.LENGTH_LONG).show();
             }
         });
     }
 
     private void setupControlListeners() {
-        buttonRefresh.setOnClickListener(v -> viewModel.manualRefresh());
+        if (buttonRefresh != null) {
+            buttonRefresh.setOnClickListener(v -> viewModel.manualRefresh());
+        }
 
-        sliderAlertLevel.addOnChangeListener((slider, value, fromUser) -> {
-            if (fromUser) {
-                int alertValue = (int) value;
-                alertLevelLabel.setText(String.format(Locale.US, "Alert Level (%d PPM)", alertValue));
-                viewModel.saveIntSetting(AirQualityViewModel.KEY_ALERT_LEVEL, alertValue);
-            }
-        });
+        if (sliderAlertLevel != null) {
+            sliderAlertLevel.addOnChangeListener((slider, value, fromUser) -> {
+                if (fromUser && alertLevelLabel != null) {
+                    int alertValue = (int) value;
+                    alertLevelLabel.setText(String.format(Locale.US, "Alert Level (%d PPM)", alertValue));
+                    viewModel.saveIntSetting(AirQualityViewModel.KEY_ALERT_LEVEL, alertValue);
+                }
+            });
+        }
 
-        switchAutoVentilation.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (buttonView.isPressed()) {
-                viewModel.saveBooleanSetting(AirQualityViewModel.KEY_AUTO_VENT, isChecked);
-                Toast.makeText(getContext(), "Auto Ventilation " + (isChecked ? "ON" : "OFF"), Toast.LENGTH_SHORT).show();
-            }
-        });
+        if (switchAutoVentilation != null) {
+            switchAutoVentilation.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                if (buttonView.isPressed()) {
+                    viewModel.saveBooleanSetting(AirQualityViewModel.KEY_AUTO_VENT, isChecked);
+                    Toast.makeText(getContext(), "Auto Ventilation " + (isChecked ? "ON" : "OFF"), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
 
-        switchPurifierPower.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (buttonView.isPressed()) {
-                viewModel.saveBooleanSetting(AirQualityViewModel.KEY_PURIFIER_POWER, isChecked);
-                sliderPurifierIntensity.setEnabled(isChecked);
-                Toast.makeText(getContext(), "Air Purifier " + (isChecked ? "ON" : "OFF"), Toast.LENGTH_SHORT).show();
-            }
-        });
+        if (switchPurifierPower != null) {
+            switchPurifierPower.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                if (buttonView.isPressed() && sliderPurifierIntensity != null) {
+                    viewModel.saveBooleanSetting(AirQualityViewModel.KEY_PURIFIER_POWER, isChecked);
+                    sliderPurifierIntensity.setEnabled(isChecked);
+                    Toast.makeText(getContext(), "Air Purifier " + (isChecked ? "ON" : "OFF"), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
 
-        sliderPurifierIntensity.addOnChangeListener((slider, value, fromUser) -> {
-            if (fromUser) {
-                int intensity = (int) value;
-                viewModel.saveIntSetting(AirQualityViewModel.KEY_PURIFIER_INTENSITY, intensity);
-                Toast.makeText(getContext(), "Purifier intensity set to " + intensity, Toast.LENGTH_SHORT).show();
-            }
-        });
+        if (sliderPurifierIntensity != null) {
+            sliderPurifierIntensity.addOnChangeListener((slider, value, fromUser) -> {
+                if (fromUser) {
+                    int intensity = (int) value;
+                    viewModel.saveIntSetting(AirQualityViewModel.KEY_PURIFIER_INTENSITY, intensity);
+                    Toast.makeText(getContext(), "Purifier intensity set to " + intensity, Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
     }
 
     private void loadSettings() {
-        int savedAlertLevel = viewModel.getIntSetting(AirQualityViewModel.KEY_ALERT_LEVEL, 2000);
-        sliderAlertLevel.setValue(savedAlertLevel);
-        alertLevelLabel.setText(String.format(Locale.US, "Alert Level (%d PPM)", savedAlertLevel));
+        if (sliderAlertLevel != null && alertLevelLabel != null) {
+            int savedAlertLevel = viewModel.getIntSetting(AirQualityViewModel.KEY_ALERT_LEVEL, 2000);
+            sliderAlertLevel.setValue(savedAlertLevel);
+            alertLevelLabel.setText(String.format(Locale.US, "Alert Level (%d PPM)", savedAlertLevel));
+        }
 
-        boolean autoVentEnabled = viewModel.getBooleanSetting(AirQualityViewModel.KEY_AUTO_VENT, false);
-        switchAutoVentilation.setChecked(autoVentEnabled);
+        if (switchAutoVentilation != null) {
+            boolean autoVentEnabled = viewModel.getBooleanSetting(AirQualityViewModel.KEY_AUTO_VENT, false);
+            switchAutoVentilation.setChecked(autoVentEnabled);
+        }
 
-        boolean purifierPowerEnabled = viewModel.getBooleanSetting(AirQualityViewModel.KEY_PURIFIER_POWER, false);
-        switchPurifierPower.setChecked(purifierPowerEnabled);
-        sliderPurifierIntensity.setEnabled(purifierPowerEnabled);
+        if (switchPurifierPower != null && sliderPurifierIntensity != null) {
+            boolean purifierPowerEnabled = viewModel.getBooleanSetting(AirQualityViewModel.KEY_PURIFIER_POWER, false);
+            switchPurifierPower.setChecked(purifierPowerEnabled);
+            sliderPurifierIntensity.setEnabled(purifierPowerEnabled);
+        }
 
-        int purifierIntensity = viewModel.getIntSetting(AirQualityViewModel.KEY_PURIFIER_INTENSITY, 1);
-        sliderPurifierIntensity.setValue(purifierIntensity);
+        if (sliderPurifierIntensity != null) {
+            int purifierIntensity = viewModel.getIntSetting(AirQualityViewModel.KEY_PURIFIER_INTENSITY, 1);
+            sliderPurifierIntensity.setValue(purifierIntensity);
+        }
+    }
+
+    public static AirQualityFragment newInstance(String selectedRoom) {
+        AirQualityFragment fragment = new AirQualityFragment();
+        Bundle args = new Bundle();
+        args.putString("SELECTED_ROOM_KEY", selectedRoom);
+        fragment.setArguments(args);
+        return fragment;
     }
 }
