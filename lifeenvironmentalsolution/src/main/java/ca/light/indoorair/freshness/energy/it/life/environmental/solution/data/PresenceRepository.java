@@ -34,7 +34,7 @@ public class PresenceRepository {
     }
 
     public void stopListening(@NonNull ValueEventListener listener, String roomName) {
-        // Remove listener from correct path
+
         DatabaseReference roomRef;
         if ("Main Office".equals(roomName)) {
             roomRef = FirebaseDatabase.getInstance().getReference("room_occupancy");
