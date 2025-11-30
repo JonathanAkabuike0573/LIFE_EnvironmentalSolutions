@@ -2,25 +2,39 @@ package ca.light.indoorair.freshness.energy.it.life.environmental.solution;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.ui.AirQualityFragment;
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.ui.EnergyFragment;
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.ui.LightFragment;
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.ui.PresenceFragment;
+
 public class MyAdapter extends RecyclerView.Adapter<MyViewHolder> {
 
     Context context;
     List<item> list;
+    RoomSelectionProvider roomSelectionProvider;
 
-    public MyAdapter(Context context, List<item> list) {
+    public interface RoomSelectionProvider {
+        String getSelectedRoom();
+    }
+
+    public MyAdapter(Context context, List<item> list, RoomSelectionProvider roomSelectionProvider) {
         this.context = context;
         this.list = list;
+        this.roomSelectionProvider = roomSelectionProvider;
     }
 
     @NonNull
@@ -35,6 +49,42 @@ public class MyAdapter extends RecyclerView.Adapter<MyViewHolder> {
 
         holder.device_name.setText(currentItem.getName());
         holder.device_status.setText(currentItem.getStatus());
+
+        holder.itemView.setOnClickListener(v -> {
+            Fragment fragment = null;
+
+            // CRITICAL FIX: Get the CURRENT room selection at click time
+            String selectedRoom = roomSelectionProvider.getSelectedRoom();
+
+            // Debug: Show which room is being passed
+            Toast.makeText(context, "Opening " + currentItem.getName() + " for: " + selectedRoom, Toast.LENGTH_SHORT).show();
+
+            Bundle args = new Bundle();
+            args.putString("SELECTED_ROOM_KEY", selectedRoom);
+
+            switch (currentItem.getName()) {
+                case "Air Quality":
+                    fragment = new AirQualityFragment();
+                    break;
+                case "Smart Light":
+                    fragment = new LightFragment();
+                    break;
+                case "Presence Sensor":
+                    fragment = new PresenceFragment();
+                    break;
+                case "Thermostat":
+                    fragment = new EnergyFragment();
+                    break;
+            }
+
+            if (fragment != null) {
+                fragment.setArguments(args);
+                ((AppCompatActivity) context).getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.main, fragment)
+                        .addToBackStack(null)
+                        .commit();
+            }
+        });
 
         if (!currentItem.isShowToggle()) {
             holder.device_toggle.setVisibility(View.GONE);

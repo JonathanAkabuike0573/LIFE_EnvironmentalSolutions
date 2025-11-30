@@ -26,6 +26,29 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <TextView
+            android:id="@+id/room_selector_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_l"
+            android:layout_marginTop="@dimen/space_l"
+            android:text="Select Room:"
+            android:textSize="@dimen/text_l"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/usergreeting" />
+
+        <Spinner
+            android:id="@+id/room_spinner"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_m"
+            android:layout_marginEnd="@dimen/space_l"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/room_selector_label"
+            app:layout_constraintTop_toTopOf="@+id/room_selector_label"
+            app:layout_constraintBottom_toBottomOf="@+id/room_selector_label" />
+
         <androidx.cardview.widget.CardView
             android:id="@+id/weather_card"
             android:layout_width="0dp"
@@ -37,7 +60,7 @@
             app:cardElevation="@dimen/elevation_high"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/usergreeting">
+            app:layout_constraintTop_toBottomOf="@+id/room_selector_label">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
