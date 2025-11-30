@@ -49,6 +49,12 @@ public class LightViewModel extends AndroidViewModel {
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(application);
     }
 
+
+    public void setSliderBrightness(int sliderValue) {
+        lightRepository.setSliderBrightness(sliderValue);
+    }
+
+
     public void init(String roomName) {
         this.currentRoom = roomName;
         startListening();
