@@ -1,5 +1,4 @@
 package ca.light.indoorair.freshness.energy.it.life.environmental.solution.ui;
-
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,18 +14,19 @@ import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 import java.text.NumberFormat;
 import java.util.Locale;
-
+import java.util.stream.Collectors;
 import ca.light.indoorair.freshness.energy.it.life.environmental.solution.R;
 
 public class PurchasesFragment extends Fragment {
 
     // UI Components
-    private Spinner freeItemsSpinner;
     private Spinner upgradesSpinner;
     private Spinner paymentTypeSpinner;
     private TextView subtotalTextView;
@@ -40,8 +40,22 @@ public class PurchasesFragment extends Fragment {
     private double currentSubtotal = 0.0;
     private String selectedPaymentMethod = "";
 
+    // ⭐ UPDATED: Max devices to 6
+    private static final int MAX_DEVICES_ALLOWED = 6;
+
     // Map to store upgrade names and their base prices
     private final Map<String, Double> upgradePrices = new HashMap<>();
+
+    // Available device options
+    private final List<String> deviceOptions = Arrays.asList(
+            "Air Quality", "Smart Light", "Thermostat", "Air Conditioner", "Presence Sensor", "Smart TV"
+    );
+
+    // This list will hold the options *displayed* in the spinner, allowing us to change the text
+    // for the selected item without recreating the adapter logic every time.
+    private List<String> currentUpgradeDisplayOptions;
+    private ArrayAdapter<String> upgradeAdapter;
+
 
     public PurchasesFragment() {
         // Initialize upgrade prices
@@ -54,7 +68,6 @@ public class PurchasesFragment extends Fragment {
 
     public static PurchasesFragment newInstance() {
         PurchasesFragment fragment = new PurchasesFragment();
-        // Standard bundle setup
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
@@ -71,7 +84,6 @@ public class PurchasesFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         // Initialize UI components
-        freeItemsSpinner = view.findViewById(R.id.spinner_free_items);
         upgradesSpinner = view.findViewById(R.id.spinner_upgrades);
         paymentTypeSpinner = view.findViewById(R.id.spinner_payment_type);
         subtotalTextView = view.findViewById(R.id.text_subtotal);
@@ -85,67 +97,68 @@ public class PurchasesFragment extends Fragment {
     }
 
     /**
-     * Extracts the original map key by stripping the appended price from the formatted spinner text.
+     * Extracts the original map key by stripping the appended price and the selected devices from the formatted spinner text.
      */
     private String getOriginalKey(String selectedItemText) {
-        // Find the index of the string " ($" which marks the start of the appended price.
+        // Find the index of the plan price/device info
         int priceStart = selectedItemText.lastIndexOf(" ($");
+        String baseText = (priceStart > 0) ? selectedItemText.substring(0, priceStart) : selectedItemText;
 
-        if (priceStart > 0) {
-            // If the price marker is found, return the substring before it.
-            return selectedItemText.substring(0, priceStart);
+        int deviceStart = baseText.lastIndexOf(" (");
+        if (deviceStart > 0) {
+            if (baseText.substring(deviceStart).contains("device(s) selected")) {
+                return baseText.substring(0, deviceStart);
+            }
         }
-        // If it's the "Select Upgrade" option (which has no price), return the text as is.
-        return selectedItemText;
+
+        return baseText;
     }
 
     /**
-     * Sets up the data and listeners for the three Spinner dropdowns.
+     * Sets up the data and listeners for the two Spinner dropdowns.
      */
     private void setupSpinners() {
-        // 1. Free Items Spinner
-        String[] freeItems = {"None", "Feature X (Lifetime)", "Feature Y (3-months)"};
-        ArrayAdapter<String> freeAdapter = new ArrayAdapter<>(getContext(),
-                android.R.layout.simple_spinner_dropdown_item, freeItems);
-        freeItemsSpinner.setAdapter(freeAdapter);
-
-        // 2. Upgrades Spinner (with Price)
-        String[] upgradeOptions = upgradePrices.keySet().stream()
+        // 1. Upgrades Spinner (with Price)
+        currentUpgradeDisplayOptions = upgradePrices.keySet().stream()
                 .map(key -> key + (upgradePrices.get(key) > 0 ? " ($" + String.format(Locale.getDefault(), "%.2f", upgradePrices.get(key)) + ")" : ""))
-                .toArray(String[]::new);
+                .collect(ArrayList::new, List::add, List::addAll);
 
-        ArrayAdapter<String> upgradeAdapter = new ArrayAdapter<>(getContext(),
-                android.R.layout.simple_spinner_dropdown_item, upgradeOptions);
+        upgradeAdapter = new ArrayAdapter<>(getContext(),
+                android.R.layout.simple_spinner_dropdown_item, currentUpgradeDisplayOptions);
         upgradesSpinner.setAdapter(upgradeAdapter);
 
-        // --- Set Default Selection and Calculate Price Immediately ---
-        final int defaultSelectionIndex = 1;
+        // Set Default Selection and Calculate Price Immediately
+        final int defaultSelectionIndex = 0; // "Select Upgrade" index
 
         upgradesSpinner.post(() -> {
             upgradesSpinner.setSelection(defaultSelectionIndex);
-
-            String selectedItemText = (String) upgradesSpinner.getItemAtPosition(defaultSelectionIndex);
-            String originalKey = getOriginalKey(selectedItemText);
-
-            if (upgradePrices.containsKey(originalKey)) {
-                currentSubtotal = upgradePrices.get(originalKey);
-            }
-            updatePriceDisplay(currentSubtotal);
+            updatePriceDisplay(0.00);
         });
 
         // --- Listener for subsequent selections ---
         upgradesSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            private boolean isInitialLoad = true;
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String selectedItemText = parent.getItemAtPosition(position).toString();
                 String originalKey = getOriginalKey(selectedItemText);
 
-                if (upgradePrices.containsKey(originalKey)) {
-                    currentSubtotal = upgradePrices.get(originalKey);
+                if (isInitialLoad && position == defaultSelectionIndex) {
+                    isInitialLoad = false;
+                    return;
+                }
+
+                double planPrice = upgradePrices.getOrDefault(originalKey, 0.00);
+
+                if (planPrice > 0.00) {
+                    currentSubtotal = planPrice; // Set subtotal to the plan price
+
+                    // Show the device selection dialog
+                    showDeviceSelectionDialog(originalKey, position);
                 } else {
                     currentSubtotal = 0.00;
+                    updatePriceDisplay(currentSubtotal);
                 }
-                updatePriceDisplay(currentSubtotal);
             }
 
             @Override
@@ -154,7 +167,7 @@ public class PurchasesFragment extends Fragment {
             }
         });
 
-        // 3. Payment Type Spinner
+        // 2. Payment Type Spinner
         String[] paymentTypes = {"Visa **** 1234", "MasterCard **** 5678", "Amex **** 9012", "PayPal", "Google Pay"};
         ArrayAdapter<String> paymentAdapter = new ArrayAdapter<>(getContext(),
                 android.R.layout.simple_spinner_dropdown_item, paymentTypes);
@@ -172,6 +185,88 @@ public class PurchasesFragment extends Fragment {
                 }
             }
         });
+    }
+
+    /**
+     * Shows a multi-choice dialog for the user to select up to 6 devices.
+     */
+    private void showDeviceSelectionDialog(String originalPlanName, int originalPosition) {
+        if (getContext() == null) return;
+
+        final CharSequence[] items = deviceOptions.toArray(new CharSequence[0]);
+        final boolean[] checkedItems = new boolean[deviceOptions.size()];
+        final List<String> selectedDevices = new ArrayList<>();
+
+        new AlertDialog.Builder(getContext())
+                // ⭐ UPDATED: Title to reflect max 6 devices
+                .setTitle("Select Devices (Max " + MAX_DEVICES_ALLOWED + ")")
+                .setMultiChoiceItems(items, checkedItems, new DialogInterface.OnMultiChoiceClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                        if (isChecked) {
+                            // Check if max limit reached (now 6)
+                            if (selectedDevices.size() >= MAX_DEVICES_ALLOWED) {
+                                // If max reached, don't allow selection and uncheck it visually
+                                checkedItems[which] = false;
+                                ((AlertDialog) dialog).getListView().setItemChecked(which, false);
+                                Toast.makeText(getContext(), "Maximum of " + MAX_DEVICES_ALLOWED + " devices allowed.", Toast.LENGTH_SHORT).show();
+                            } else {
+                                selectedDevices.add(deviceOptions.get(which));
+                            }
+                        } else {
+                            selectedDevices.remove(deviceOptions.get(which));
+                        }
+                    }
+                })
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // ⭐ REQUIREMENT MET: Update spinner display with selection (0 to 6)
+                        updateUpgradeSpinnerDisplay(originalPlanName, selectedDevices, originalPosition);
+                        dialog.dismiss(); // ⭐ FIX: Explicitly dismiss the dialog once
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // ⭐ FIX: Reset selection and dismiss immediately once
+                        upgradesSpinner.setSelection(0);
+                        currentSubtotal = 0.00;
+                        updatePriceDisplay(currentSubtotal);
+                        dialog.dismiss();
+                    }
+                })
+                .setCancelable(true)
+                .show();
+    }
+
+    /**
+     * Updates the Spinner's displayed text after devices are selected.
+     * This method fixes the issue by updating the *data backing the adapter* and calling notifyDataSetChanged().
+     */
+    private void updateUpgradeSpinnerDisplay(String originalPlanName, List<String> selectedDevices, int positionToSet) {
+        if (upgradeAdapter == null) return;
+
+        // Build the new display text. Handles 0 selected devices.
+        String deviceSummary = selectedDevices.isEmpty()
+                ? ""
+                : " (" + selectedDevices.size() + " device(s) selected)";
+
+        String priceText = upgradePrices.get(originalPlanName) > 0
+                ? " ($" + String.format(Locale.getDefault(), "%.2f", upgradePrices.get(originalPlanName)) + ")"
+                : "";
+
+        String newDisplayText = originalPlanName + deviceSummary + priceText;
+
+        // Update the list data and notify the adapter
+        currentUpgradeDisplayOptions.set(positionToSet, newDisplayText);
+        upgradeAdapter.notifyDataSetChanged();
+
+        // Set the selection
+        upgradesSpinner.setSelection(positionToSet);
+
+        // ⭐ FIX: Recalculate and update price display after setting selection/display
+        updatePriceDisplay(currentSubtotal);
     }
 
     /**
@@ -203,18 +298,14 @@ public class PurchasesFragment extends Fragment {
                 .setMessage("Do you want to cancel your upgrade?")
                 .setPositiveButton("Yes, Cancel", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        // User clicked Yes, handle cancellation logic
                         Toast.makeText(getContext(), "Your Upgrade will be canceled in 10 business days.", Toast.LENGTH_LONG).show();
-                        // You might want to update the UI or navigate away here
                     }
                 })
                 .setNegativeButton("No, Keep It", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        // User clicked No, the dialog is dismissed, and they return to the payment page.
                         Toast.makeText(getContext(), "Upgrade maintained.", Toast.LENGTH_SHORT).show();
                     }
                 })
-                // ⭐ UPDATED ICON: Using R.drawable.logolife
                 .setIcon(R.drawable.logolife)
                 .show();
     }
