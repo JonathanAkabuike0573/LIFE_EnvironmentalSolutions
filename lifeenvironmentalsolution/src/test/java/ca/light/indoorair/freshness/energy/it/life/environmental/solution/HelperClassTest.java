@@ -1,8 +1,7 @@
 package ca.light.indoorair.freshness.energy.it.life.environmental.solution;
-
 import org.junit.Test;
 import static org.junit.Assert.*;
-
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.auth.HelperClass;
 public class HelperClassTest {
 
     // 1 - Test constructor initializes values correctly
@@ -91,4 +90,27 @@ public class HelperClassTest {
         assertEquals("newfrank@example.com", helper.getEmail());
         // Name should remain the same
         assertEquals("Frank", helper.getName());
+    }
+
+    // Automation Tests
+
+    // 11 - Test assertTrue usage
+    @Test
+    public void testEmailContainsAtSymbol() {
+        HelperClass helper = new HelperClass("User", "test@domain.com", "123");
+        assertTrue("Email should contain @ symbol", helper.getEmail().contains("@"));
+    }
+
+    // 12 - Test assertFalse usage
+    @Test
+    public void testNameNotEmpty() {
+        HelperClass helper = new HelperClass("User", "test@domain.com", "123");
+        assertFalse("Name should not be empty", helper.getName().isEmpty());
+    }
+
+    // 13 - Test assertNotEquals usage
+    @Test
+    public void testDifferentPhoneNumbers() {
+        HelperClass helper = new HelperClass("User", "test@domain.com", "12345");
+        assertNotEquals("67890", helper.getPhoneNumber());
     } }

@@ -6,11 +6,14 @@ import androidx.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -21,16 +24,22 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
+
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.ui.FeedBackPage;
 
 public class DashBoardFragment extends Fragment {
 
     public Object dataProvider;
     // UI Elements
     private TextView userGreeting, temperatureText, comfortLevelText;
+    private ImageView settingsIcon;
 
     // Firebase
     private FirebaseAuth mAuth;
@@ -41,7 +50,8 @@ public class DashBoardFragment extends Fragment {
     private SharedPreferences sharedPreferences;
     private SharedPreferences.OnSharedPreferenceChangeListener preferenceChangeListener;
     private MyAdapter adapter;
-    private List<item> items;
+    private List<item> allItems;
+    private List<item> visibleItems;
 
     public DashBoardFragment() {
         // Required empty public constructor
@@ -51,18 +61,32 @@ public class DashBoardFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_dash_board, container, false);
 
-        items = new ArrayList<>();
-        items.add(new item("Air Quality", "Good", R.drawable.air_qualityicon, true, false));
-        items.add(new item("Smart Light", "Off", R.drawable.lightofficon, false, true));
-        items.add(new item("Thermostat", "22°C", R.drawable.thermostaticon, true, false));
-        items.add(new item("Air Conditioner", "Off", R.drawable.airconditionericon, false, true));
-        items.add(new item("Presence Sensor", "Off", R.drawable.sensor_occupied, false, true));
-        items.add(new item("Smart TV", "Off", R.drawable.tv_officon, false, true));
+        allItems = new ArrayList<>();
+        allItems.add(new item("Air Quality", "Good", R.drawable.air_qualityicon, true, false));
+        allItems.add(new item("Smart Light", "Off", R.drawable.lightofficon, false, true));
+        allItems.add(new item("Thermostat", "22°C", R.drawable.thermostaticon, true, false));
+        allItems.add(new item("Air Conditioner", "Off", R.drawable.airconditionericon, false, true));
+        allItems.add(new item("Presence Sensor", "Off", R.drawable.sensor_occupied, false, true));
+        allItems.add(new item("Smart TV", "Off", R.drawable.tv_officon, false, true));
+
+        visibleItems = new ArrayList<>();
 
         RecyclerView recycler = view.findViewById(R.id.recyclerView);
         recycler.setLayoutManager(new GridLayoutManager(getContext(), 2));
-        adapter = new MyAdapter(getContext(), items);
+        adapter = new MyAdapter(getContext(), visibleItems);
         recycler.setAdapter(adapter);
+        FloatingActionButton fab = view.findViewById(R.id.fab_open_feedback);
+        fab.setOnClickListener(v -> {
+            // Open Feedback fragment
+            requireActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.main, new FeedBackPage())
+                    .addToBackStack(null)
+                    .commit();
+
+            // Show Snackbar confirmation
+            Snackbar.make(v, "Opening feedback form...", Snackbar.LENGTH_SHORT).show();
+        });
 
         return view;
     }
@@ -77,9 +101,12 @@ public class DashBoardFragment extends Fragment {
             sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
         }
 
+        settingsIcon.setOnClickListener(v -> showSettingsDialog());
+
         loadGreeting(new FirebaseUserDataProvider());
         initializeFirebase();
         setupPreferenceListener();
+        updateVisibleItems();
         updateAirQualityStatus();
     }
 
@@ -87,6 +114,47 @@ public class DashBoardFragment extends Fragment {
         userGreeting = view.findViewById(R.id.usergreeting);
         temperatureText = view.findViewById(R.id.temperature_text);
         comfortLevelText = view.findViewById(R.id.weather_description); // Reusing for comfort level
+        settingsIcon = view.findViewById(R.id.settings_icon);
+    }
+
+    private void showSettingsDialog() {
+        String[] itemNames = new String[allItems.size()];
+        boolean[] checkedItems = new boolean[allItems.size()];
+
+        for (int i = 0; i < allItems.size(); i++) {
+            itemNames[i] = allItems.get(i).getName();
+            checkedItems[i] = sharedPreferences.getBoolean("item_" + i, true);
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setTitle("Select Items to Display");
+        builder.setMultiChoiceItems(itemNames, checkedItems, (dialog, which, isChecked) -> {
+            checkedItems[which] = isChecked;
+        });
+
+        builder.setPositiveButton("OK", (dialog, which) -> {
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            for (int i = 0; i < checkedItems.length; i++) {
+                editor.putBoolean("item_" + i, checkedItems[i]);
+            }
+            editor.apply();
+            updateVisibleItems();
+        });
+
+        builder.setNegativeButton("Cancel", null);
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    private void updateVisibleItems() {
+        visibleItems.clear();
+        for (int i = 0; i < allItems.size(); i++) {
+            if (sharedPreferences.getBoolean("item_" + i, true)) {
+                visibleItems.add(allItems.get(i));
+            }
+        }
+        adapter.notifyDataSetChanged();
     }
 
     private void initializeFirebase() {
@@ -131,7 +199,7 @@ public class DashBoardFragment extends Fragment {
     private void updateAirQualityStatus() {
         if (sharedPreferences != null && adapter != null) {
             String airQuality = sharedPreferences.getString("air_quality_description", "Good");
-            for (item i : items) {
+            for (item i : allItems) {
                 if (i.getName().equals("Air Quality")) {
                     i.setStatus(airQuality);
                     adapter.notifyDataSetChanged();
