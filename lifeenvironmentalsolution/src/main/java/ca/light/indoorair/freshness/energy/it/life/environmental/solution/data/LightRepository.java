@@ -16,12 +16,15 @@ public class LightRepository {
 
     private DatabaseReference lightSensorDbRef;
     private ValueEventListener lightValueEventListener;
+    private boolean powerOn = true;
+    private ValueEventListener controlListener;
+
     private final Random random = new Random();
     private static final int SIMULATION_INTERVAL = 4000;
 
-    // Simulation state
+
     private boolean autoBrightnessEnabled = true;
-    private int sliderBrightnessValue = 50; // 0-100
+    private int sliderBrightnessValue = 50;
     private android.os.Handler simulationHandler;
 
     private void setupFirebaseReference(String roomName) {
@@ -37,15 +40,65 @@ public class LightRepository {
         setupFirebaseReference(roomName);
         lightValueEventListener = listener;
         lightSensorDbRef.addValueEventListener(listener);
+
+
+        controlListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+
+                    Boolean pValue = snapshot.child("powerOn").getValue(Boolean.class);
+                    if (pValue != null) {
+                        powerOn = pValue;
+                    }
+
+
+                    Boolean abValue = snapshot.child("autoBrightness").getValue(Boolean.class);
+                    if (abValue != null) {
+                        autoBrightnessEnabled = abValue;
+                    }
+
+
+                    Integer sliderValue = snapshot.child("sliderBrightness").getValue(Integer.class);
+                    if (sliderValue != null) {
+                        sliderBrightnessValue = sliderValue;
+                    }
+
+                    stopSimulation();
+                    startSmartSimulation();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {}
+        };
+        lightSensorDbRef.addListenerForSingleValueEvent(controlListener);
+
+
         startSmartSimulation();
     }
+
 
     public void stopListening() {
         if (lightValueEventListener != null && lightSensorDbRef != null) {
             lightSensorDbRef.removeEventListener(lightValueEventListener);
             lightValueEventListener = null;
         }
+        if (controlListener != null && lightSensorDbRef != null) {
+            lightSensorDbRef.removeEventListener(controlListener);
+            controlListener = null;
+        }
         stopSimulation();
+    }
+
+
+    public void setPowerOn(boolean enabled) {
+        powerOn = enabled;
+        if (lightSensorDbRef != null) {
+            lightSensorDbRef.child("powerOn").setValue(enabled);
+        }
+        stopSimulation();
+        startSmartSimulation();
     }
 
     public void setAutoBrightness(boolean enabled) {
@@ -53,7 +106,6 @@ public class LightRepository {
         if (lightSensorDbRef != null) {
             lightSensorDbRef.child("autoBrightness").setValue(enabled);
         }
-        // Restart simulation with new mode
         stopSimulation();
         startSmartSimulation();
     }
@@ -64,9 +116,11 @@ public class LightRepository {
         }
     }
 
-    public void setSliderBrightness(int sliderValue) { // 0-100
+    public void setSliderBrightness(int sliderValue) {
         sliderBrightnessValue = sliderValue;
-        // Only affect simulation if auto brightness is OFF
+        if (lightSensorDbRef != null) {
+            lightSensorDbRef.child("sliderBrightness").setValue(sliderValue);
+        }
         if (!autoBrightnessEnabled) {
             stopSimulation();
             startSmartSimulation();
@@ -90,12 +144,12 @@ public class LightRepository {
             int luxValue;
 
             if (autoBrightnessEnabled) {
-                // AUTO MODE: Random fluctuation (50-2000 lux)
+
                 luxValue = 50 + random.nextInt(1950);
             } else {
-                // SLIDER MODE: Follow slider value (convert 0-100 → 0-2000 lux)
+
                 int baseLux = (int) ((sliderBrightnessValue / 100.0) * 2000);
-                // Small fluctuation ±10% around slider value
+
                 int fluctuation = (int) (baseLux * 0.1 * (random.nextFloat() - 0.5));
                 luxValue = Math.max(0, Math.min(2000, baseLux + fluctuation));
             }
@@ -106,7 +160,7 @@ public class LightRepository {
 
             lightSensorDbRef.updateChildren(sensorData);
 
-            // Schedule next update
+
             simulationHandler.postDelayed(this, SIMULATION_INTERVAL);
         }
     };
