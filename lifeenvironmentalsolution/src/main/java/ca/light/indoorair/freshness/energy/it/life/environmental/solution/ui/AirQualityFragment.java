@@ -1,7 +1,12 @@
 package ca.light.indoorair.freshness.energy.it.life.environmental.solution.ui;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +17,8 @@ import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.preference.PreferenceManager;
@@ -57,6 +64,10 @@ public class AirQualityFragment extends Fragment {
     public static final String KEY_AUTO_VENT = "auto_vent_enabled";
     public static final String KEY_PURIFIER_POWER = "purifier_power_enabled";
     public static final String KEY_PURIFIER_INTENSITY = "purifier_intensity";
+
+    // --- Notification constants ---
+    private static final String CHANNEL_ID = "air_quality_alerts";
+    private static final int NOTIFICATION_ID = 1001;
 
     public AirQualityFragment() {
         // Required empty public constructor
@@ -186,7 +197,7 @@ public class AirQualityFragment extends Fragment {
             lastUpdatedTime.setText(formatTimestamp(timestamp));
 
             // Save the description to SharedPreferences
-            if (co2Description != null) {
+            if (co2Description != null && sharedPreferences != null) {
                 sharedPreferences.edit().putString("air_quality_description", co2Description).apply();
             }
 
@@ -204,6 +215,15 @@ public class AirQualityFragment extends Fragment {
                 color = ContextCompat.getColor(getContext(), R.color.air_quality_very_poor);
             }
             ((GradientDrawable) statusIndicator.getBackground()).setColor(color);
+
+            // --- Notification check using saved alert level ---
+            if (sharedPreferences != null) {
+                int alertLevel = sharedPreferences.getInt(KEY_ALERT_LEVEL, 2000);
+                if (eco2Value > alertLevel) {
+                    showHighCo2Notification(eco2Value);
+                }
+            }
+
         } else {
             // Handle the case where there is no data (e.g., sensor is offline)
             airQualityProgress.setProgress(0);
@@ -219,7 +239,7 @@ public class AirQualityFragment extends Fragment {
         buttonRefresh.setOnClickListener(v -> manualRefresh());
 
         sliderAlertLevel.addOnChangeListener((slider, value, fromUser) -> {
-            if (fromUser) {
+            if (fromUser && sharedPreferences != null) {
                 int alertValue = (int) value;
                 alertLevelLabel.setText(String.format(Locale.US, "Alert Level (%d PPM)", alertValue));
                 sharedPreferences.edit().putInt(KEY_ALERT_LEVEL, alertValue).apply();
@@ -227,14 +247,14 @@ public class AirQualityFragment extends Fragment {
         });
 
         switchAutoVentilation.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (buttonView.isPressed()) {
+            if (buttonView.isPressed() && sharedPreferences != null) {
                 sharedPreferences.edit().putBoolean(KEY_AUTO_VENT, isChecked).apply();
                 Toast.makeText(getContext(), "Auto Ventilation " + (isChecked ? "ON" : "OFF"), Toast.LENGTH_SHORT).show();
             }
         });
 
         switchPurifierPower.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (buttonView.isPressed()) {
+            if (buttonView.isPressed() && sharedPreferences != null) {
                 sharedPreferences.edit().putBoolean(KEY_PURIFIER_POWER, isChecked).apply();
                 sliderPurifierIntensity.setEnabled(isChecked);
                 Toast.makeText(getContext(), "Air Purifier " + (isChecked ? "ON" : "OFF"), Toast.LENGTH_SHORT).show();
@@ -242,7 +262,7 @@ public class AirQualityFragment extends Fragment {
         });
 
         sliderPurifierIntensity.addOnChangeListener((slider, value, fromUser) -> {
-            if (fromUser) {
+            if (fromUser && sharedPreferences != null) {
                 int intensity = (int) value;
                 sharedPreferences.edit().putInt(KEY_PURIFIER_INTENSITY, intensity).apply();
                 Toast.makeText(getContext(), "Purifier intensity set to " + intensity, Toast.LENGTH_SHORT).show();
@@ -251,6 +271,8 @@ public class AirQualityFragment extends Fragment {
     }
 
     private void loadSettings() {
+        if (sharedPreferences == null) return;
+
         // Load and apply the saved value for the alert slider
         int savedAlertLevel = sharedPreferences.getInt(KEY_ALERT_LEVEL, 2000);
         sliderAlertLevel.setValue(savedAlertLevel);
@@ -282,6 +304,42 @@ public class AirQualityFragment extends Fragment {
         } catch (Exception e) {
             return rawTimestamp; // Fallback to raw string if parsing fails
         }
+    }
+
+    /**
+     * Shows a high-priority notification when eCO₂ exceeds the alert level.
+     */
+    private void showHighCo2Notification(long eco2Value) {
+        Context context = getContext();
+        if (context == null) return;
+
+        // Create channel for API 26+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = "Air Quality Alerts";
+            String description = "Notifications when indoor air quality is poor";
+            int importance = NotificationManager.IMPORTANCE_HIGH;
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
+            channel.setDescription(description);
+            channel.enableLights(true);
+            channel.setLightColor(Color.RED);
+            channel.enableVibration(true);
+
+            NotificationManager notificationManager =
+                    context.getSystemService(NotificationManager.class);
+            if (notificationManager != null) {
+                notificationManager.createNotificationChannel(channel);
+            }
+        }
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
+                .setSmallIcon(R.drawable.notification_foreground) // make sure this icon exists
+                .setContentTitle("Poor Air Quality Detected")
+                .setContentText("eCO₂ level is " + eco2Value + " ppm. Please ventilate the room.")
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setAutoCancel(true);
+
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
+        notificationManager.notify(NOTIFICATION_ID, builder.build());
     }
 
     @Override
