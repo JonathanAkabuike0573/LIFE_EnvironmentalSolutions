@@ -2,14 +2,18 @@ package ca.light.indoorair.freshness.energy.it.life.environmental.solution;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+
+import androidx.lifecycle.ViewModelProvider;
 import androidx.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -27,12 +31,12 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
 import ca.light.indoorair.freshness.energy.it.life.environmental.solution.ui.FeedBackPage;
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.viewmodel.SharedRoomViewModel;
 
 public class DashBoardFragment extends Fragment {
 
@@ -40,11 +44,17 @@ public class DashBoardFragment extends Fragment {
     // UI Elements
     private TextView userGreeting, temperatureText, comfortLevelText;
     private ImageView settingsIcon;
+    private Spinner roomSpinner;
 
     // Firebase
     private FirebaseAuth mAuth;
-    private DatabaseReference presenceRef;
-    private ValueEventListener presenceListener;
+    private DatabaseReference roomsRef;
+    private ValueEventListener roomsListener;
+    private DatabaseReference selectedRoomRef;
+    private ValueEventListener selectedRoomListener;
+    private DatabaseReference airQualityRef;
+    private ValueEventListener airQualityListener;
+    private String currentSelectedRoom;
 
     // SharedPreferences
     private SharedPreferences sharedPreferences;
@@ -52,9 +62,11 @@ public class DashBoardFragment extends Fragment {
     private MyAdapter adapter;
     private List<item> allItems;
     private List<item> visibleItems;
+    private List<String> roomNames;
+    private ArrayAdapter<String> roomAdapter;
 
     public DashBoardFragment() {
-        // Required empty public constructor
+
     }
 
     @Override
@@ -70,21 +82,37 @@ public class DashBoardFragment extends Fragment {
         allItems.add(new item("Smart TV", "Off", R.drawable.tv_officon, false, true));
 
         visibleItems = new ArrayList<>();
+        roomNames = new ArrayList<>();
+
+
+        roomSpinner = view.findViewById(R.id.room_spinner);
 
         RecyclerView recycler = view.findViewById(R.id.recyclerView);
         recycler.setLayoutManager(new GridLayoutManager(getContext(), 2));
-        adapter = new MyAdapter(getContext(), visibleItems);
+
+
+        adapter = new MyAdapter(getContext(), visibleItems, new MyAdapter.RoomSelectionProvider() {
+            @Override
+            public String getSelectedRoom() {
+                if (roomSpinner != null && roomSpinner.getSelectedItem() != null) {
+                    return roomSpinner.getSelectedItem().toString();
+                }
+                return "Main Office";
+            }
+        });
         recycler.setAdapter(adapter);
+
+        roomAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, roomNames);
+        roomAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        roomSpinner.setAdapter(roomAdapter);
+
         FloatingActionButton fab = view.findViewById(R.id.fab_open_feedback);
         fab.setOnClickListener(v -> {
-            // Open Feedback fragment
             requireActivity().getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.main, new FeedBackPage())
                     .addToBackStack(null)
                     .commit();
-
-            // Show Snackbar confirmation
             Snackbar.make(v, "Opening feedback form...", Snackbar.LENGTH_SHORT).show();
         });
 
@@ -107,14 +135,14 @@ public class DashBoardFragment extends Fragment {
         initializeFirebase();
         setupPreferenceListener();
         updateVisibleItems();
-        updateAirQualityStatus();
     }
 
     private void initializeViews(View view) {
         userGreeting = view.findViewById(R.id.usergreeting);
         temperatureText = view.findViewById(R.id.temperature_text);
-        comfortLevelText = view.findViewById(R.id.weather_description); // Reusing for comfort level
+        comfortLevelText = view.findViewById(R.id.weather_description);
         settingsIcon = view.findViewById(R.id.settings_icon);
+
     }
 
     private void showSettingsDialog() {
@@ -158,12 +186,86 @@ public class DashBoardFragment extends Fragment {
     }
 
     private void initializeFirebase() {
-        presenceRef = FirebaseDatabase.getInstance().getReference("room_occupancy");
-        presenceListener = new ValueEventListener() {
+        roomsRef = FirebaseDatabase.getInstance().getReference("rooms");
+        roomsListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                roomNames.clear();
+                roomNames.add("Main Office");
+                for (DataSnapshot roomSnapshot : dataSnapshot.getChildren()) {
+                    roomNames.add(roomSnapshot.getKey());
+                }
+                roomAdapter.notifyDataSetChanged();
+                if (!roomNames.isEmpty()) {
+                    String lastSelectedRoom = sharedPreferences.getString("last_selected_room", roomNames.get(0));
+                    int spinnerPosition = roomAdapter.getPosition(lastSelectedRoom);
+                    if (spinnerPosition >= 0) {
+                        roomSpinner.setSelection(spinnerPosition);
+                    } else {
+
+                        roomSpinner.setSelection(0);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Toast.makeText(getContext(), "Error loading rooms: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        };
+
+
+        roomSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String selectedRoom = (String) parent.getItemAtPosition(position);
+                sharedPreferences.edit().putString("last_selected_room", selectedRoom).apply();
+
+
+                SharedRoomViewModel sharedRoomViewModel = new ViewModelProvider(requireActivity()).get(SharedRoomViewModel.class);
+                sharedRoomViewModel.setCurrentRoom(selectedRoom);
+
+                attachRoomListener(selectedRoom);
+
+
+                Toast.makeText(getContext(), "Loading data for: " + selectedRoom, Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+
+        roomsRef.addValueEventListener(roomsListener);
+    }
+
+    private void attachRoomListener(String roomName) {
+        currentSelectedRoom = roomName;
+
+
+        if (selectedRoomRef != null && selectedRoomListener != null) {
+            selectedRoomRef.removeEventListener(selectedRoomListener);
+        }
+        if (airQualityRef != null && airQualityListener != null) {
+            airQualityRef.removeEventListener(airQualityListener);
+        }
+
+        // Set up references based on room selection
+        if ("Main Office".equals(roomName)) {
+            selectedRoomRef = FirebaseDatabase.getInstance().getReference("room_occupancy");
+            airQualityRef = FirebaseDatabase.getInstance().getReference("sgp30_readings");
+        } else {
+            selectedRoomRef = FirebaseDatabase.getInstance().getReference("rooms").child(roomName).child("room_occupancy");
+            airQualityRef = FirebaseDatabase.getInstance().getReference("rooms").child(roomName).child("air_quality_readings");
+        }
+
+
+        selectedRoomListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
-                    // Get the last entry
                     DataSnapshot lastReading = null;
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                         lastReading = snapshot;
@@ -174,34 +276,73 @@ public class DashBoardFragment extends Fragment {
                         Double tempF = lastReading.child("current_temperature_f").getValue(Double.class);
                         String comfortLevel = lastReading.child("comfort_level").getValue(String.class);
 
-                        updateWeatherCard(tempC, tempF, comfortLevel);
+                        if (tempC != null || tempF != null) {
+                            updateWeatherCard(tempC, tempF, comfortLevel);
+                        } else {
+
+                            updateWeatherCard(null, null, "No data");
+                        }
+                    } else {
+
+                        updateWeatherCard(null, null, "No data");
                     }
+                } else {
+
+                    updateWeatherCard(null, null, "No data");
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                if (getContext() != null) {
-                    Toast.makeText(getContext(), "Error: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Temperature Error: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                updateWeatherCard(null, null, "Error");
+            }
+        };
+        selectedRoomRef.addValueEventListener(selectedRoomListener);
+
+
+        airQualityListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    DataSnapshot lastReading = null;
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        lastReading = snapshot;
+                    }
+
+                    if (lastReading != null) {
+                        String airQualityDescription = lastReading.child("co2_description").getValue(String.class);
+                        updateAirQualityStatus(airQualityDescription);
+                    } else {
+                        updateAirQualityStatus("Good");
+                    }
+                } else {
+                    updateAirQualityStatus("Good");
                 }
             }
-        };
-    }
 
-    private void setupPreferenceListener() {
-        preferenceChangeListener = (sharedPreferences, key) -> {
-            if (key.equals("air_quality_description")) {
-                updateAirQualityStatus();
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Toast.makeText(getContext(), "Air Quality Error: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+                updateAirQualityStatus("Offline");
             }
         };
+        airQualityRef.limitToLast(1).addValueEventListener(airQualityListener);
     }
 
-    private void updateAirQualityStatus() {
-        if (sharedPreferences != null && adapter != null) {
-            String airQuality = sharedPreferences.getString("air_quality_description", "Good");
+    private void updateAirQualityStatus(String airQualityDescription) {
+        if (adapter != null && allItems != null) {
             for (item i : allItems) {
                 if (i.getName().equals("Air Quality")) {
-                    i.setStatus(airQuality);
+                    i.setStatus(airQualityDescription != null ? airQualityDescription : "Good");
+
+
+                    for (item visibleItem : visibleItems) {
+                        if (visibleItem.getName().equals("Air Quality")) {
+                            visibleItem.setStatus(airQualityDescription != null ? airQualityDescription : "Good");
+                            break;
+                        }
+                    }
                     adapter.notifyDataSetChanged();
                     break;
                 }
@@ -209,43 +350,65 @@ public class DashBoardFragment extends Fragment {
         }
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        if (presenceRef != null && presenceListener != null) {
-            presenceRef.addValueEventListener(presenceListener);
-        }
-        if (sharedPreferences != null) {
-            sharedPreferences.registerOnSharedPreferenceChangeListener(preferenceChangeListener);
-            updateAirQualityStatus();
-        }
+    private void setupPreferenceListener() {
+        preferenceChangeListener = (sharedPreferences, key) -> {
+
+        };
+        sharedPreferences.registerOnSharedPreferenceChangeListener(preferenceChangeListener);
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        if (presenceRef != null && presenceListener != null) {
-            presenceRef.removeEventListener(presenceListener);
+        if (roomsRef != null && roomsListener != null) {
+            roomsRef.removeEventListener(roomsListener);
         }
-        if (sharedPreferences != null) {
+        if (selectedRoomRef != null && selectedRoomListener != null) {
+            selectedRoomRef.removeEventListener(selectedRoomListener);
+        }
+        if (airQualityRef != null && airQualityListener != null) {
+            airQualityRef.removeEventListener(airQualityListener);
+        }
+        if (sharedPreferences != null && preferenceChangeListener != null) {
             sharedPreferences.unregisterOnSharedPreferenceChangeListener(preferenceChangeListener);
         }
     }
 
     private void updateWeatherCard(Double tempC, Double tempF, String comfortLevel) {
+        if (temperatureText == null || comfortLevelText == null) return;
+
         if (sharedPreferences == null && getContext() != null) {
             sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
         }
-        String unit = sharedPreferences.getString("units", "Metric (°C)");
+
+        String unit = sharedPreferences != null ? sharedPreferences.getString("units", "Metric (°C)") : "Metric (°C)";
+
+        if (tempC == null && tempF == null) {
+
+            temperatureText.setText("--°");
+            comfortLevelText.setText(comfortLevel != null ? comfortLevel : "No data");
+            return;
+        }
 
         if (unit.equals("Imperial (°F)") && tempF != null) {
             temperatureText.setText(String.format(java.util.Locale.getDefault(), "%.0f°F", tempF));
         } else if (tempC != null) {
             temperatureText.setText(String.format(java.util.Locale.getDefault(), "%.0f°C", tempC));
+        } else {
+
+            if (tempC != null) {
+                temperatureText.setText(String.format(java.util.Locale.getDefault(), "%.0f°C", tempC));
+            } else if (tempF != null) {
+                temperatureText.setText(String.format(java.util.Locale.getDefault(), "%.0f°F", tempF));
+            } else {
+                temperatureText.setText("--°");
+            }
         }
 
         if (comfortLevel != null) {
             comfortLevelText.setText(comfortLevel.replace("_", " "));
+        } else {
+            comfortLevelText.setText("Comfort level unknown");
         }
     }
 

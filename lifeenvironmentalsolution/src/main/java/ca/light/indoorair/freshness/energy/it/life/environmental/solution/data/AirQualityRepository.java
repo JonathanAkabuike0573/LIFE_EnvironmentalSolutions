@@ -10,23 +10,31 @@ import com.google.firebase.database.ValueEventListener;
 
 public class AirQualityRepository {
 
-    private final DatabaseReference databaseReference;
+    private final DatabaseReference baseRef;
 
     public AirQualityRepository() {
-        databaseReference = FirebaseDatabase.getInstance().getReference("sgp30_readings");
+        baseRef = FirebaseDatabase.getInstance().getReference();
     }
 
-    public void listenForSensorData(@NonNull ValueEventListener listener) {
-        // Query for the single most recent reading
-        databaseReference.limitToLast(1).addValueEventListener(listener);
+    private DatabaseReference getDatabaseReference(String roomName) {
+        if ("Main Office".equals(roomName)) {
+            return baseRef.child("sgp30_readings");
+        } else {
+            return baseRef.child("rooms").child(roomName).child("air_quality_readings");
+        }
     }
 
-    public void removeListener(@NonNull ValueEventListener listener) {
-        databaseReference.removeEventListener(listener);
+    public void listenForSensorData(@NonNull ValueEventListener listener, String roomName) {
+        getDatabaseReference(roomName).limitToLast(1).addValueEventListener(listener);
     }
 
-    public Task<DataSnapshot> manualRefresh() {
-        // Force a one-time fresh read from the server for the latest reading
-        return databaseReference.limitToLast(1).get();
+    public void removeListener(@NonNull ValueEventListener listener, String roomName) {
+        if (roomName != null) {
+            getDatabaseReference(roomName).removeEventListener(listener);
+        }
+    }
+
+    public Task<DataSnapshot> manualRefresh(String roomName) {
+        return getDatabaseReference(roomName).limitToLast(1).get();
     }
 }
