@@ -8,27 +8,17 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.preference.PreferenceManager;
 
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Random;
 
 import ca.light.indoorair.freshness.energy.it.life.environmental.solution.R;
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.data.LightRepository;
 
 public class LightViewModel extends AndroidViewModel {
 
     private String currentRoom;
-    private DatabaseReference lightSensorDbRef;
-    private ValueEventListener lightValueEventListener;
+    private final LightRepository lightRepository;
+    private final SharedPreferences sharedPreferences;
 
     // LiveData
     private final MutableLiveData<Integer> _lux = new MutableLiveData<>(0);
@@ -49,39 +39,24 @@ public class LightViewModel extends AndroidViewModel {
     private final MutableLiveData<Boolean> _autoBrightness = new MutableLiveData<>(true);
     public final LiveData<Boolean> autoBrightness = _autoBrightness;
 
-    private final SharedPreferences sharedPreferences;
-    private final Random random = new Random();
-    private static final int SIMULATION_INTERVAL = 4000;
-
+    // Thresholds
     private static final int LUX_DIM_THRESHOLD = 200;
     private static final int LUX_NORMAL_THRESHOLD = 1000;
 
     public LightViewModel(@NonNull Application application) {
         super(application);
+        lightRepository = new LightRepository();
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(application);
     }
 
     public void init(String roomName) {
         this.currentRoom = roomName;
-        setupFirebaseReference();
         startListening();
         loadSettings();
     }
 
-    private void setupFirebaseReference() {
-        if ("Main Office".equals(currentRoom)) {
-            lightSensorDbRef = FirebaseDatabase.getInstance().getReference("sensorData").child("light");
-        } else {
-            lightSensorDbRef = FirebaseDatabase.getInstance().getReference("rooms").child(currentRoom).child("light");
-        }
-    }
-
     private void startListening() {
-        if (lightValueEventListener != null) {
-            lightSensorDbRef.removeEventListener(lightValueEventListener);
-        }
-
-        lightValueEventListener = new ValueEventListener() {
+        lightRepository.startListening(currentRoom, new com.google.firebase.database.ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
@@ -100,42 +75,24 @@ public class LightViewModel extends AndroidViewModel {
 
                     if (autoBrightnessValue != null) {
                         _autoBrightness.setValue(autoBrightnessValue);
-                        sharedPreferences.edit().putBoolean("auto_brightness_enabled", autoBrightnessValue).apply();
+                        sharedPreferences.edit()
+                                .putBoolean("auto_brightness_enabled", autoBrightnessValue)
+                                .apply();
                     }
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {}
-        };
-
-        lightSensorDbRef.addValueEventListener(lightValueEventListener);
-        startSimulation();
+        });
     }
 
     public void setBrightness(String brightness) {
-        lightSensorDbRef.child("brightness").setValue(brightness);
+        lightRepository.setBrightness(brightness);
     }
 
     public void setAutoBrightness(boolean enabled) {
-        lightSensorDbRef.child("autoBrightness").setValue(enabled);
-        sharedPreferences.edit().putBoolean("auto_brightness_enabled", enabled).apply();
-    }
-
-    private void startSimulation() {
-        new android.os.Handler(android.os.Looper.getMainLooper()).post(new Runnable() {
-            @Override
-            public void run() {
-                int currentLux = 50 + random.nextInt(1950);
-                Map<String, Object> sensorData = new HashMap<>();
-                sensorData.put("lux", currentLux);
-                sensorData.put("timestamp", System.currentTimeMillis());
-                lightSensorDbRef.updateChildren(sensorData);
-
-                android.os.Handler handler = new android.os.Handler(android.os.Looper.getMainLooper());
-                handler.postDelayed(this, SIMULATION_INTERVAL);
-            }
-        });
+        lightRepository.setAutoBrightness(enabled);
     }
 
     private void updateLightLevelUI(int lux) {
@@ -155,7 +112,8 @@ public class LightViewModel extends AndroidViewModel {
 
         _lightLevelText.setValue(levelText);
         _statusColor.setValue(colorRes);
-        _lastUpdatedTime.setValue(new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date()));
+        _lastUpdatedTime.setValue(new java.text.SimpleDateFormat("HH:mm:ss", java.util.Locale.getDefault())
+                .format(new java.util.Date()));
     }
 
     private void loadSettings() {
@@ -166,8 +124,6 @@ public class LightViewModel extends AndroidViewModel {
     @Override
     protected void onCleared() {
         super.onCleared();
-        if (lightValueEventListener != null && lightSensorDbRef != null) {
-            lightSensorDbRef.removeEventListener(lightValueEventListener);
-        }
+        lightRepository.stopListening();
     }
 }
