@@ -1,15 +1,12 @@
 package ca.light.indoorair.freshness.energy.it.life.environmental.solution;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
-import android.content.pm.PackageManager;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
@@ -20,8 +17,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -49,6 +44,18 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.auth.HelperClass;
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.ui.AboutUsFragment;
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.ui.AccountFragment;
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.ui.AirQualityFragment;
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.ui.EnergyFragment;
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.ui.FeedBackPage;
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.ui.LightFragment;
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.ui.NotificationFragment;
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.ui.PresenceFragment;
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.ui.PurchasesFragment;
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.ui.SettingsFragment;
+
 // Implement OnBackStackChangedListener to react to navigation changes
 public class MainActivity extends AppCompatActivity implements FragmentManager.OnBackStackChangedListener {
 
@@ -63,14 +70,6 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
     private static final String PREFS_NAME = "MyPrefsFile";
     private static final String THEME_KEY = "ThemeKey";
 
-    private final ActivityResultLauncher<String> requestPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
-        if (isGranted) {
-            Toast.makeText(this, R.string.permission_granted, Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(this, R.string.permission_denied, Toast.LENGTH_SHORT).show();
-        }
-    });
-
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,7 +81,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
 
         auth = FirebaseAuth.getInstance();
         fragmentManager = getSupportFragmentManager();
-        // **CRITICAL: Listen for back stack changes**
+
         fragmentManager.addOnBackStackChangedListener(this);
 
         setupTheme();
@@ -142,7 +141,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         });
 
         updateNavHeader();
-        // **IMPROVED: Centralized back press logic**
+
         setupBackButton();
     }
 
@@ -228,7 +227,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         }
     }
 
-    // **NEW: This method now controls the hamburger/back icon and bottom nav visibility**
+
     @Override
     public void onBackStackChanged() {
         boolean hasBackStack = fragmentManager.getBackStackEntryCount() > 0;
@@ -250,7 +249,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         }
     }
 
-    // **NEW: Helper to sync bottom nav when returning from back stack**
+
     private void syncBottomNavSelection() {
         Fragment currentFragment = fragmentManager.findFragmentById(R.id.main);
         if (currentFragment instanceof DashBoardFragment) {
@@ -351,7 +350,8 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         }
         int itemId = item.getItemId();
         if (itemId == R.id.action_notification) {
-            askNotificationPermission();
+            setCurrentFragment(new NotificationFragment(), true);
+            getSupportActionBar().setTitle(getString(R.string.notification));
             return true;
         } else if (itemId == R.id.action_aboutus) {
             setCurrentFragment(new AboutUsFragment(), true);
@@ -360,7 +360,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         return super.onOptionsItemSelected(item);
     }
 
-    // **UPDATED: setCurrentFragment now supports adding to back stack**
+
     private void setCurrentFragment(Fragment fragment, boolean addToBackStack) {
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.replace(R.id.main, fragment);
@@ -383,15 +383,4 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         });
     }
 
-    private void askNotificationPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
-            } else {
-                Toast.makeText(this, R.string.permission_already_granted, Toast.LENGTH_SHORT).show();
-            }
-        } else {
-            Toast.makeText(this, "Notification permission not required on this Android version.", Toast.LENGTH_SHORT).show();
-        }
-    }
 }

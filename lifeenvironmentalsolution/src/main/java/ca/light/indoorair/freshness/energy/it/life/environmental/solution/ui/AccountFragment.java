@@ -1,4 +1,4 @@
-package ca.light.indoorair.freshness.energy.it.life.environmental.solution;
+package ca.light.indoorair.freshness.energy.it.life.environmental.solution.ui;
 
 import android.Manifest;
 import android.app.Activity;
@@ -37,6 +37,9 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.R;
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.validation.InputValidation;
 
 public class AccountFragment extends Fragment {
 
@@ -242,16 +245,16 @@ public class AccountFragment extends Fragment {
         builder.setView(viewInflated);
 
         builder.setPositiveButton("Confirm", (dialog, which) -> {
-            String newPassword = newPasswordEditText.getText().toString().trim();
-            String confirmPassword = confirmPasswordEditText.getText().toString().trim();
+            String newPassword = newPasswordEditText.getText().toString();
+            String confirmPassword = confirmPasswordEditText.getText().toString();
 
-            if (newPassword.length() < 6) {
-                Toast.makeText(getContext(), "Password must be at least 6 characters", Toast.LENGTH_SHORT).show();
+            if (!InputValidation.isValidPassword(newPassword)) {
+                newPasswordEditText.setError("Password does not meet requirements.");
                 return;
             }
 
             if (!newPassword.equals(confirmPassword)) {
-                Toast.makeText(getContext(), "Passwords do not match", Toast.LENGTH_SHORT).show();
+                confirmPasswordEditText.setError("Passwords do not match.");
                 return;
             }
 
