@@ -37,12 +37,10 @@ public class PurchasesFragment extends Fragment {
     private Button confirmAndPayButton;
     private TextView cancelSubscriptionLink;
 
-    // *** NEW UI Components for Payment Details ***
+    // *** UI Components for Payment Details ***
     private LinearLayout paymentDetailsLayout;
     private EditText cardNameEditText;
     private EditText cardNumberEditText;
-    // Note: Other EditTexts (expiry, cvv) are in the layout but not explicitly needed
-    // in Java for this logic, so they are omitted here for brevity.
     // **********************************************
 
     // Data and Constants
@@ -50,7 +48,6 @@ public class PurchasesFragment extends Fragment {
     private double currentSubtotal = 0.0;
     private String selectedPaymentMethod = "";
 
-    // ⭐ UPDATED: Max devices to 6
     private static final int MAX_DEVICES_ALLOWED = 6;
 
     // Map to store upgrade names and their base prices
@@ -61,8 +58,11 @@ public class PurchasesFragment extends Fragment {
             "Air Quality", "Smart Light", "Thermostat", "Air Conditioner", "Presence Sensor", "Smart TV"
     );
 
+    private final List<String> bankOptions = Arrays.asList( // ADDED LIST OF BANKS
+            "CIBC", "TD", "RBC", "Scotiabank", "BMO"
+    );
+
     // This list will hold the options *displayed* in the spinner, allowing us to change the text
-    // for the selected item without recreating the adapter logic every time.
     private List<String> currentUpgradeDisplayOptions;
     private ArrayAdapter<String> upgradeAdapter;
 
@@ -102,16 +102,18 @@ public class PurchasesFragment extends Fragment {
         confirmAndPayButton = view.findViewById(R.id.button_confirm_and_pay);
         cancelSubscriptionLink = view.findViewById(R.id.text_cancel_subscription_link);
 
-        // *** NEW: Initialize Payment Detail components ***
+        // Initialize Payment Detail components
         paymentDetailsLayout = view.findViewById(R.id.layout_payment_details);
         cardNameEditText = view.findViewById(R.id.edit_text_card_name);
         cardNumberEditText = view.findViewById(R.id.edit_text_card_number);
-
 
         setupSpinners();
         setupClickListeners(view);
     }
 
+    /**
+     * Extracts the original map key by stripping the appended price and the selected devices from the formatted spinner text.
+     */
     private String getOriginalKey(String selectedItemText) {
         // Find the index of the plan price/device info
         int priceStart = selectedItemText.lastIndexOf(" ($");
@@ -121,12 +123,15 @@ public class PurchasesFragment extends Fragment {
         if (deviceStart > 0) {
             if (baseText.substring(deviceStart).contains("device(s) selected")) {
                 return baseText.substring(0, deviceStart);
-            } }
+            }
+        }
 
         return baseText;
     }
 
-
+    /**
+     * Sets up the data and listeners for the two Spinner dropdowns.
+     */
     private void setupSpinners() {
         // 1. Upgrades Spinner (with Price)
         currentUpgradeDisplayOptions = upgradePrices.keySet().stream()
@@ -162,8 +167,6 @@ public class PurchasesFragment extends Fragment {
 
                 if (planPrice > 0.00) {
                     currentSubtotal = planPrice; // Set subtotal to the plan price
-
-                    // Show the device selection dialog
                     showDeviceSelectionDialog(originalKey, position);
                 } else {
                     currentSubtotal = 0.00;
@@ -178,12 +181,11 @@ public class PurchasesFragment extends Fragment {
         });
 
         // 2. Payment Type Spinner
-        String[] paymentTypes = {"Select Payment Type", "Visa/Mastercard", "Amex", "PayPal", "Google Pay"}; // Added "Select Payment Type"
+        String[] paymentTypes = {"Select Payment Type", "Visa/Mastercard", "Amex", "PayPal", "Google Pay"};
         ArrayAdapter<String> paymentAdapter = new ArrayAdapter<>(getContext(),
                 android.R.layout.simple_spinner_dropdown_item, paymentTypes);
         paymentTypeSpinner.setAdapter(paymentAdapter);
 
-        // Set default to "Select Payment Type"
         paymentTypeSpinner.setSelection(0);
 
         paymentTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -191,20 +193,75 @@ public class PurchasesFragment extends Fragment {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 selectedPaymentMethod = parent.getItemAtPosition(position).toString();
 
-                // *** NEW LOGIC: Show/Hide Payment Details Section ***
-                if (position > 0) { // If anything other than "Select Payment Type" is selected
-                    paymentDetailsLayout.setVisibility(View.VISIBLE);
-                } else {
+                // *** MODIFIED LOGIC: Check for Visa/Mastercard selection ***
+                if (selectedPaymentMethod.equals("Visa/Mastercard")) {
+                    // Show bank selection dialog, which will then show the details layout
+                    showBankSelectionDialog();
+                    // Keep layout hidden until bank is selected in the dialog
                     paymentDetailsLayout.setVisibility(View.GONE);
-                } }
+                } else if (position > 0) { // If any other payment method is selected (Amex, PayPal, Google Pay)
+                    // Set selected method and show details immediately
+                    paymentDetailsLayout.setVisibility(View.VISIBLE);
+                } else { // "Select Payment Type"
+                    paymentDetailsLayout.setVisibility(View.GONE);
+                }
+            }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
                 // Do nothing
             }
-        }); }
+        });
+    }
 
+    /**
+     * Shows a dialog for the user to select one of the five banks.
+     */
+    private void showBankSelectionDialog() {
+        if (getContext() == null) return;
 
+        final CharSequence[] banks = bankOptions.toArray(new CharSequence[0]);
+
+        new AlertDialog.Builder(getContext())
+                .setTitle("Select Your Issuing Bank")
+                .setItems(banks, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // User selected a bank
+                        String selectedBank = bankOptions.get(which);
+
+                        // Update the overall selected method with the bank name
+                        selectedPaymentMethod = "Visa/Mastercard (" + selectedBank + ")";
+
+                        // Show the payment input fields
+                        paymentDetailsLayout.setVisibility(View.VISIBLE);
+
+                        Toast.makeText(getContext(),
+                                selectedBank + " Card selected. Enter details below.",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Reset the spinner selection if the user cancels bank selection
+                        paymentTypeSpinner.setSelection(0);
+                        paymentDetailsLayout.setVisibility(View.GONE);
+                        selectedPaymentMethod = "";
+                    }
+                })
+                .setCancelable(false) // Force the user to choose or cancel
+                .show();
+    }
+
+    // Remaining methods (showDeviceSelectionDialog, updateUpgradeSpinnerDisplay,
+    // updatePriceDisplay, showCancelDialog, showEmailReceiptDialog,
+    // showPaymentSuccessfulDialog, setupClickListeners) are unchanged
+    // from the previous iteration, but included here for completeness:
+
+    /**
+     * Shows a multi-choice dialog for the user to select up to 6 devices.
+     */
     private void showDeviceSelectionDialog(String originalPlanName, int originalPosition) {
         if (getContext() == null) return;
 
@@ -213,15 +270,12 @@ public class PurchasesFragment extends Fragment {
         final List<String> selectedDevices = new ArrayList<>();
 
         new AlertDialog.Builder(getContext())
-                // ⭐ UPDATED: Title to reflect max 6 devices
                 .setTitle("Select Devices (Max " + MAX_DEVICES_ALLOWED + ")")
                 .setMultiChoiceItems(items, checkedItems, new DialogInterface.OnMultiChoiceClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which, boolean isChecked) {
                         if (isChecked) {
-                            // Check if max limit reached (now 6)
                             if (selectedDevices.size() >= MAX_DEVICES_ALLOWED) {
-                                // If max reached, don't allow selection and uncheck it visually
                                 checkedItems[which] = false;
                                 ((AlertDialog) dialog).getListView().setItemChecked(which, false);
                                 Toast.makeText(getContext(), "Maximum of " + MAX_DEVICES_ALLOWED + " devices allowed.", Toast.LENGTH_SHORT).show();
@@ -236,7 +290,6 @@ public class PurchasesFragment extends Fragment {
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-
                         updateUpgradeSpinnerDisplay(originalPlanName, selectedDevices, originalPosition);
                         dialog.dismiss();
                     }
@@ -244,7 +297,6 @@ public class PurchasesFragment extends Fragment {
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        // ⭐ FIX: Reset selection and dismiss immediately once
                         upgradesSpinner.setSelection(0);
                         currentSubtotal = 0.00;
                         updatePriceDisplay(currentSubtotal);
@@ -255,10 +307,12 @@ public class PurchasesFragment extends Fragment {
                 .show();
     }
 
+    /**
+     * Updates the Spinner's displayed text after devices are selected.
+     */
     private void updateUpgradeSpinnerDisplay(String originalPlanName, List<String> selectedDevices, int positionToSet) {
         if (upgradeAdapter == null) return;
 
-        // Build the new display text. Handles 0 selected devices.
         String deviceSummary = selectedDevices.isEmpty()
                 ? ""
                 : " (" + selectedDevices.size() + " device(s) selected)";
@@ -269,14 +323,9 @@ public class PurchasesFragment extends Fragment {
 
         String newDisplayText = originalPlanName + deviceSummary + priceText;
 
-        // Update the list data and notify the adapter
         currentUpgradeDisplayOptions.set(positionToSet, newDisplayText);
         upgradeAdapter.notifyDataSetChanged();
-
-        // Set the selection
         upgradesSpinner.setSelection(positionToSet);
-
-        // Recalculate and update price display after setting selection/display
         updatePriceDisplay(currentSubtotal);
     }
 
@@ -287,17 +336,18 @@ public class PurchasesFragment extends Fragment {
         double tax = subtotal * TAX_RATE;
         double total = subtotal + tax;
 
-        // Use currency formatter for consistent display
         NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(Locale.getDefault());
 
         subtotalTextView.setText("Subtotal: " + currencyFormat.format(subtotal));
         taxTextView.setText("Tax (" + String.format(Locale.getDefault(), "%.0f%%", TAX_RATE * 100) + "): " + currencyFormat.format(tax));
         totalTextView.setText("Total: " + currencyFormat.format(total));
 
-        // Update the button text with the final total
         confirmAndPayButton.setText("Continue and Pay " + currencyFormat.format(total));
     }
 
+    /**
+     * Displays an AlertDialog to confirm upgrade cancellation.
+     */
     private void showCancelDialog() {
         if (getContext() == null) return;
 
@@ -318,7 +368,9 @@ public class PurchasesFragment extends Fragment {
                 .show();
     }
 
-
+    /**
+     * Shows the AlertDialog asking the user if they want an email copy of the receipt.
+     */
     private void showEmailReceiptDialog() {
         if (getContext() == null) return;
 
@@ -335,18 +387,15 @@ public class PurchasesFragment extends Fragment {
                         // User chose not to receive an email
                     }
                 })
-                // Use the requested icon
                 .setIcon(R.drawable.logolife)
                 .show();
     }
 
-
+    /**
+     * Shows the Payment Successful dialog.
+     */
     private void showPaymentSuccessfulDialog() {
         if (getContext() == null) return;
-
-        // Use a Handler to delay the AlertDialog slightly after the Toast finishes,
-        // but for simplicity here, we'll just show it immediately after the Toast.
-        // In a real app, you'd use a Handler/Timer.
 
         new AlertDialog.Builder(getContext())
                 .setTitle("Payment Successful! 🎉")
@@ -356,6 +405,9 @@ public class PurchasesFragment extends Fragment {
                 .show();
     }
 
+    /**
+     * Sets up click listeners for the buttons and links.
+     */
     private void setupClickListeners(@NonNull View view) {
         // "Confirm and Pay" button
         confirmAndPayButton.setOnClickListener(v -> {
@@ -367,7 +419,7 @@ public class PurchasesFragment extends Fragment {
                 Toast.makeText(getContext(), "Please select a payment type to continue.", Toast.LENGTH_LONG).show();
                 return;
             }
-            // In a real app, you would validate the EditText fields (card number, etc.) here.
+            // In a real app, you would also validate the EditText fields here.
 
             // 1. Display Toast: "payment is in process"
             Toast.makeText(getContext(),
@@ -375,14 +427,12 @@ public class PurchasesFragment extends Fragment {
                     Toast.LENGTH_LONG).show();
 
             // 2. Display Alert Dialog: "Payment successful"
-            // Delaying this is better UX, but for immediate display:
             showPaymentSuccessfulDialog();
         });
 
-        // *** UPDATED: "View Receipts" link now shows Email Receipt Dialog ***
+        // "Do you want an email copy of receipt?" link
         TextView viewReceiptsLink = view.findViewById(R.id.text_view_receipts_link);
         if (viewReceiptsLink != null) {
-            // Text is already changed in XML to "Do you want an email copy of receipt?"
             viewReceiptsLink.setOnClickListener(v -> {
                 showEmailReceiptDialog();
             });
