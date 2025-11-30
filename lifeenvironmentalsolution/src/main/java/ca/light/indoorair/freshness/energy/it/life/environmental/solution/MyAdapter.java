@@ -30,7 +30,6 @@ public class MyAdapter extends RecyclerView.Adapter<MyViewHolder> {
     List<item> list;
     RoomSelectionProvider roomSelectionProvider;
 
-    // Interface to get the current room from DashboardFragment
     public interface RoomSelectionProvider {
         String getSelectedRoom();
     }
@@ -51,31 +50,25 @@ public class MyAdapter extends RecyclerView.Adapter<MyViewHolder> {
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         item currentItem = list.get(position);
 
+
         holder.device_name.setText(currentItem.getName());
         holder.device_status.setText(currentItem.getStatus());
 
-        // --- 1. CLICK LISTENER (OPEN FRAGMENT) ---
+
+        updateIcon(holder, currentItem, currentItem.isDeviceOn());
+
+
         holder.itemView.setOnClickListener(v -> {
             Fragment fragment = null;
             String selectedRoom = roomSelectionProvider.getSelectedRoom();
-
-            // Pass the selected room to the new fragment
             Bundle args = new Bundle();
             args.putString("SELECTED_ROOM_KEY", selectedRoom);
 
             switch (currentItem.getName()) {
-                case "Air Quality":
-                    fragment = new AirQualityFragment();
-                    break;
-                case "Smart Light":
-                    fragment = new LightFragment();
-                    break;
-                case "Presence Sensor":
-                    fragment = new PresenceFragment();
-                    break;
-                case "Thermostat":
-                    fragment = new EnergyFragment();
-                    break;
+                case "Air Quality": fragment = new AirQualityFragment(); break;
+                case "Smart Light": fragment = new LightFragment(); break;
+                case "Presence Sensor": fragment = new PresenceFragment(); break;
+                case "Thermostat": fragment = new EnergyFragment(); break;
             }
 
             if (fragment != null) {
@@ -87,7 +80,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyViewHolder> {
             }
         });
 
-        // --- 2. SETUP TOGGLE SWITCH ---
+
         if (!currentItem.isShowToggle()) {
             holder.device_toggle.setVisibility(View.GONE);
             holder.device_icon.setImageResource(currentItem.getImages());
@@ -96,29 +89,20 @@ public class MyAdapter extends RecyclerView.Adapter<MyViewHolder> {
 
         holder.device_toggle.setVisibility(View.VISIBLE);
 
-        // Remove previous listener to avoid triggering it during recycling
+
         holder.device_toggle.setOnCheckedChangeListener(null);
 
-        // Set the current visual state
-        holder.device_toggle.setChecked(currentItem.isDeviceOn());
-        updateIcon(holder, currentItem, currentItem.isDeviceOn());
 
-        // --- 3. TOGGLE CLICK LISTENER (THE FIX) ---
+        holder.device_toggle.setChecked(currentItem.isDeviceOn());
+
+
+
         holder.device_toggle.setOnCheckedChangeListener((buttonView, isChecked) -> {
 
-            // A. Immediate Local UI Update (Responsiveness)
-            currentItem.setDeviceOn(isChecked);
-            String status = isChecked ? "On" : "Off";
-            currentItem.setStatus(status);
-            holder.device_status.setText(status);
-            updateIcon(holder, currentItem, isChecked);
-
-            // B. Write to Firebase (Control Logic)
             if ("Smart Light".equals(currentItem.getName())) {
-                // 1. Get Current Room
-                String roomName = roomSelectionProvider.getSelectedRoom();
 
-                // 2. Determine Firebase Path
+
+                String roomName = roomSelectionProvider.getSelectedRoom();
                 DatabaseReference lightRef;
                 if ("Main Office".equals(roomName)) {
                     lightRef = FirebaseDatabase.getInstance().getReference("sensorData").child("light");
@@ -126,23 +110,28 @@ public class MyAdapter extends RecyclerView.Adapter<MyViewHolder> {
                     lightRef = FirebaseDatabase.getInstance().getReference("rooms").child(roomName).child("light");
                 }
 
-                // 3. Write to 'powerOn' node (Controls LightFragment & Simulation)
-                lightRef.child("powerOn").setValue(isChecked)
-                        .addOnFailureListener(e -> {
-                            // Revert UI if write fails
-                            Toast.makeText(context, "Failed to switch light", Toast.LENGTH_SHORT).show();
-                            holder.device_toggle.setChecked(!isChecked);
-                        });
+
+                lightRef.child("powerOn").setValue(isChecked);
+
 
             } else if ("Presence Sensor".equals(currentItem.getName())) {
-                // Presence Sensor Logic (SharedPrefs)
+
+                currentItem.setDeviceOn(isChecked);
+                String status = isChecked ? "On" : "Off";
+                currentItem.setStatus(status);
+                holder.device_status.setText(status);
+                updateIcon(holder, currentItem, isChecked);
+
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
                 prefs.edit().putBoolean("presence_detection_enabled", isChecked).apply();
-                Toast.makeText(context, "Presence Sensor is " + status, Toast.LENGTH_SHORT).show();
 
             } else {
 
-                Toast.makeText(context, currentItem.getName() + " is " + status, Toast.LENGTH_SHORT).show();
+                currentItem.setDeviceOn(isChecked);
+                String status = isChecked ? "On" : "Off";
+                currentItem.setStatus(status);
+                holder.device_status.setText(status);
+                updateIcon(holder, currentItem, isChecked);
             }
         });
     }
