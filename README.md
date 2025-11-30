@@ -1,5 +1,5 @@
 # Project Name: 
-<img src="app/src/main/res/drawable/image.jpg" alt="Life Logo" width="25" height="25"/> LIFE Environmental Solutions
+<img src="app/src/main/res/drawable/logolife.png" alt="Life Logo" width="25" height="25"/> LIFE Environmental Solutions
 
 **Team Members:**
 Mohamed Ali (ID: N01440760)
@@ -19,7 +19,7 @@ It demonstrates [A smart environmental monitoring system that improves indoor co
 - Light Intensity Monitoring – Monitors visible light levels across six wavelength bands for comfort and energy savings.
 
 ## Project Screenshot:
-<img src="app/src/main/res/drawable/image.jpg" alt="Life Logo" width="100" height="100"/>
+<img src="app/src/main/res/drawable/logolife.png" alt="Life Logo" width="100" height="100"/>
 
 ## Project Link:
 [GitHub Repository](https://github.com/JonathanAkabuike0573/LIFE_EnvironmentalSolutions)  
