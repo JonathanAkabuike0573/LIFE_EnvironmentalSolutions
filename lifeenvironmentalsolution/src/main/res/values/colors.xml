@@ -39,4 +39,8 @@
     <color name="bottom_nav_item_unselected">#FF000000</color> <!-- Black -->
     <color name="bottom_nav_pill_background">#40FFFFFF</color> <!-- 25% transparent white -->
 
-</resources>
+    <color name="card_glow_warm">#FFF3E0</color>     <!-- Warm light yellow -->
+    <color name="card_glow_cool">#E3F2FD</color>     <!-- Cool light blue -->
+    <color name="card_glow_neutral">#F5F5F5</color>  <!-- Neutral light gray -->
+
+    </resources>

@@ -51,6 +51,7 @@ public class AirQualityViewModel extends AndroidViewModel {
     public final LiveData<String> error = _error;
 
     private ValueEventListener sensorListener;
+    private String currentRoom;
 
     public AirQualityViewModel(@NonNull Application application) {
         super(application);
@@ -58,26 +59,28 @@ public class AirQualityViewModel extends AndroidViewModel {
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(application);
     }
 
-    public void init() {
-        listenForSensorData();
+    public void init(String roomName) {
+        this.currentRoom = roomName;
+        listenForSensorData(roomName);
     }
 
-    private void listenForSensorData() {
-        if (sensorListener == null) {
-            sensorListener = new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    processDataSnapshot(dataSnapshot);
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-                    _error.setValue("Firebase Error: " + databaseError.getMessage());
-                    updateUI(null, null, null);
-                }
-            };
+    private void listenForSensorData(String roomName) {
+        if (sensorListener != null && currentRoom != null) {
+            airQualityRepository.removeListener(sensorListener, currentRoom);
         }
-        airQualityRepository.listenForSensorData(sensorListener);
+        sensorListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                processDataSnapshot(dataSnapshot);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                _error.setValue("Firebase Error: " + databaseError.getMessage());
+                updateUI(null, null, null);
+            }
+        };
+        airQualityRepository.listenForSensorData(sensorListener, roomName);
     }
 
     public void manualRefresh() {
@@ -85,7 +88,7 @@ public class AirQualityViewModel extends AndroidViewModel {
             return;
         }
         _isRefreshing.setValue(true);
-        airQualityRepository.manualRefresh().addOnCompleteListener(task -> {
+        airQualityRepository.manualRefresh(currentRoom).addOnCompleteListener(task -> {
             if (task.isSuccessful() && task.getResult() != null) {
                 processDataSnapshot(task.getResult());
             } else {
@@ -97,11 +100,18 @@ public class AirQualityViewModel extends AndroidViewModel {
 
     private void processDataSnapshot(DataSnapshot dataSnapshot) {
         if (dataSnapshot.exists()) {
-            DataSnapshot latestReading = dataSnapshot.getChildren().iterator().next();
-            Long eco2Value = latestReading.child("eCO2").getValue(Long.class);
-            String co2Description = latestReading.child("co2_description").getValue(String.class);
-            String timestamp = latestReading.child("timestamp").getValue(String.class);
-            updateUI(eco2Value, co2Description, timestamp);
+            DataSnapshot latestReading = null;
+            for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                latestReading = snapshot;
+            }
+            if (latestReading != null) {
+                Long eco2Value = latestReading.child("eCO2").getValue(Long.class);
+                String co2Description = latestReading.child("co2_description").getValue(String.class);
+                String timestamp = latestReading.child("timestamp").getValue(String.class);
+                updateUI(eco2Value, co2Description, timestamp);
+            } else {
+                updateUI(null, null, null);
+            }
         } else {
             updateUI(null, null, null);
         }
@@ -167,8 +177,8 @@ public class AirQualityViewModel extends AndroidViewModel {
     @Override
     protected void onCleared() {
         super.onCleared();
-        if (sensorListener != null) {
-            airQualityRepository.removeListener(sensorListener);
+        if (sensorListener != null && currentRoom != null) {
+            airQualityRepository.removeListener(sensorListener, currentRoom);
         }
     }
 }
