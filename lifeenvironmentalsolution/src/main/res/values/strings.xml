@@ -240,6 +240,7 @@ CENG-322-OCC,  Software Project -->
     <string name="rating">rating</string>
     <string name="message">message</string>
     <string name="you_can_submit_again_in_02d_02d_02d">You can submit again in: %02d:%02d:%02d</string>
+    <string name="open_feedback">open_feedback</string>
 
     <string-array name="auto_off_time_options">
         <item>5 minutes</item>

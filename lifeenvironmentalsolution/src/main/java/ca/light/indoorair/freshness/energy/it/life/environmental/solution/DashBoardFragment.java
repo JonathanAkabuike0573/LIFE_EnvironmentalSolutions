@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -21,10 +22,15 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
+
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.ui.FeedBackPage;
 
 public class DashBoardFragment extends Fragment {
 
@@ -63,6 +69,18 @@ public class DashBoardFragment extends Fragment {
         recycler.setLayoutManager(new GridLayoutManager(getContext(), 2));
         adapter = new MyAdapter(getContext(), items);
         recycler.setAdapter(adapter);
+        FloatingActionButton fab = view.findViewById(R.id.fab_open_feedback);
+        fab.setOnClickListener(v -> {
+            // Open Feedback fragment
+            requireActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.main, new FeedBackPage())
+                    .addToBackStack(null)
+                    .commit();
+
+            // Show Snackbar confirmation
+            Snackbar.make(v, "Opening feedback form...", Snackbar.LENGTH_SHORT).show();
+        });
 
         return view;
     }
