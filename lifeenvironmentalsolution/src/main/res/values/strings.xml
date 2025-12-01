@@ -244,6 +244,27 @@ CENG-322-OCC,  Software Project -->
     <string name="opening_feedback_form">Opening feedback form...</string>
     <string name="error_loading_rooms">Error loading rooms</string>
     <string name="loading_data_for">"Loading data for: "</string>
+    <string name="help">Help</string>
+    <string name="help_title">Need help using LIFE Environmental Solutions?</string>
+    <string name="help_subtitle">This page gives you quick tips, answers to common questions, and ways to contact support.</string>
+
+    <string name="help_section_quick_tips">Quick Tips</string>
+    <string name="help_tip_1">Use the bottom navigation to switch between air quality, settings, and more.</string>
+    <string name="help_tip_2">Tap the refresh button on each screen to get the latest sensor data.</string>
+    <string name="help_tip_3">If data looks outdated, check your Wi-Fi or mobile connection.</string>
+
+    <string name="help_section_troubleshooting">Troubleshooting</string>
+    <string name="help_trouble_1">No data? Make sure the hardware hub is powered on and connected.</string>
+    <string name="help_trouble_2">If readings look wrong, restart the app and try again.</string>
+    <string name="help_trouble_3">If the issue continues, send us a support email with screenshots.</string>
+
+    <string name="help_section_more_support">More Support</string>
+    <string name="help_quick_start">Open Quick Start Guide</string>
+    <string name="help_contact_support">Contact Support</string>
+    <string name="help_open_faq">View Online FAQ</string>
+    <string name="help_support_email_subject">LIFE Environmental Solutions - Help Request</string>
+    <string name="help_support_email">support@life-environmental.app</string>
+    <string name="help_no_email_app">No email app found on this device.</string>
 
     <string-array name="auto_off_time_options">
         <item>5 minutes</item>
