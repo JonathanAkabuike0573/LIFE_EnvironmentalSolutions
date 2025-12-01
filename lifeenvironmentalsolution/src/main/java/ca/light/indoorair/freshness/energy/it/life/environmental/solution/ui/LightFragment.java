@@ -1,10 +1,6 @@
 package ca.light.indoorair.freshness.energy.it.life.environmental.solution.ui;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
-import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,56 +10,36 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.slider.Slider;
 import com.google.android.material.switchmaterial.SwitchMaterial;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Random;
 
 import ca.light.indoorair.freshness.energy.it.life.environmental.solution.R;
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.viewmodel.LightViewModel;
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.viewmodel.SharedRoomViewModel;
 
 public class LightFragment extends Fragment {
 
     // UI Elements
-    private TextView lightLevelValueText, lightLevelText, lastUpdatedTimeText;
+    private TextView lightLevelValueText, lightLevelText, lastUpdatedTimeText, currentRoomText;
     private ProgressBar lightLevelProgress;
     private View statusIndicator;
-    private ChipGroup lightBrightnessChipGroup;
-    private SwitchMaterial autoBrightnessSwitch;
+    private CardView lightLevelCard;
+    private ChipGroup lightBrightnessChipGroup, lightPresetsChipGroup;
+    private SwitchMaterial autoBrightnessSwitch, powerOnSwitch;
     private Slider brightnessSlider;
 
-    // Firebase
-    private DatabaseReference lightSensorDbRef;
-    private ValueEventListener lightValueEventListener;
+    // ViewModels
+    private LightViewModel viewModel;
+    private SharedRoomViewModel sharedRoomViewModel;
 
-    // SharedPreferences
-    private SharedPreferences sharedPreferences;
-    private SharedPreferences.OnSharedPreferenceChangeListener preferenceChangeListener;
-    private static final String AUTO_BRIGHTNESS_KEY = "auto_brightness_enabled";
 
-    // Simulation logic
-    private final Handler simulationHandler = new Handler(Looper.getMainLooper());
-    private final Random random = new Random();
-    private static final int SIMULATION_INTERVAL = 4000; // 4 seconds
-
-    // Light level thresholds (in LUX)
-    private static final int LUX_DIM_THRESHOLD = 200;
-    private static final int LUX_NORMAL_THRESHOLD = 1000;
-
-    public LightFragment() {
-        // Required empty public constructor
-    }
+    public LightFragment() {}
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -73,174 +49,207 @@ public class LightFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        if (getContext() != null) {
-            sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-        }
+
+        viewModel = new ViewModelProvider(requireActivity()).get(LightViewModel.class);  // Activity scope
+        sharedRoomViewModel = new ViewModelProvider(requireActivity()).get(SharedRoomViewModel.class);
 
         initializeViews(view);
-        // Initialize Firebase Database reference
-        lightSensorDbRef = FirebaseDatabase.getInstance().getReference("sensorData").child("light");
+        setupRoomSync();
         setupListeners();
-
+        observeViewModel();
     }
 
     private void initializeViews(View view) {
         lightLevelValueText = view.findViewById(R.id.light_level_value_text);
         lightLevelText = view.findViewById(R.id.light_level_text);
         lastUpdatedTimeText = view.findViewById(R.id.last_updated_time);
+        currentRoomText = view.findViewById(R.id.current_room_text);
         lightLevelProgress = view.findViewById(R.id.light_level_progress);
         statusIndicator = view.findViewById(R.id.status_indicator);
+        lightLevelCard = view.findViewById(R.id.light_level_card);
         lightBrightnessChipGroup = view.findViewById(R.id.chip_group_light_brightness);
         autoBrightnessSwitch = view.findViewById(R.id.power_on);
         brightnessSlider = view.findViewById(R.id.slider_brightness);
+        lightPresetsChipGroup = view.findViewById(R.id.chip_group_presets);
+        powerOnSwitch = view.findViewById(R.id.light_switch);
+    }
+
+    private void setupRoomSync() {
+        sharedRoomViewModel.getCurrentRoom().observe(getViewLifecycleOwner(), roomName -> {
+            if (roomName != null && !roomName.isEmpty() && currentRoomText != null) {
+                currentRoomText.setText(roomName);
+                viewModel.init(roomName);
+                safeToast("Light: Switched to " + roomName);
+            }
+        });
     }
 
     private void setupListeners() {
-        lightBrightnessChipGroup.setOnCheckedChangeListener((group, checkedId) -> {
-            Chip selectedChip = group.findViewById(checkedId);
-            if (selectedChip != null && selectedChip.isPressed()) {
-                String selectedBrightness = selectedChip.getText().toString();
-                lightSensorDbRef.child("brightness").setValue(selectedBrightness);
-                Toast.makeText(getContext(), selectedBrightness + " selected", Toast.LENGTH_SHORT).show();
-            }
-        });
 
-        autoBrightnessSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (buttonView.isPressed()) {
-                sharedPreferences.edit().putBoolean(AUTO_BRIGHTNESS_KEY, isChecked).apply();
-                brightnessSlider.setEnabled(!isChecked);
-                String message = isChecked ? "Auto brightness enabled" : "Auto brightness disabled";
-                Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
-                lightSensorDbRef.child("autoBrightness").setValue(isChecked);
-            }
-        });
-
-        preferenceChangeListener = (prefs, key) -> {
-            if (key.equals(AUTO_BRIGHTNESS_KEY)) {
-                syncSwitchState();
-            }
-        };
-    }
-
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        syncSwitchState();
-        sharedPreferences.registerOnSharedPreferenceChangeListener(preferenceChangeListener);
-        startLightLevelSimulationAndDbRead();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        sharedPreferences.unregisterOnSharedPreferenceChangeListener(preferenceChangeListener);
-        stopLightLevelSimulationAndDbRead();
-    }
-
-    private void startLightLevelSimulationAndDbRead() {
-        // Start the simulation to write data
-        simulationHandler.post(lightLevelRunnable);
-
-        // Start listening for data changes from Firebase
-        if (lightValueEventListener == null) {
-            lightValueEventListener = new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    if (dataSnapshot.exists()) {
-                        if (dataSnapshot.hasChild("lux")) {
-                            Integer lux = dataSnapshot.child("lux").getValue(Integer.class);
-                            if (lux != null) {
-                                updateLightLevelUI(lux);
-                            }
-                        }
-                        if (dataSnapshot.hasChild("brightness")) {
-                            String brightness = dataSnapshot.child("brightness").getValue(String.class);
-                            if (brightness != null) {
-                                updateBrightnessSelection(brightness);
-                            }
-                        }
-                        if (dataSnapshot.hasChild("autoBrightness")) {
-                            Boolean autoBrightness = dataSnapshot.child("autoBrightness").getValue(Boolean.class);
-                            if (autoBrightness != null) {
-                                sharedPreferences.edit().putBoolean(AUTO_BRIGHTNESS_KEY, autoBrightness).apply();
-                            }
-                        }
+        if (lightBrightnessChipGroup != null) {
+            lightBrightnessChipGroup.setOnCheckedStateChangeListener((group, checkedIds) -> {
+                if (!checkedIds.isEmpty()) {
+                    int checkedId = checkedIds.get(0);
+                    Chip selectedChip = group.findViewById(checkedId);
+                    if (selectedChip != null) {
+                        viewModel.setBrightness(selectedChip.getText().toString());
+                        safeToast(selectedChip.getText() + " selected");
                     }
                 }
+            });
+        }
 
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-                    // Handle error
+
+        if (lightPresetsChipGroup != null) {
+            lightPresetsChipGroup.setOnCheckedStateChangeListener((group, checkedIds) -> {
+                if (!checkedIds.isEmpty()) {
+                    int checkedId = checkedIds.get(0);
+                    Chip selectedChip = group.findViewById(checkedId);
+                    if (selectedChip != null) {
+                        viewModel.setPreset(selectedChip.getText().toString());
+                        safeToast("Mode: " + selectedChip.getText());
+                    }
                 }
-            };
+            });
         }
-        lightSensorDbRef.addValueEventListener(lightValueEventListener);
+
+        if (powerOnSwitch != null) {
+            powerOnSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                if (buttonView.isPressed()) {
+                    viewModel.setPowerOn(isChecked);
+                    safeToast(isChecked ? "Light turned on" : "Light turned off");
+                }
+            });
+        }
+
+
+        if (autoBrightnessSwitch != null) {
+            autoBrightnessSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                if (buttonView.isPressed()) {
+                    viewModel.setAutoBrightness(isChecked);
+                    if (brightnessSlider != null) {
+                        brightnessSlider.setEnabled(!isChecked);
+                    }
+                    safeToast(isChecked ? "Auto brightness enabled" : "Auto brightness disabled");
+                }
+            });
+        }
+
+
+
+        if (brightnessSlider != null) {
+            brightnessSlider.addOnChangeListener((slider, value, fromUser) -> {
+                if (fromUser) {
+                    viewModel.setSliderBrightness((int) value);
+                }
+            });
+        }
     }
 
-    private void stopLightLevelSimulationAndDbRead() {
-        // Stop the simulation
-        simulationHandler.removeCallbacks(lightLevelRunnable);
+    private void observeViewModel() {
+        viewModel.lux.observe(getViewLifecycleOwner(), lux -> {
+            if (lux != null && lightLevelValueText != null && lightLevelProgress != null) {
+                lightLevelValueText.setText(String.valueOf(lux));
+                lightLevelProgress.setProgress(lux);
+            }
+        });
 
-        // Stop listening for data changes
-        if (lightValueEventListener != null) {
-            lightSensorDbRef.removeEventListener(lightValueEventListener);
-        }
-    }
+        viewModel.lightLevelText.observe(getViewLifecycleOwner(), text -> {
+            if (text != null && lightLevelText != null) lightLevelText.setText(text);
+        });
 
-    private final Runnable lightLevelRunnable = new Runnable() {
-        @Override
-        public void run() {
-            // Simulate a new light level reading
-            int currentLux = 50 + random.nextInt(1950); // Ranges from 50 to 2000 LUX
+        viewModel.lastUpdatedTime.observe(getViewLifecycleOwner(), time -> {
+            if (time != null && lastUpdatedTimeText != null) lastUpdatedTimeText.setText(time);
+        });
 
-            // Create a data map to send to Firebase
-            Map<String, Object> sensorData = new HashMap<>();
-            sensorData.put("lux", currentLux);
-            sensorData.put("timestamp", System.currentTimeMillis());
+        viewModel.statusColor.observe(getViewLifecycleOwner(), color -> {
+            if (color != null && statusIndicator != null) {
+                statusIndicator.setBackgroundResource(color);
+            }
+        });
 
-            // Write to Firebase
-            lightSensorDbRef.updateChildren(sensorData);
 
-            // Schedule the next update
-            simulationHandler.postDelayed(this, SIMULATION_INTERVAL);
-        }
-    };
+        viewModel.cardGlowColor.observe(getViewLifecycleOwner(), color -> {
+            if (color != null && lightLevelCard != null) {
+                lightLevelCard.setCardBackgroundColor(
+                        getResources().getColor(color, getContext().getTheme())
+                );
+            }
+        });
 
-    private void updateLightLevelUI(int lux) {
-        lightLevelValueText.setText(String.valueOf(lux));
-        lightLevelProgress.setProgress(lux);
 
-        // Update the qualitative assessment and status indicator
-        if (lux < LUX_DIM_THRESHOLD) {
-            lightLevelText.setText(R.string.dim);
-            statusIndicator.setBackgroundResource(R.drawable.circle_indicator_yellow);
-        } else if (lux < LUX_NORMAL_THRESHOLD) {
-            lightLevelText.setText(R.string.normal);
-            statusIndicator.setBackgroundResource(R.drawable.circle_indicator_green);
-        } else {
-            lightLevelText.setText("Bright");
-            statusIndicator.setBackgroundResource(R.drawable.circle_indicator_red);
-        }
+        viewModel.sliderPosition.observe(getViewLifecycleOwner(), position -> {
+            if (position != null && brightnessSlider != null) {
+                brightnessSlider.setValue(position);
+            }
+        });
 
-        // Update the timestamp
-        String currentTime = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
-        lastUpdatedTimeText.setText(currentTime);
+        viewModel.brightness.observe(getViewLifecycleOwner(), brightness -> {
+            if (brightness != null) updateBrightnessSelection(brightness);
+        });
+
+        viewModel.autoBrightness.observe(getViewLifecycleOwner(), enabled -> {
+            if (enabled != null) updateAutoBrightnessState(enabled);
+        });
+
+        viewModel.powerOn.observe(getViewLifecycleOwner(), isOn -> {
+            if (isOn != null) {
+                if (powerOnSwitch != null) {
+                    powerOnSwitch.setChecked(isOn);
+                }
+
+
+                boolean controlsEnabled = isOn;
+
+
+                if (brightnessSlider != null) {
+                    brightnessSlider.setEnabled(controlsEnabled && !viewModel.autoBrightness.getValue());
+                }
+
+
+                if (lightBrightnessChipGroup != null) {
+                    lightBrightnessChipGroup.setEnabled(controlsEnabled);
+                }
+
+
+                if (autoBrightnessSwitch != null) {
+                    autoBrightnessSwitch.setEnabled(controlsEnabled);
+                }
+
+
+                if (lightPresetsChipGroup != null) {
+                    lightPresetsChipGroup.setEnabled(controlsEnabled);
+                }
+            }
+        });
+
+
+        viewModel.autoBrightness.observe(getViewLifecycleOwner(), enabled -> {
+            if (enabled != null) updateAutoBrightnessState(enabled);
+        });
     }
 
     private void updateBrightnessSelection(String brightness) {
-        if (brightness.equals("Warm")) {
-            lightBrightnessChipGroup.check(R.id.chip_warm);
-        } else if (brightness.equals("Neutral")) {
-            lightBrightnessChipGroup.check(R.id.chip_neutral);
-        } else if (brightness.equals("Cool")) {
-            lightBrightnessChipGroup.check(R.id.chip_cool);
+        if (lightBrightnessChipGroup == null) return;
+        int chipId = R.id.chip_neutral;
+        if ("Warm".equals(brightness)) chipId = R.id.chip_warm;
+        else if ("Neutral".equals(brightness)) chipId = R.id.chip_neutral;
+        else if ("Cool".equals(brightness)) chipId = R.id.chip_cool;
+        lightBrightnessChipGroup.check(chipId);
+    }
+
+    private void updateAutoBrightnessState(boolean enabled) {
+        if (autoBrightnessSwitch != null) {
+            autoBrightnessSwitch.setChecked(enabled);
+        }
+        if (brightnessSlider != null && viewModel.powerOn.getValue() == true) {
+            brightnessSlider.setEnabled(!enabled);
         }
     }
 
-    private void syncSwitchState() {
-        boolean isEnabled = sharedPreferences.getBoolean(AUTO_BRIGHTNESS_KEY, true);
-        autoBrightnessSwitch.setChecked(isEnabled);
-        brightnessSlider.setEnabled(!isEnabled);
+    private void safeToast(String message) {
+        if (getContext() != null) {
+            Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+        }
     }
 }

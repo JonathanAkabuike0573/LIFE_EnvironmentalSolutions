@@ -2,25 +2,42 @@ package ca.light.indoorair.freshness.energy.it.life.environmental.solution;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 import java.util.List;
+
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.ui.AirQualityFragment;
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.ui.EnergyFragment;
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.ui.LightFragment;
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.ui.PresenceFragment;
 
 public class MyAdapter extends RecyclerView.Adapter<MyViewHolder> {
 
     Context context;
     List<item> list;
+    RoomSelectionProvider roomSelectionProvider;
 
-    public MyAdapter(Context context, List<item> list) {
+    public interface RoomSelectionProvider {
+        String getSelectedRoom();
+    }
+
+    public MyAdapter(Context context, List<item> list, RoomSelectionProvider roomSelectionProvider) {
         this.context = context;
         this.list = list;
+        this.roomSelectionProvider = roomSelectionProvider;
     }
 
     @NonNull
@@ -33,8 +50,28 @@ public class MyAdapter extends RecyclerView.Adapter<MyViewHolder> {
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         item currentItem = list.get(position);
 
+
         holder.device_name.setText(currentItem.getName());
         holder.device_status.setText(currentItem.getStatus());
+
+
+        updateIcon(holder, currentItem, currentItem.isDeviceOn());
+
+
+        holder.itemView.setOnClickListener(v -> {
+            String selectedRoom = roomSelectionProvider.getSelectedRoom();
+
+
+            if (context instanceof MainActivity) {
+                ((MainActivity) context).navigateToDashboardItem(currentItem.getName(), selectedRoom);
+            }
+        });
+
+
+
+
+
+
 
         if (!currentItem.isShowToggle()) {
             holder.device_toggle.setVisibility(View.GONE);
@@ -44,52 +81,50 @@ public class MyAdapter extends RecyclerView.Adapter<MyViewHolder> {
 
         holder.device_toggle.setVisibility(View.VISIBLE);
 
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-        // --- Initial State Setup ---
-        boolean isInitiallyOn;
-        if ("Presence Sensor".equals(currentItem.getName())) {
-            isInitiallyOn = prefs.getBoolean("presence_detection_enabled", true);
-        } else {
-            isInitiallyOn = currentItem.isDeviceOn();
-        }
-
-        // Update the model and UI without triggering the listener
         holder.device_toggle.setOnCheckedChangeListener(null);
-        holder.device_toggle.setChecked(isInitiallyOn);
-        currentItem.setDeviceOn(isInitiallyOn);
 
-        String initialStatus;
-        if ("Presence Sensor".equals(currentItem.getName())) {
-            initialStatus = isInitiallyOn ? "On" : "Off";
-        } else {
-            initialStatus = isInitiallyOn ? "On" : "Off";
-        }
-        if(!"Air Quality".equals(currentItem.getName())) {
-            holder.device_status.setText(initialStatus);
-            currentItem.setStatus(initialStatus);
-        }
-        updateIcon(holder, currentItem, isInitiallyOn);
 
-        // --- Listener Setup ---
+        holder.device_toggle.setChecked(currentItem.isDeviceOn());
+
+
+
         holder.device_toggle.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            String status;
-            if ("Presence Sensor".equals(currentItem.getName())) {
-                status = isChecked ? "On" : "Off";
-                // Save state for presence sensor
+
+            if ("Smart Light".equals(currentItem.getName())) {
+
+
+                String roomName = roomSelectionProvider.getSelectedRoom();
+                DatabaseReference lightRef;
+                if ("Main Office".equals(roomName)) {
+                    lightRef = FirebaseDatabase.getInstance().getReference("sensorData").child("light");
+                } else {
+                    lightRef = FirebaseDatabase.getInstance().getReference("rooms").child(roomName).child("light");
+                }
+
+
+                lightRef.child("powerOn").setValue(isChecked);
+
+
+            } else if ("Presence Sensor".equals(currentItem.getName())) {
+
+                currentItem.setDeviceOn(isChecked);
+                String status = isChecked ? "On" : "Off";
+                currentItem.setStatus(status);
+                holder.device_status.setText(status);
+                updateIcon(holder, currentItem, isChecked);
+
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
                 prefs.edit().putBoolean("presence_detection_enabled", isChecked).apply();
+
             } else {
-                status = isChecked ? "On" : "Off";
+
+                currentItem.setDeviceOn(isChecked);
+                String status = isChecked ? "On" : "Off";
+                currentItem.setStatus(status);
+                holder.device_status.setText(status);
+                updateIcon(holder, currentItem, isChecked);
             }
-
-            String message = currentItem.getName() + " is " + status;
-            Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
-
-            // Update model and UI
-            currentItem.setDeviceOn(isChecked);
-            currentItem.setStatus(status);
-            holder.device_status.setText(status);
-            updateIcon(holder, currentItem, isChecked);
         });
     }
 

@@ -145,6 +145,8 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         setupBackButton();
     }
 
+
+
     private void setupBackButton() {
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
@@ -250,7 +252,48 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
     }
 
 
-    private void syncBottomNavSelection() {
+    public void navigateToDashboardItem(String itemName, String roomName) {
+
+        clearBackStack();
+
+        Fragment fragment = null;
+        Bundle args = new Bundle();
+        args.putString("SELECTED_ROOM_KEY", roomName);
+
+        switch (itemName) {
+            case "Air Quality":
+                fragment = new AirQualityFragment();
+                bottomNavigationView.setSelectedItemId(R.id.air_quality);
+                getSupportActionBar().setTitle(R.string.air_quality);
+                break;
+            case "Smart Light":
+                fragment = new LightFragment();
+                bottomNavigationView.setSelectedItemId(R.id.light);
+                getSupportActionBar().setTitle(R.string.light);
+                break;
+            case "Presence Sensor":
+                fragment = new PresenceFragment();
+                bottomNavigationView.setSelectedItemId(R.id.presence);
+                getSupportActionBar().setTitle(R.string.presence);
+                break;
+            case "Thermostat":
+                fragment = new EnergyFragment();
+                bottomNavigationView.setSelectedItemId(R.id.bi_directional);
+                getSupportActionBar().setTitle("Energy");
+                break;
+        }
+
+        if (fragment != null) {
+            fragment.setArguments(args);
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.main, fragment)
+                    .commit();
+        }
+    }
+
+
+
+    public void syncBottomNavSelection() {
         Fragment currentFragment = fragmentManager.findFragmentById(R.id.main);
         if (currentFragment instanceof DashBoardFragment) {
             bottomNavigationView.setSelectedItemId(R.id.dashboard);
@@ -264,6 +307,8 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
             bottomNavigationView.setSelectedItemId(R.id.presence);
         }
     }
+
+
 
 
     private void showExitDialog() {
@@ -344,7 +389,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Let the toggle handle drawer events first
+
         if (toggle.onOptionsItemSelected(item)) {
             return true;
         }
@@ -374,7 +419,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         auth.signOut();
         Identity.getSignInClient(this).signOut().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
-                // Correctly redirect to SignInActivity
+
                 startActivity(new Intent(MainActivity.this, LoginActivity.class));
                 finish();
             } else {
