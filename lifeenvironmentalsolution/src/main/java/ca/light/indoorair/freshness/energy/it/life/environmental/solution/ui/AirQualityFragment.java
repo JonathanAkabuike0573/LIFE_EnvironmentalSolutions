@@ -18,6 +18,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.slider.Slider;
 import com.google.android.material.switchmaterial.SwitchMaterial;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.util.Locale;
 
@@ -91,6 +92,17 @@ public class AirQualityFragment extends Fragment {
             return args.getString("SELECTED_ROOM_KEY", "Main Office");
         }
         return "Main Office";
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Log that the user is viewing the Presence Screen
+        FirebaseAnalytics mFirebaseAnalytics = FirebaseAnalytics.getInstance(requireContext());
+        Bundle bundle = new Bundle();
+        bundle.putString(FirebaseAnalytics.Param.SCREEN_NAME, "Presence Screen");
+        bundle.putString(FirebaseAnalytics.Param.SCREEN_CLASS, "PresenceFragment");
+        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW, bundle);
     }
 
     private void initializeViews(View view) {

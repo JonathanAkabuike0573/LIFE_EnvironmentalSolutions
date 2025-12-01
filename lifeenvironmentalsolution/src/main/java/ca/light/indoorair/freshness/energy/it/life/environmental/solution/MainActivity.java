@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
@@ -69,6 +70,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
 
     private static final String PREFS_NAME = "MyPrefsFile";
     private static final String THEME_KEY = "ThemeKey";
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -76,6 +78,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
         setupWindowInsets();
         setupToolbar();
 
