@@ -244,6 +244,58 @@ CENG-322-OCC,  Software Project -->
     <string name="opening_feedback_form">Opening feedback form...</string>
     <string name="error_loading_rooms">Error loading rooms</string>
     <string name="loading_data_for">"Loading data for: "</string>
+    <string name="help">Help</string>
+    <string name="help_title">Need help using LIFE Environmental Solutions?</string>
+    <string name="help_subtitle">
+        This page gives you quick tips, answers to common questions, and ways to contact support.
+    </string>
+
+    <string name="help_section_quick_tips">Quick Tips</string>
+    <string name="help_tip_1">Use the bottom navigation to switch between air quality, settings, and more.</string>
+    <string name="help_tip_2">Tap the refresh button on each screen to get the latest sensor data.</string>
+    <string name="help_tip_3">If data looks outdated, check your Wi-Fi or mobile connection.</string>
+
+    <string name="help_section_troubleshooting">Troubleshooting</string>
+    <string name="help_trouble_1">No data? Make sure the hardware hub is powered on and connected.</string>
+    <string name="help_trouble_2">If readings look wrong, restart the app and try again.</string>
+    <string name="help_trouble_3">If the issue continues, send us a support email with screenshots.</string>
+
+    <string name="help_section_more_support">More Support</string>
+    <string name="help_quick_start">Open Quick Start Guide</string>
+    <string name="help_contact_support">Contact Support</string>
+
+    <!-- Email details for Help / Bug report -->
+    <string name="help_support_email_subject">LIFE Environmental Solutions - Help Request</string>
+    <string name="help_support_email">support@life-environmental.app</string>
+
+    <!-- 🔹 NEW: label for the Help screen button -->
+    <string name="help_report_bug">Report a Bug</string>
+
+    <!-- 🔹 NEW: subject line used in BugReportFragment -->
+    <string name="help_bug_email_subject">LIFE Environmental Solutions - Bug Report</string>
+
+    <!-- Bug report page -->
+    <string name="bug_report_title">Report a Bug</string>
+    <string name="bug_report_intro">
+Tell us what went wrong so we can improve LIFE Environmental Solutions.
+</string>
+
+    <string name="bug_field_summary_hint">Short summary (e.g. crash on Air Quality screen)</string>
+    <string name="bug_field_steps_hint">Steps to reproduce (what you did before it happened)</string>
+    <string name="bug_field_expected_hint">What did you expect to happen?</string>
+    <string name="bug_field_actual_hint">What actually happened?</string>
+    <string name="bug_field_extra_hint">Any extra notes (screenshots, frequency, etc.)</string>
+
+    <string name="bug_submit">Submit Bug Report</string>
+    <string name="bug_error_empty">Please at least fill in a summary and what happened.</string>
+    <string name="bug_submitted_to_email">Opening your email app with the bug details…</string>
+
+    <string name="help_no_email_app">No email app found on this device.</string>
+
+    <string name="bug_add_screenshot">Add Screenshot (optional)</string>
+    <string name="bug_screenshot_none">No screenshot selected</string>
+    <string name="bug_screenshot_selected">Screenshot attached</string>
+    <string name="bug_screenshot_section">Screenshot</string>
 
     <string-array name="auto_off_time_options">
         <item>5 minutes</item>
@@ -251,5 +303,4 @@ CENG-322-OCC,  Software Project -->
         <item>15 minutes</item>
         <item>20 minutes</item>
     </string-array>
-
 </resources>

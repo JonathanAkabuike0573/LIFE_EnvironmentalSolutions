@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.HelpFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Title -->
+        <TextView
+            android:id="@+id/help_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/help_title"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:paddingBottom="8dp" />
+
+        <!-- Subtitle -->
+        <TextView
+            android:id="@+id/help_subtitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/help_subtitle"
+            android:textSize="14sp"
+            android:paddingBottom="16dp" />
+
+        <!-- Quick Tips Section -->
+        <TextView
+            android:id="@+id/help_quick_tips_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/help_section_quick_tips"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:paddingTop="8dp"
+            android:paddingBottom="4dp" />
+
+        <TextView
+            android:id="@+id/help_quick_tip_1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/help_tip_1"
+            android:paddingBottom="2dp" />
+
+        <TextView
+            android:id="@+id/help_quick_tip_2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/help_tip_2"
+            android:paddingBottom="2dp" />
+
+        <TextView
+            android:id="@+id/help_quick_tip_3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/help_tip_3"
+            android:paddingBottom="12dp" />
+
+        <!-- Troubleshooting Section -->
+        <TextView
+            android:id="@+id/help_troubleshooting_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/help_section_troubleshooting"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:paddingTop="8dp"
+            android:paddingBottom="4dp" />
+
+        <TextView
+            android:id="@+id/help_trouble_1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/help_trouble_1"
+            android:paddingBottom="2dp" />
+
+        <TextView
+            android:id="@+id/help_trouble_2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/help_trouble_2"
+            android:paddingBottom="2dp" />
+
+        <TextView
+            android:id="@+id/help_trouble_3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/help_trouble_3"
+            android:paddingBottom="16dp" />
+
+        <!-- Action Buttons -->
+        <TextView
+            android:id="@+id/help_more_support_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/help_section_more_support"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp" />
+
+        <Button
+            android:id="@+id/button_view_guide"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/help_quick_start"
+            android:layout_marginBottom="8dp" />
+
+        <Button
+            android:id="@+id/button_contact_support"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/help_contact_support"
+            android:layout_marginBottom="8dp" />
+
+        <Button
+            android:id="@+id/button_report_bug"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/bug_report_title"
+            android:layout_marginBottom="8dp" />
+
+    </LinearLayout>
+</ScrollView>
