@@ -12,7 +12,7 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
         android:layout_margin="8dp"
-        android:text="Clear All" />
+        android:text="@string/clear_all" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/notification_recycler_view"

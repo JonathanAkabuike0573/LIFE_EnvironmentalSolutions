@@ -223,7 +223,7 @@ public class PurchasesFragment extends Fragment {
         final List<String> selectedDevices = new ArrayList<>();
 
         new AlertDialog.Builder(getContext())
-                .setTitle(originalPlanName + " Devices (Max " + maxDevices + ")")
+                .setTitle(originalPlanName + " Devices") // <<< MODIFIED: Removed " (Max " + maxDevices + ")"
                 .setMultiChoiceItems(items, checkedItems, new DialogInterface.OnMultiChoiceClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which, boolean isChecked) {

@@ -345,7 +345,7 @@
                     android:layout_height="wrap_content"
                     android:paddingTop="@dimen/space_m"
                     android:paddingBottom="@dimen/space_s"
-                    android:text="APP INFO"
+                    android:text="@string/app_info"
                     android:textColor="@color/primary"
                     android:textStyle="bold" />
 
@@ -370,7 +370,7 @@
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:layout_toStartOf="@id/iv_contact_support_arrow"
-                        android:text="Contact Support"
+                        android:text="@string/contact_support"
                         android:textColor="@color/on_surface"
                         android:textSize="@dimen/text_m" />
                 </RelativeLayout>
@@ -387,7 +387,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
-                        android:text="App Version (1.0.0)"
+                        android:text="@string/app_version_1_0_0"
                         android:textColor="@color/on_surface"
                         android:textSize="@dimen/text_m" />
                 </RelativeLayout>

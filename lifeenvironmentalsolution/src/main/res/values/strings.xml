@@ -281,6 +281,37 @@ CENG-322-OCC,  Software Project -->
     <string name="bug_submitted_to_email">bug_submitted_to_email</string>
     <string name="help_no_email_app">help_no_email_app</string>
     <string name="help_support_email_subject">help_support_email_subject</string>
+    <string name="new_password">New Password</string>
+    <string name="power_consumption">Power Consumption</string>
+    <string name="show_power">Show Power</string>
+    <string name="scale">Scale</string>
+    <string name="show_as">Show As</string>
+    <string name="voltage">Voltage</string>
+    <string name="current">Current</string>
+    <string name="positive">Positive</string>
+    <string name="negative">Negative</string>
+    <string name="clear_all">Clear All</string>
+    <string name="turn_off_lights_after">Turn off lights after:</string>
+    <string name="start_time">Start Time</string>
+    <string name="end_time">End Time</string>
+    <string name="today_s_activity">Today\'s Activity</string>
+    <string name="session_duration">Session Duration:</string>
+    <string name="total_detections">Total Detections:</string>
+    <string name="select_an_upgrade_option">Select an UPGRADE option:</string>
+    <string name="subtotal_0_00">Subtotal: $0.00</string>
+    <string name="tax_13_0_00">Tax (13%): $0.00</string>
+    <string name="total_0_00">Total: $0.00</string>
+    <string name="select_payment_type">Select Payment Type:</string>
+    <string name="name_on_card_account">Name on Card/Account</string>
+    <string name="card_number_or_account_id">Card Number or Account ID</string>
+    <string name="expiry_mm_yy">Expiry (MM/YY)</string>
+    <string name="cvv_security_code">CVV/Security Code</string>
+    <string name="do_you_want_an_email_copy_of_receipt">Do you want an email copy of receipt?</string>
+    <string name="cancel_upgrade">Cancel Upgrade</string>
+    <string name="continue_and_pay_0_00">Continue and Pay $0.00</string>
+    <string name="app_info">APP INFO</string>
+    <string name="contact_support">Contact Support</string>
+    <string name="app_version_1_0_0">App Version (1.0.0)</string>
 
     <string-array name="auto_off_time_options">
         <item>1 minute</item>
