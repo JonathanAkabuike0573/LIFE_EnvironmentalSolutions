@@ -13,6 +13,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.os.Build;
+
+
+
 import ca.light.indoorair.freshness.energy.it.life.environmental.solution.R;
 
 public class HelpFragment extends Fragment {
@@ -37,9 +43,9 @@ public class HelpFragment extends Fragment {
 
         Button quickStartButton = view.findViewById(R.id.button_view_guide);
         Button contactSupportButton = view.findViewById(R.id.button_contact_support);
-        Button openFaqButton = view.findViewById(R.id.button_open_faq);
+        Button reportBugButton = view.findViewById(R.id.button_report_bug);
 
-        // 🔹 Quick Start Guide – for now just show a Toast (you can later navigate to a real fragment)
+        // Quick Start
         if (quickStartButton != null) {
             quickStartButton.setOnClickListener(v ->
                     Toast.makeText(requireContext(),
@@ -48,14 +54,14 @@ public class HelpFragment extends Fragment {
             );
         }
 
-        // 🔹 Contact Support – open email app
+        // Contact Support
         if (contactSupportButton != null) {
             contactSupportButton.setOnClickListener(v -> {
                 String[] emails = new String[]{
                         getString(R.string.help_support_email)
                 };
                 Intent intent = new Intent(Intent.ACTION_SENDTO);
-                intent.setData(Uri.parse("mailto:")); // only email apps should handle this
+                intent.setData(Uri.parse("mailto:"));
                 intent.putExtra(Intent.EXTRA_EMAIL, emails);
                 intent.putExtra(Intent.EXTRA_SUBJECT,
                         getString(R.string.help_support_email_subject));
@@ -71,17 +77,48 @@ public class HelpFragment extends Fragment {
             });
         }
 
-        // 🔹 Open FAQ – open a web page (you can replace with your real site later)
-        if (openFaqButton != null) {
-            openFaqButton.setOnClickListener(v -> {
-                // TODO: replace with your real FAQ URL when available
-                Uri uri = Uri.parse("https://example.com/life-environmental/faq");
-                Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+        // Report Bug
+        if (reportBugButton != null) {
+            reportBugButton.setOnClickListener(v -> {
+                String supportEmail = getString(R.string.help_support_email);
+                String subject = getString(R.string.help_bug_email_subject);
+
+                StringBuilder bodyBuilder = new StringBuilder();
+                bodyBuilder.append(getString(R.string.help_bug_email_body));
+                bodyBuilder.append("\n");
+
                 try {
-                    startActivity(intent);
+                    PackageManager pm = requireContext().getPackageManager();
+                    PackageInfo pInfo = pm.getPackageInfo(requireContext().getPackageName(), 0);
+                    String versionName = pInfo.versionName;
+                    int versionCode = (int) pInfo.getLongVersionCode();
+                    bodyBuilder.append("App Version: ").append(versionName)
+                            .append(" (").append(versionCode).append(")\n");
+                } catch (Exception e) {
+                    bodyBuilder.append("App Version: unknown\n");
+                }
+
+                bodyBuilder.append("Device: ")
+                        .append(Build.MANUFACTURER).append(" ")
+                        .append(Build.MODEL).append("\n");
+                bodyBuilder.append("Android: ")
+                        .append(Build.VERSION.RELEASE)
+                        .append(" (API ").append(Build.VERSION.SDK_INT).append(")\n");
+
+                String body = bodyBuilder.toString();
+
+                Intent intent = new Intent(Intent.ACTION_SENDTO);
+                intent.setData(Uri.parse("mailto:"));
+                intent.putExtra(Intent.EXTRA_EMAIL, new String[]{supportEmail});
+                intent.putExtra(Intent.EXTRA_SUBJECT, subject);
+                intent.putExtra(Intent.EXTRA_TEXT, body);
+
+                try {
+                    startActivity(Intent.createChooser(intent,
+                            getString(R.string.help_report_bug)));
                 } catch (Exception e) {
                     Toast.makeText(requireContext(),
-                            "No browser found to open FAQ.",
+                            getString(R.string.help_no_email_app),
                             Toast.LENGTH_SHORT).show();
                 }
             });

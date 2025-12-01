@@ -120,10 +120,11 @@
             android:layout_marginBottom="8dp" />
 
         <Button
-            android:id="@+id/button_open_faq"
+            android:id="@+id/button_report_bug"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/help_open_faq" />
+            android:text="@string/help_report_bug"
+            android:layout_marginBottom="8dp" />
 
     </LinearLayout>
 </ScrollView>
