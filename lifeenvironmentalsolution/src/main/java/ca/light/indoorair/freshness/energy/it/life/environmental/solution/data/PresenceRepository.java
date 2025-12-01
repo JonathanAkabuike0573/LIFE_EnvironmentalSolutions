@@ -1,6 +1,7 @@
 package ca.light.indoorair.freshness.energy.it.life.environmental.solution.data;
 
 import androidx.annotation.NonNull;
+import android.content.Context;
 import android.util.Log;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
@@ -15,6 +16,8 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.utils.NotificationHelper;
+
 public class PresenceRepository {
 
     public interface TimerCallback {
@@ -22,26 +25,63 @@ public class PresenceRepository {
     }
 
     private final DatabaseReference presenceRef;
+    private final Context appContext;
     private String currentRoom;
     private final LightRepository lightRepository = new LightRepository();
     private final android.os.Handler vacancyHandler = new android.os.Handler(android.os.Looper.getMainLooper());
     private Runnable vacancyTimeoutRunnable;
+
 
     private boolean lastPresenceStatus = true;
     private boolean isLightOn = false;
     private boolean autoLightsOffActive = false;
     private int currentTimeoutMinutes = 5;
 
+
+    private boolean alertsEnabled = false;
+    private String alertStartTime = "18:00";
+    private String alertEndTime = "08:00";
+
     private ValueEventListener autoOffListener;
     private ValueEventListener lightStatusListener;
     private TimerCallback timerCallback;
 
-    public PresenceRepository() {
-        presenceRef = FirebaseDatabase.getInstance().getReference("room_occupancy");
+
+    public PresenceRepository(Context context) {
+        this.presenceRef = FirebaseDatabase.getInstance().getReference("room_occupancy");
+        this.appContext = context.getApplicationContext();
     }
 
     public void setTimerCallback(TimerCallback callback) {
         this.timerCallback = callback;
+    }
+
+
+    public void setAlertSettings(boolean enabled, String startTime, String endTime) {
+        this.alertsEnabled = enabled;
+        if (startTime != null) this.alertStartTime = startTime;
+        if (endTime != null) this.alertEndTime = endTime;
+    }
+
+    private boolean isWithinAlertTimeWindow() {
+        if (!alertsEnabled) return false;
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.getDefault());
+            Date now = sdf.parse(sdf.format(new Date()));
+            Date start = sdf.parse(alertStartTime);
+            Date end = sdf.parse(alertEndTime);
+
+            if (now == null || start == null || end == null) return false;
+
+
+            if (end.before(start)) {
+                return now.after(start) || now.before(end);
+            } else {
+                return now.after(start) && now.before(end);
+            }
+        } catch (Exception e) {
+            return false;
+        }
     }
 
 
@@ -54,16 +94,16 @@ public class PresenceRepository {
         getRoomRef(roomName).removeEventListener(listener);
     }
 
+
     public Task<Void> manualOverride(String status) {
         String timestamp = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault()).format(new Date());
         Map<String, Object> firebaseData = new HashMap<>();
         firebaseData.put("room_status", status.toLowerCase());
-
         firebaseData.put("manual_override", true);
         firebaseData.put("timestamp", timestamp);
+
         return presenceRef.push().setValue(firebaseData);
     }
-
 
 
     public void setAutoLightsOff(String roomName, boolean enabled, int timeoutMinutes) {
@@ -81,11 +121,6 @@ public class PresenceRepository {
             lightStatusListener = null;
         }
 
-        if (!enabled) {
-            cancelVacancyTimer();
-            return;
-        }
-
 
         lightStatusListener = new ValueEventListener() {
             @Override
@@ -95,11 +130,9 @@ public class PresenceRepository {
 
                 if (isLightOn != newLightState) {
                     isLightOn = newLightState;
-
                     if (!isLightOn) {
-
                         cancelVacancyTimer();
-                    } else if (!lastPresenceStatus) {
+                    } else if (!lastPresenceStatus && autoLightsOffActive) {
 
                         startVacancyTimer(currentTimeoutMinutes);
                     }
@@ -127,15 +160,23 @@ public class PresenceRepository {
 
                             if (!isOccupied) {
 
-                                if (isLightOn) {
+                                if (autoLightsOffActive && isLightOn) {
                                     startVacancyTimer(currentTimeoutMinutes);
                                 } else {
-
-                                    Log.d("PresenceRepo", "Room vacant, but light is OFF. No action.");
+                                    Log.d("PresenceRepo", "Room vacant but timer condition not met.");
                                 }
                             } else {
 
                                 cancelVacancyTimer();
+
+
+                                if (isWithinAlertTimeWindow()) {
+                                    String msg = (currentRoom != null ? currentRoom : "Room") + " became occupied after hours.";
+                                    NotificationHelper.sendPresenceAlert(appContext, currentRoom, msg);
+                                    if (timerCallback != null) {
+                                        timerCallback.onTimerEvent("Alert sent: Occupancy detected after hours!");
+                                    }
+                                }
                             }
                         }
                     }
@@ -149,7 +190,6 @@ public class PresenceRepository {
 
     private void startVacancyTimer(int minutes) {
         cancelVacancyTimer();
-
         if (timerCallback != null) {
             timerCallback.onTimerEvent("Vacancy detected: Lights off in " + minutes + " min");
         }
@@ -157,10 +197,7 @@ public class PresenceRepository {
         vacancyTimeoutRunnable = () -> {
             if (isLightOn) {
                 Log.d("PresenceRepo", "Timeout reached: Turning Lights OFF");
-
-
                 lightRepository.setPowerOn(currentRoom, false);
-
                 if (timerCallback != null) {
                     timerCallback.onTimerEvent("Timeout reached: Lights turned OFF");
                 }
@@ -176,13 +213,8 @@ public class PresenceRepository {
         if (vacancyTimeoutRunnable != null) {
             vacancyHandler.removeCallbacks(vacancyTimeoutRunnable);
             vacancyTimeoutRunnable = null;
-
-            if (timerCallback != null && isLightOn) {
-
-            }
         }
     }
-
 
     private DatabaseReference getRoomRef(String roomName) {
         if ("Main Office".equals(roomName)) {
@@ -191,7 +223,6 @@ public class PresenceRepository {
             return FirebaseDatabase.getInstance().getReference("rooms").child(roomName).child("room_occupancy");
         }
     }
-
 
     private DatabaseReference getLightRef(String roomName) {
         if ("Main Office".equals(roomName)) {
@@ -202,7 +233,6 @@ public class PresenceRepository {
     }
 
     public void resetVacancyTimer() {
-
         if (autoLightsOffActive) {
             setAutoLightsOff(currentRoom, true, currentTimeoutMinutes);
         }
