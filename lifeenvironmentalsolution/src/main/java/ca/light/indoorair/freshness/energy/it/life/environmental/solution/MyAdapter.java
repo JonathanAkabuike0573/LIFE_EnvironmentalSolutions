@@ -59,26 +59,18 @@ public class MyAdapter extends RecyclerView.Adapter<MyViewHolder> {
 
 
         holder.itemView.setOnClickListener(v -> {
-            Fragment fragment = null;
             String selectedRoom = roomSelectionProvider.getSelectedRoom();
-            Bundle args = new Bundle();
-            args.putString("SELECTED_ROOM_KEY", selectedRoom);
 
-            switch (currentItem.getName()) {
-                case "Air Quality": fragment = new AirQualityFragment(); break;
-                case "Smart Light": fragment = new LightFragment(); break;
-                case "Presence Sensor": fragment = new PresenceFragment(); break;
-                case "Thermostat": fragment = new EnergyFragment(); break;
-            }
 
-            if (fragment != null) {
-                fragment.setArguments(args);
-                ((AppCompatActivity) context).getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.main, fragment)
-                        .addToBackStack(null)
-                        .commit();
+            if (context instanceof MainActivity) {
+                ((MainActivity) context).navigateToDashboardItem(currentItem.getName(), selectedRoom);
             }
         });
+
+
+
+
+
 
 
         if (!currentItem.isShowToggle()) {

@@ -207,9 +207,9 @@ public class DashBoardFragment extends Fragment {
             @Override
             public void onNothingSelected(AdapterView<?> parent) {}
         });
+
+
     }
-
-
 
     private void updateTemperatureDisplay(Double tempC) {
         Double tempF = dashboardViewModel.getTemperatureF().getValue();
@@ -346,11 +346,16 @@ public class DashBoardFragment extends Fragment {
         }
     }
 
-    // Greeting methods
+
     protected void loadGreeting(UserDataProvider dataProvider) {
         dataProvider.fetchUserData(new UserDataProvider.UserDataCallback() {
             @Override
             public void onDataReceived(String userName) {
+
+                if (!isAdded() || getContext() == null) {
+                    return;
+                }
+
                 if (userName != null && !userName.trim().isEmpty()) {
                     String firstName = userName.split(" ")[0];
                     setGreeting(firstName);
@@ -361,13 +366,17 @@ public class DashBoardFragment extends Fragment {
 
             @Override
             public void onError(String errorMessage) {
-                setGreeting("User");
-                if (getContext() != null) {
-                    Toast.makeText(getContext(), "Error: " + errorMessage, Toast.LENGTH_SHORT).show();
+
+                if (!isAdded() || getContext() == null) {
+                    return;
                 }
+
+                setGreeting("User");
+                Toast.makeText(getContext(), "Error: " + errorMessage, Toast.LENGTH_SHORT).show();
             }
         });
     }
+
 
     protected Calendar getCalendarInstance() {
         return Calendar.getInstance();
