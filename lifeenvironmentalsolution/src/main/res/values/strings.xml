@@ -244,12 +244,14 @@ CENG-322-OCC,  Software Project -->
     <string name="opening_feedback_form">Opening feedback form...</string>
     <string name="error_loading_rooms">Error loading rooms</string>
     <string name="loading_data_for">"Loading data for: "</string>
+    <string name="sign_out_failed">Sign out failed.</string>
 
     <string-array name="auto_off_time_options">
+        <item>1 minute</item>
+        <item>2 minutes</item>
         <item>5 minutes</item>
         <item>10 minutes</item>
         <item>15 minutes</item>
-        <item>20 minutes</item>
     </string-array>
 
 </resources>
