@@ -47,7 +47,6 @@ public class DashBoardFragment extends Fragment {
     private ImageView settingsIcon;
     private Spinner roomSpinner;
 
-
     private DashboardViewModel dashboardViewModel;
     private SharedRoomViewModel sharedRoomViewModel;
 
@@ -66,7 +65,7 @@ public class DashBoardFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_dash_board, container, false);
 
-        // Setup data lists
+
         allItems = new ArrayList<>();
         allItems.add(new item("Air Quality", "Good", R.drawable.air_qualityicon, true, false));
         allItems.add(new item("Smart Light", "Off", R.drawable.lightofficon, false, true));
@@ -78,7 +77,7 @@ public class DashBoardFragment extends Fragment {
         visibleItems = new ArrayList<>();
         roomNames = new ArrayList<>();
 
-        // Setup RecyclerView
+
         roomSpinner = view.findViewById(R.id.room_spinner);
         RecyclerView recycler = view.findViewById(R.id.recyclerView);
         recycler.setLayoutManager(new GridLayoutManager(getContext(), 2));
@@ -94,12 +93,12 @@ public class DashBoardFragment extends Fragment {
         });
         recycler.setAdapter(adapter);
 
-        // Setup room spinner
+
         roomAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, roomNames);
         roomAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         roomSpinner.setAdapter(roomAdapter);
 
-        // Setup FAB
+
         FloatingActionButton fab = view.findViewById(R.id.fab_open_feedback);
         fab.setOnClickListener(v -> {
             requireActivity().getSupportFragmentManager()
@@ -117,9 +116,7 @@ public class DashBoardFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext());
-
 
         dashboardViewModel = new ViewModelProvider(requireActivity()).get(DashboardViewModel.class);
         sharedRoomViewModel = new ViewModelProvider(requireActivity()).get(SharedRoomViewModel.class);
@@ -130,44 +127,38 @@ public class DashBoardFragment extends Fragment {
         setupPreferenceListener();
         updateVisibleItems();
 
-        // Load greeting
+
         loadGreeting(new FirebaseUserDataProvider());
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        // Log that the user is viewing the Presence Screen
         FirebaseAnalytics mFirebaseAnalytics = FirebaseAnalytics.getInstance(requireContext());
         Bundle bundle = new Bundle();
-        bundle.putString(FirebaseAnalytics.Param.SCREEN_NAME, "Presence Screen");
-        bundle.putString(FirebaseAnalytics.Param.SCREEN_CLASS, "PresenceFragment");
+        bundle.putString(FirebaseAnalytics.Param.SCREEN_NAME, "Dashboard Screen");
+        bundle.putString(FirebaseAnalytics.Param.SCREEN_CLASS, "DashBoardFragment");
         mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW, bundle);
-    }
 
+
+        updateVisibleItems();
+    }
 
     private void initializeViews(View view) {
         userGreeting = view.findViewById(R.id.usergreeting);
         temperatureText = view.findViewById(R.id.temperature_text);
         comfortLevelText = view.findViewById(R.id.weather_description);
         settingsIcon = view.findViewById(R.id.settings_icon);
-
-
         settingsIcon.setOnClickListener(v -> showSettingsDialog());
     }
 
     private void setupObservers() {
-
         dashboardViewModel.getTemperatureC().observe(getViewLifecycleOwner(), this::updateTemperatureDisplay);
         dashboardViewModel.getComfortLevel().observe(getViewLifecycleOwner(), this::updateComfortDisplay);
-
-
         dashboardViewModel.getAirQuality().observe(getViewLifecycleOwner(), this::updateAirQualityItem);
-
-
         dashboardViewModel.getSmartLightPower().observe(getViewLifecycleOwner(), this::updateSmartLightStatus);
 
-        // Sync with room changes
+
         sharedRoomViewModel.getCurrentRoom().observe(getViewLifecycleOwner(), roomName -> {
             if (roomName != null && !roomName.isEmpty()) {
                 dashboardViewModel.init(roomName);
@@ -176,7 +167,6 @@ public class DashBoardFragment extends Fragment {
     }
 
     private void setupRoomSpinner() {
-
         DatabaseReference roomsRef = FirebaseDatabase.getInstance().getReference("rooms");
         roomsRef.addValueEventListener(new ValueEventListener() {
             @Override
@@ -187,7 +177,6 @@ public class DashBoardFragment extends Fragment {
                     roomNames.add(roomSnapshot.getKey());
                 }
                 roomAdapter.notifyDataSetChanged();
-
 
                 if (!roomNames.isEmpty()) {
                     String lastSelectedRoom = sharedPreferences.getString("last_selected_room", roomNames.get(0));
@@ -206,7 +195,6 @@ public class DashBoardFragment extends Fragment {
             }
         });
 
-        // Room selection
         roomSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -219,8 +207,6 @@ public class DashBoardFragment extends Fragment {
             @Override
             public void onNothingSelected(AdapterView<?> parent) {}
         });
-
-
     }
 
     private void updateTemperatureDisplay(Double tempC) {
@@ -236,33 +222,27 @@ public class DashBoardFragment extends Fragment {
     }
 
     private void updateAirQualityItem(String airQualityDescription) {
-        if (adapter != null && allItems != null) {
-            for (item i : allItems) {
-                if (i.getName().equals("Air Quality")) {
-                    i.setStatus(airQualityDescription != null ? airQualityDescription : "Good");
-                    for (item visibleItem : visibleItems) {
-                        if (visibleItem.getName().equals("Air Quality")) {
-                            visibleItem.setStatus(airQualityDescription != null ? airQualityDescription : "Good");
-                            break;
-                        }
-                    }
-                    adapter.notifyDataSetChanged();
-                    break;
-                }
-            }
-        }
+        updateItemStatus("Air Quality", airQualityDescription != null ? airQualityDescription : "Good", true);
     }
 
     private void updateSmartLightStatus(Boolean isOn) {
         if (isOn == null) return;
+
+        // Check lock status
+        if (!dashboardViewModel.isDeviceUnlocked("Smart Light")) return;
+
         String status = isOn ? "On" : "Off";
+        updateItemStatus("Smart Light", status, isOn);
+    }
+
+    private void updateItemStatus(String name, String status, boolean isOn) {
         if (adapter != null && allItems != null) {
             for (item i : allItems) {
-                if (i.getName().equals("Smart Light")) {
+                if (i.getName().equals(name)) {
                     i.setStatus(status);
                     i.setDeviceOn(isOn);
                     for (item visibleItem : visibleItems) {
-                        if (visibleItem.getName().equals("Smart Light")) {
+                        if (visibleItem.getName().equals(name)) {
                             visibleItem.setStatus(status);
                             visibleItem.setDeviceOn(isOn);
                             break;
@@ -311,7 +291,6 @@ public class DashBoardFragment extends Fragment {
         }
     }
 
-
     private void showSettingsDialog() {
         String[] itemNames = new String[allItems.size()];
         boolean[] checkedItems = new boolean[allItems.size()];
@@ -344,8 +323,22 @@ public class DashBoardFragment extends Fragment {
     private void updateVisibleItems() {
         visibleItems.clear();
         for (int i = 0; i < allItems.size(); i++) {
+
             if (sharedPreferences.getBoolean("item_" + i, true)) {
-                visibleItems.add(allItems.get(i));
+                item currentItem = allItems.get(i);
+
+
+                if (!dashboardViewModel.isDeviceUnlocked(currentItem.getName())) {
+                    currentItem.setStatus("Locked");
+                    currentItem.setDeviceOn(false);
+                } else {
+
+                    if ("Locked".equals(currentItem.getStatus())) {
+                        currentItem.setStatus("Off");
+                    }
+                }
+
+                visibleItems.add(currentItem);
             }
         }
         adapter.notifyDataSetChanged();
@@ -358,16 +351,11 @@ public class DashBoardFragment extends Fragment {
         }
     }
 
-
     protected void loadGreeting(UserDataProvider dataProvider) {
         dataProvider.fetchUserData(new UserDataProvider.UserDataCallback() {
             @Override
             public void onDataReceived(String userName) {
-
-                if (!isAdded() || getContext() == null) {
-                    return;
-                }
-
+                if (!isAdded() || getContext() == null) return;
                 if (userName != null && !userName.trim().isEmpty()) {
                     String firstName = userName.split(" ")[0];
                     setGreeting(firstName);
@@ -375,37 +363,39 @@ public class DashBoardFragment extends Fragment {
                     setGreeting("User");
                 }
             }
-
             @Override
             public void onError(String errorMessage) {
-
-                if (!isAdded() || getContext() == null) {
-                    return;
-                }
-
+                if (!isAdded() || getContext() == null) return;
                 setGreeting("User");
                 Toast.makeText(getContext(), "Error: " + errorMessage, Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-
     protected Calendar getCalendarInstance() {
         return Calendar.getInstance();
     }
 
+    // 1. Add this helper method (It allows us to override it in tests)
+    protected String getResourceString(int id) {
+        if (getContext() == null) return ""; // Safety check
+        return getString(id);
+    }
+
+    // 2. Update this method to use the helper instead of getString directly
     String generateGreetingMessage(String name, Calendar calendar) {
         int hourOfDay = calendar.get(Calendar.HOUR_OF_DAY);
         String greeting;
         if (hourOfDay >= 0 && hourOfDay < 12) {
-            greeting = getString(R.string.good_morning);
+            greeting = getResourceString(R.string.good_morning); // Changed here
         } else if (hourOfDay >= 12 && hourOfDay < 18) {
-            greeting = getString(R.string.good_afternoon);
+            greeting = getResourceString(R.string.good_afternoon); // Changed here
         } else {
-            greeting = getString(R.string.good_evening);
+            greeting = getResourceString(R.string.good_evening); // Changed here
         }
         return greeting + ", " + name;
     }
+
 
     protected void setGreeting(String name) {
         Calendar calendar = getCalendarInstance();

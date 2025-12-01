@@ -1,7 +1,10 @@
 package ca.light.indoorair.freshness.energy.it.life.environmental.solution;
 
+import com.google.firebase.database.IgnoreExtraProperties;
+
 import java.util.Date;
 
+@IgnoreExtraProperties
 public class NotificationItem {
     private String id;
     private String text;
@@ -9,6 +12,7 @@ public class NotificationItem {
 
     // Empty constructor required for Firebase
     public NotificationItem() {}
+
 
     public NotificationItem(String text, long timestamp) {
         this.text = text;
