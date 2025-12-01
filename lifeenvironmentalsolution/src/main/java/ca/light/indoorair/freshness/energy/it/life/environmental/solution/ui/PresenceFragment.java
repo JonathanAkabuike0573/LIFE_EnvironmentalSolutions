@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -48,9 +49,7 @@ public class PresenceFragment extends Fragment {
     private PresenceViewModel viewModel;
     private SharedRoomViewModel sharedRoomViewModel;
 
-    public PresenceFragment() {
-        // Required empty public constructor
-    }
+    public PresenceFragment() {}
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -61,17 +60,11 @@ public class PresenceFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // 1. Initialize ViewModels FIRST
         viewModel = new ViewModelProvider(this).get(PresenceViewModel.class);
         sharedRoomViewModel = new ViewModelProvider(requireActivity()).get(SharedRoomViewModel.class);
 
-        // 2. Initialize ALL views
         initializeViews(view);
-
-        // 3. Setup room synchronization (SAFE)
         setupRoomSynchronization();
-
-        // 4. Setup UI components
         setupSpinner();
         setupListeners();
         observeViewModel();
@@ -95,33 +88,26 @@ public class PresenceFragment extends Fragment {
         timeRangePickerContainer = view.findViewById(R.id.time_range_picker_container);
         startTimeInput = view.findViewById(R.id.start_time_input);
         endTimeInput = view.findViewById(R.id.end_time_input);
-
-        Log.d("PresenceFragment", "Views initialized. currentRoomText: " + (currentRoomText != null ? "OK" : "NULL"));
     }
 
     private void setupRoomSynchronization() {
         sharedRoomViewModel.getCurrentRoom().observe(getViewLifecycleOwner(), roomName -> {
             if (roomName != null && !roomName.isEmpty()) {
-                // SAFE TextView update
-                if (currentRoomText != null) {
-                    currentRoomText.setText(roomName);
-                }
-
-                // Initialize ViewModel with room
-                if (viewModel != null) {
-                    viewModel.init(roomName);
-                }
-
-                // Safe toast
-                if (getContext() != null) {
-                    Toast.makeText(getContext(), "Presence: Switched to " + roomName, Toast.LENGTH_SHORT).show();
-                }
+                if (currentRoomText != null) currentRoomText.setText(roomName);
+                if (viewModel != null) viewModel.init(roomName);
             }
         });
     }
 
+    private void setupSpinner() {
+        if (autoOffTimeSpinner == null || getContext() == null) return;
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
+                getContext(), R.array.auto_off_time_options, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        autoOffTimeSpinner.setAdapter(adapter);
+    }
+
     private void setupListeners() {
-        // Presence detection switch
         if (presenceDetectionSwitch != null) {
             presenceDetectionSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 if (buttonView.isPressed() && viewModel != null) {
@@ -131,33 +117,47 @@ public class PresenceFragment extends Fragment {
             });
         }
 
-        // Auto lights off
-        if (autoLightsOffCheckbox != null && labelAutoOffTime != null && autoOffTimeSpinner != null) {
+        if (autoLightsOffCheckbox != null) {
             autoLightsOffCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                labelAutoOffTime.setVisibility(isChecked ? View.VISIBLE : View.GONE);
-                autoOffTimeSpinner.setVisibility(isChecked ? View.VISIBLE : View.GONE);
-            });
-        }
+                boolean visible = isChecked;
+                if (labelAutoOffTime != null) labelAutoOffTime.setVisibility(visible ? View.VISIBLE : View.GONE);
+                if (autoOffTimeSpinner != null) autoOffTimeSpinner.setVisibility(visible ? View.VISIBLE : View.GONE);
 
-        // Alerts checkbox
-        if (alertAfterHoursCheckbox != null && timeRangePickerContainer != null) {
-            alertAfterHoursCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 if (viewModel != null) {
-                    viewModel.setAlertsEnabled(isChecked);
+                    if (isChecked) {
+                        String timeoutText = autoOffTimeSpinner.getSelectedItem() != null ?
+                                autoOffTimeSpinner.getSelectedItem().toString() : "5 minutes";
+                        viewModel.setAutoLightsOffEnabled(true, parseTimeoutMinutes(timeoutText));
+                    } else {
+                        viewModel.setAutoLightsOffEnabled(false, 0);
+                    }
                 }
-                timeRangePickerContainer.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+            });
+
+            if (autoOffTimeSpinner != null) {
+                autoOffTimeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        if (autoLightsOffCheckbox.isChecked() && viewModel != null) {
+                            String timeoutText = parent.getItemAtPosition(position).toString();
+                            viewModel.setAutoLightsOffEnabled(true, parseTimeoutMinutes(timeoutText));
+                        }
+                    }
+                    @Override public void onNothingSelected(AdapterView<?> parent) {}
+                });
+            }
+        }
+
+        if (alertAfterHoursCheckbox != null) {
+            alertAfterHoursCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                if (viewModel != null) viewModel.setAlertsEnabled(isChecked);
+                if (timeRangePickerContainer != null) timeRangePickerContainer.setVisibility(isChecked ? View.VISIBLE : View.GONE);
             });
         }
 
-        // Time pickers
-        if (startTimeInput != null) {
-            startTimeInput.setOnClickListener(v -> showTimePicker(true));
-        }
-        if (endTimeInput != null) {
-            endTimeInput.setOnClickListener(v -> showTimePicker(false));
-        }
+        if (startTimeInput != null) startTimeInput.setOnClickListener(v -> showTimePicker(true));
+        if (endTimeInput != null) endTimeInput.setOnClickListener(v -> showTimePicker(false));
 
-        // Manual override buttons
         if (markOccupiedButton != null && viewModel != null) {
             markOccupiedButton.setOnClickListener(v -> viewModel.manualOverride("Occupied"));
         }
@@ -169,110 +169,79 @@ public class PresenceFragment extends Fragment {
     private void observeViewModel() {
         if (viewModel == null) return;
 
-        // Presence detection enabled
         viewModel.presenceDetectionEnabled.observe(getViewLifecycleOwner(), isEnabled -> {
-            if (presenceDetectionSwitch != null) {
-                presenceDetectionSwitch.setChecked(isEnabled != null && isEnabled);
+            if (presenceDetectionSwitch != null) presenceDetectionSwitch.setChecked(isEnabled != null && isEnabled);
+        });
+
+        viewModel.autoLightsOffEnabled.observe(getViewLifecycleOwner(), enabled -> {
+            if (autoLightsOffCheckbox != null) {
+                autoLightsOffCheckbox.setChecked(enabled != null && enabled);
+                boolean visible = enabled != null && enabled;
+                if (labelAutoOffTime != null) labelAutoOffTime.setVisibility(visible ? View.VISIBLE : View.GONE);
+                if (autoOffTimeSpinner != null) autoOffTimeSpinner.setVisibility(visible ? View.VISIBLE : View.GONE);
             }
         });
 
-        // Presence status
         viewModel.presenceStatus.observe(getViewLifecycleOwner(), status -> {
-            if (status != null) {
-                updatePresenceUI(status);
-            }
+            if (status != null) updatePresenceUI(status);
         });
 
-        // Timestamps and counters
         viewModel.lastUpdatedTime.observe(getViewLifecycleOwner(), time -> {
-            if (lastUpdatedTimeText != null && time != null) {
-                lastUpdatedTimeText.setText(time);
-            }
+            if (lastUpdatedTimeText != null && time != null) lastUpdatedTimeText.setText(time);
         });
 
         viewModel.sessionDuration.observe(getViewLifecycleOwner(), duration -> {
-            if (sessionDurationText != null) {
-                if (duration != null) {
-                    sessionDurationText.setText(String.format(Locale.getDefault(), "%d seconds", duration));
-                } else {
-                    sessionDurationText.setText("--");
-                }
-            }
+            if (sessionDurationText != null) sessionDurationText.setText(duration != null ? duration + " seconds" : "--");
         });
 
         viewModel.totalDetections.observe(getViewLifecycleOwner(), detections -> {
-            if (totalDetectionsText != null) {
-                if (detections != null) {
-                    totalDetectionsText.setText(String.valueOf(detections));
-                } else {
-                    totalDetectionsText.setText("--");
-                }
+            if (totalDetectionsText != null) totalDetectionsText.setText(detections != null ? String.valueOf(detections) : "--");
+        });
+
+        // --- NEW: Toast Timer Events ---
+        viewModel.timerEventMessage.observe(getViewLifecycleOwner(), message -> {
+            if (message != null) {
+                safeToast(message);
             }
         });
 
-        // Errors
         viewModel.error.observe(getViewLifecycleOwner(), error -> {
-            if (error != null && !error.isEmpty()) {
-                safeToast(error);
-            }
+            if (error != null && !error.isEmpty()) safeToast(error);
         });
     }
 
     private void updatePresenceUI(String status) {
-        if (presenceStatusText == null || presenceIcon == null || statusIndicator == null) return;
-
+        if (presenceStatusText == null) return;
         boolean occupied = "occupied".equalsIgnoreCase(status);
-
-        if (occupied) {
-            presenceStatusText.setText("Occupied");
-            if (presenceIcon != null) presenceIcon.setImageResource(R.drawable.ic_room_occupied);
-            if (statusIndicator != null) statusIndicator.setBackgroundResource(R.drawable.circle_indicator_green);
-        } else {
-            presenceStatusText.setText("Vacant");
-            if (presenceIcon != null) presenceIcon.setImageResource(R.drawable.ic_room_empty);
-            if (statusIndicator != null) statusIndicator.setBackgroundResource(R.drawable.circle_indicator_red);
-        }
+        presenceStatusText.setText(occupied ? "Occupied" : "Vacant");
+        if (presenceIcon != null) presenceIcon.setImageResource(occupied ? R.drawable.ic_room_occupied : R.drawable.ic_room_empty);
+        if (statusIndicator != null) statusIndicator.setBackgroundResource(occupied ? R.drawable.circle_indicator_green : R.drawable.circle_indicator_red);
     }
 
     private void showTimePicker(boolean isStartTime) {
         if (getParentFragmentManager() == null) return;
-
         MaterialTimePicker picker = new MaterialTimePicker.Builder()
-                .setTimeFormat(TimeFormat.CLOCK_12H)
-                .setHour(12)
-                .setMinute(0)
-                .setTitleText("Select Time")
-                .build();
-
+                .setTimeFormat(TimeFormat.CLOCK_12H).setHour(12).setMinute(0).setTitleText("Select Time").build();
         picker.addOnPositiveButtonClickListener(v -> {
-            int hour = picker.getHour();
-            int minute = picker.getMinute();
-            String formattedTime = String.format(Locale.getDefault(), "%02d:%02d", hour, minute);
-
-            if (isStartTime && startTimeInput != null && viewModel != null) {
-                startTimeInput.setText(formattedTime);
-                viewModel.setAlertStartTime(formattedTime);
-            } else if (endTimeInput != null && viewModel != null) {
-                endTimeInput.setText(formattedTime);
-                viewModel.setAlertEndTime(formattedTime);
-            }
+            String time = String.format(Locale.getDefault(), "%02d:%02d", picker.getHour(), picker.getMinute());
+            if (isStartTime) { if (startTimeInput != null) startTimeInput.setText(time); viewModel.setAlertStartTime(time); }
+            else { if (endTimeInput != null) endTimeInput.setText(time); viewModel.setAlertEndTime(time); }
         });
-
         picker.show(getParentFragmentManager(), "timePicker");
     }
 
-    private void setupSpinner() {
-        if (autoOffTimeSpinner == null || getContext() == null) return;
-
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
-                R.array.auto_off_time_options, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        autoOffTimeSpinner.setAdapter(adapter);
+    private int parseTimeoutMinutes(String text) {
+        switch (text) {
+            case "1 minute": return 1;
+            case "2 minutes": return 2;
+            case "5 minutes": return 5;
+            case "10 minutes": return 10;
+            case "15 minutes": return 15;
+            default: return 5;
+        }
     }
 
     private void safeToast(String message) {
-        if (getContext() != null) {
-            Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
-        }
+        if (getContext() != null) Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
     }
 }
