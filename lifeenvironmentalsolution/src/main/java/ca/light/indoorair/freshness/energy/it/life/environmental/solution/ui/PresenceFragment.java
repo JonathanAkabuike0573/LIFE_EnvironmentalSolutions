@@ -1,7 +1,8 @@
 package ca.light.indoorair.freshness.energy.it.life.environmental.solution.ui;
 
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,8 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -33,7 +36,7 @@ import ca.light.indoorair.freshness.energy.it.life.environmental.solution.viewmo
 
 public class PresenceFragment extends Fragment {
 
-    // UI Elements
+
     private TextView presenceStatusText, lastUpdatedTimeText, sessionDurationText,
             totalDetectionsText, labelAutoOffTime, currentRoomText;
     private ImageView presenceIcon;
@@ -45,7 +48,7 @@ public class PresenceFragment extends Fragment {
     private LinearLayout timeRangePickerContainer;
     private TextInputEditText startTimeInput, endTimeInput;
 
-    // ViewModels
+
     private PresenceViewModel viewModel;
     private SharedRoomViewModel sharedRoomViewModel;
 
@@ -59,6 +62,13 @@ public class PresenceFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(requireActivity(), new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, 101);
+            }
+        }
 
         viewModel = new ViewModelProvider(this).get(PresenceViewModel.class);
         sharedRoomViewModel = new ViewModelProvider(requireActivity()).get(SharedRoomViewModel.class);
@@ -108,6 +118,7 @@ public class PresenceFragment extends Fragment {
     }
 
     private void setupListeners() {
+
         if (presenceDetectionSwitch != null) {
             presenceDetectionSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 if (buttonView.isPressed() && viewModel != null) {
@@ -116,6 +127,7 @@ public class PresenceFragment extends Fragment {
                 }
             });
         }
+
 
         if (autoLightsOffCheckbox != null) {
             autoLightsOffCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -148,15 +160,21 @@ public class PresenceFragment extends Fragment {
             }
         }
 
+
         if (alertAfterHoursCheckbox != null) {
             alertAfterHoursCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 if (viewModel != null) viewModel.setAlertsEnabled(isChecked);
-                if (timeRangePickerContainer != null) timeRangePickerContainer.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+
+                if (timeRangePickerContainer != null) {
+                    timeRangePickerContainer.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+                }
             });
         }
 
+
         if (startTimeInput != null) startTimeInput.setOnClickListener(v -> showTimePicker(true));
         if (endTimeInput != null) endTimeInput.setOnClickListener(v -> showTimePicker(false));
+
 
         if (markOccupiedButton != null && viewModel != null) {
             markOccupiedButton.setOnClickListener(v -> viewModel.manualOverride("Occupied"));
@@ -182,6 +200,21 @@ public class PresenceFragment extends Fragment {
             }
         });
 
+
+        viewModel.alertsEnabled.observe(getViewLifecycleOwner(), enabled -> {
+            if (alertAfterHoursCheckbox != null) alertAfterHoursCheckbox.setChecked(enabled);
+            if (timeRangePickerContainer != null) timeRangePickerContainer.setVisibility(enabled ? View.VISIBLE : View.GONE);
+        });
+
+        viewModel.alertStartTime.observe(getViewLifecycleOwner(), time -> {
+            if (startTimeInput != null && time != null) startTimeInput.setText(time);
+        });
+
+        viewModel.alertEndTime.observe(getViewLifecycleOwner(), time -> {
+            if (endTimeInput != null && time != null) endTimeInput.setText(time);
+        });
+
+
         viewModel.presenceStatus.observe(getViewLifecycleOwner(), status -> {
             if (status != null) updatePresenceUI(status);
         });
@@ -198,11 +231,8 @@ public class PresenceFragment extends Fragment {
             if (totalDetectionsText != null) totalDetectionsText.setText(detections != null ? String.valueOf(detections) : "--");
         });
 
-        // --- NEW: Toast Timer Events ---
         viewModel.timerEventMessage.observe(getViewLifecycleOwner(), message -> {
-            if (message != null) {
-                safeToast(message);
-            }
+            if (message != null) safeToast(message);
         });
 
         viewModel.error.observe(getViewLifecycleOwner(), error -> {
@@ -220,12 +250,33 @@ public class PresenceFragment extends Fragment {
 
     private void showTimePicker(boolean isStartTime) {
         if (getParentFragmentManager() == null) return;
+
+        int hour = 12, minute = 0;
+        try {
+            String currentText = isStartTime ? startTimeInput.getText().toString() : endTimeInput.getText().toString();
+            if (!currentText.isEmpty() && currentText.contains(":")) {
+                String[] parts = currentText.split(":");
+                hour = Integer.parseInt(parts[0]);
+                minute = Integer.parseInt(parts[1]);
+            }
+        } catch (Exception ignored) {}
+
         MaterialTimePicker picker = new MaterialTimePicker.Builder()
-                .setTimeFormat(TimeFormat.CLOCK_12H).setHour(12).setMinute(0).setTitleText("Select Time").build();
+                .setTimeFormat(TimeFormat.CLOCK_12H)
+                .setHour(hour)
+                .setMinute(minute)
+                .setTitleText(isStartTime ? "Start Time" : "End Time")
+                .build();
+
         picker.addOnPositiveButtonClickListener(v -> {
             String time = String.format(Locale.getDefault(), "%02d:%02d", picker.getHour(), picker.getMinute());
-            if (isStartTime) { if (startTimeInput != null) startTimeInput.setText(time); viewModel.setAlertStartTime(time); }
-            else { if (endTimeInput != null) endTimeInput.setText(time); viewModel.setAlertEndTime(time); }
+            if (isStartTime) {
+                if (startTimeInput != null) startTimeInput.setText(time);
+                viewModel.setAlertStartTime(time);
+            } else {
+                if (endTimeInput != null) endTimeInput.setText(time);
+                viewModel.setAlertEndTime(time);
+            }
         });
         picker.show(getParentFragmentManager(), "timePicker");
     }

@@ -34,7 +34,6 @@ public class LightFragment extends Fragment {
     private SwitchMaterial autoBrightnessSwitch, powerOnSwitch;
     private Slider brightnessSlider;
 
-    // ViewModels
     private LightViewModel viewModel;
     private SharedRoomViewModel sharedRoomViewModel;
 
