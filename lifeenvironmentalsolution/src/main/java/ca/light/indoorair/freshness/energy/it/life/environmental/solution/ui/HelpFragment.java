@@ -13,12 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.os.Build;
-
-
-
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.MainActivity;
 import ca.light.indoorair.freshness.energy.it.life.environmental.solution.R;
 
 public class HelpFragment extends Fragment {
@@ -54,7 +49,7 @@ public class HelpFragment extends Fragment {
             );
         }
 
-        // Contact Support
+        // Contact Support (opens email directly)
         if (contactSupportButton != null) {
             contactSupportButton.setOnClickListener(v -> {
                 String[] emails = new String[]{
@@ -77,48 +72,15 @@ public class HelpFragment extends Fragment {
             });
         }
 
-        // Report Bug
+        // Report Bug – open full BugReportFragment page (feedback form)
         if (reportBugButton != null) {
             reportBugButton.setOnClickListener(v -> {
-                String supportEmail = getString(R.string.help_support_email);
-                String subject = getString(R.string.help_bug_email_subject);
-
-                StringBuilder bodyBuilder = new StringBuilder();
-                bodyBuilder.append(getString(R.string.help_bug_email_body));
-                bodyBuilder.append("\n");
-
-                try {
-                    PackageManager pm = requireContext().getPackageManager();
-                    PackageInfo pInfo = pm.getPackageInfo(requireContext().getPackageName(), 0);
-                    String versionName = pInfo.versionName;
-                    int versionCode = (int) pInfo.getLongVersionCode();
-                    bodyBuilder.append("App Version: ").append(versionName)
-                            .append(" (").append(versionCode).append(")\n");
-                } catch (Exception e) {
-                    bodyBuilder.append("App Version: unknown\n");
-                }
-
-                bodyBuilder.append("Device: ")
-                        .append(Build.MANUFACTURER).append(" ")
-                        .append(Build.MODEL).append("\n");
-                bodyBuilder.append("Android: ")
-                        .append(Build.VERSION.RELEASE)
-                        .append(" (API ").append(Build.VERSION.SDK_INT).append(")\n");
-
-                String body = bodyBuilder.toString();
-
-                Intent intent = new Intent(Intent.ACTION_SENDTO);
-                intent.setData(Uri.parse("mailto:"));
-                intent.putExtra(Intent.EXTRA_EMAIL, new String[]{supportEmail});
-                intent.putExtra(Intent.EXTRA_SUBJECT, subject);
-                intent.putExtra(Intent.EXTRA_TEXT, body);
-
-                try {
-                    startActivity(Intent.createChooser(intent,
-                            getString(R.string.help_report_bug)));
-                } catch (Exception e) {
+                if (requireActivity() instanceof MainActivity) {
+                    ((MainActivity) requireActivity())
+                            .setCurrentFragment(new BugReportFragment(), true);
+                } else {
                     Toast.makeText(requireContext(),
-                            getString(R.string.help_no_email_app),
+                            "Unable to open bug report page.",
                             Toast.LENGTH_SHORT).show();
                 }
             });
