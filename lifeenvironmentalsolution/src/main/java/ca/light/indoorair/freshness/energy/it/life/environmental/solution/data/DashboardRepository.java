@@ -51,7 +51,7 @@ public class DashboardRepository {
     }
 
     private void attachListeners() {
-        // Room/Temperature
+
         roomListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -81,7 +81,7 @@ public class DashboardRepository {
         };
         roomRef.addValueEventListener(roomListener);
 
-        // Air Quality
+
         airQualityListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
