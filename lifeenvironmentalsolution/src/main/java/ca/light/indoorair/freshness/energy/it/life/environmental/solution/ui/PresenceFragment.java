@@ -27,6 +27,7 @@ import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.timepicker.MaterialTimePicker;
 import com.google.android.material.timepicker.TimeFormat;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.util.Locale;
 
@@ -80,6 +81,16 @@ public class PresenceFragment extends Fragment {
         observeViewModel();
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Log that the user is viewing the Presence Screen
+        FirebaseAnalytics mFirebaseAnalytics = FirebaseAnalytics.getInstance(requireContext());
+        Bundle bundle = new Bundle();
+        bundle.putString(FirebaseAnalytics.Param.SCREEN_NAME, "Presence Screen");
+        bundle.putString(FirebaseAnalytics.Param.SCREEN_CLASS, "PresenceFragment");
+        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW, bundle);
+    }
     private void initializeViews(View view) {
         presenceStatusText = view.findViewById(R.id.presence_status_text);
         lastUpdatedTimeText = view.findViewById(R.id.last_updated_time);
