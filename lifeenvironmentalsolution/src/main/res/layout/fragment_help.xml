@@ -123,7 +123,7 @@
             android:id="@+id/button_report_bug"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/help_report_bug"
+            android:text="@string/bug_report_title"
             android:layout_marginBottom="8dp" />
 
     </LinearLayout>
