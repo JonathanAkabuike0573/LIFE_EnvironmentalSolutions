@@ -55,6 +55,8 @@ import ca.light.indoorair.freshness.energy.it.life.environmental.solution.ui.Not
 import ca.light.indoorair.freshness.energy.it.life.environmental.solution.ui.PresenceFragment;
 import ca.light.indoorair.freshness.energy.it.life.environmental.solution.ui.PurchasesFragment;
 import ca.light.indoorair.freshness.energy.it.life.environmental.solution.ui.SettingsFragment;
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.ui.HelpFragment;
+
 
 // Implement OnBackStackChangedListener to react to navigation changes
 public class MainActivity extends AppCompatActivity implements FragmentManager.OnBackStackChangedListener {
@@ -393,17 +395,36 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         if (toggle.onOptionsItemSelected(item)) {
             return true;
         }
+
         int itemId = item.getItemId();
+
         if (itemId == R.id.action_notification) {
             setCurrentFragment(new NotificationFragment(), true);
             getSupportActionBar().setTitle(getString(R.string.notification));
             return true;
+
         } else if (itemId == R.id.action_aboutus) {
             setCurrentFragment(new AboutUsFragment(), true);
             getSupportActionBar().setTitle(getString(R.string.about_us));
+            return true;
+
+        } else if (itemId == R.id.action_togglemode) {
+            // your existing theme toggle code here
+            // ...
+            return true;
+
+        } else if (itemId == R.id.action_help) {
+            // 🔹 NEW: open Help fragment
+            setCurrentFragment(new HelpFragment(), true);
+            if (getSupportActionBar() != null) {
+                getSupportActionBar().setTitle(getString(R.string.help));
+            }
+            return true;
         }
+
         return super.onOptionsItemSelected(item);
     }
+
 
 
     private void setCurrentFragment(Fragment fragment, boolean addToBackStack) {
