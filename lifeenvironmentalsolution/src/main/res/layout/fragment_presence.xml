@@ -150,7 +150,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="8dp"
-                    android:text="Turn off lights after:"
+                    android:text="@string/turn_off_lights_after"
                     android:visibility="gone" />
 
                 <Spinner
@@ -184,7 +184,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:hint="Start Time">
+                            android:hint="@string/start_time">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/start_time_input"
@@ -198,7 +198,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:layout_marginStart="8dp"
-                            android:hint="End Time">
+                            android:hint="@string/end_time">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/end_time_input"
@@ -295,7 +295,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Today's Activity"
+                    android:text="@string/today_s_activity"
                     android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6" />
 
                 <LinearLayout
@@ -307,7 +307,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Session Duration:"
+                        android:text="@string/session_duration"
                         android:textAppearance="@style/TextAppearance.MaterialComponents.Body1" />
 
                     <TextView
@@ -328,7 +328,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Total Detections:"
+                        android:text="@string/total_detections"
                         android:textAppearance="@style/TextAppearance.MaterialComponents.Body1" />
 
                     <TextView

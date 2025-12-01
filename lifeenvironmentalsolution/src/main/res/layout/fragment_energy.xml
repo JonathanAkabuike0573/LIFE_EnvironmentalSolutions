@@ -31,7 +31,7 @@
                     android:id="@+id/light_level_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Power Consumption"
+                    android:text="@string/power_consumption"
                     android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
                     android:textColor="?android:attr/textColorPrimary"
                     app:layout_constraintStart_toStartOf="parent"
@@ -141,7 +141,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:checked="true"
-                    android:text="Show Power"
+                    android:text="@string/show_power"
                     android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1" />
 
                 <View android:layout_width="match_parent" android:layout_height="1dp" android:background="?android:attr/listDivider" android:layout_marginTop="16dp" android:layout_marginBottom="16dp"/>
@@ -149,7 +149,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Scale"
+                    android:text="@string/scale"
                     android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1" />
 
                 <com.google.android.material.slider.Slider
@@ -166,7 +166,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Show As"
+                    android:text="@string/show_as"
                     android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1" />
 
                 <com.google.android.material.chip.ChipGroup
@@ -189,14 +189,14 @@
                         style="@style/Widget.MaterialComponents.Chip.Choice"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Voltage" />
+                        android:text="@string/voltage" />
 
                     <com.google.android.material.chip.Chip
                         android:id="@+id/chip_current"
                         style="@style/Widget.MaterialComponents.Chip.Choice"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Current" />
+                        android:text="@string/current" />
                 </com.google.android.material.chip.ChipGroup>
 
                 <View android:layout_width="match_parent" android:layout_height="1dp" android:background="?android:attr/listDivider" android:layout_marginTop="16dp" android:layout_marginBottom="16dp"/>
@@ -204,7 +204,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Show As"
+                    android:text="@string/show_as"
                     android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1" />
 
                 <com.google.android.material.chip.ChipGroup
@@ -219,14 +219,14 @@
                         style="@style/Widget.MaterialComponents.Chip.Choice"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Positive" />
+                        android:text="@string/positive" />
 
                     <com.google.android.material.chip.Chip
                         android:id="@+id/chip_relax"
                         style="@style/Widget.MaterialComponents.Chip.Choice"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Negative" />
+                        android:text="@string/negative" />
 
 
 

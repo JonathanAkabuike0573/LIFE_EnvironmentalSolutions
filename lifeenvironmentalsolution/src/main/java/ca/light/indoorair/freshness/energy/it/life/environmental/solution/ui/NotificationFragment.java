@@ -48,7 +48,6 @@ public class NotificationFragment extends Fragment implements NotificationAdapte
         Button clearAllButton = view.findViewById(R.id.clear_all_button);
         clearAllButton.setOnClickListener(v -> showClearAllConfirmationDialog());
 
-        notificationViewModel.loadNotifications();
     }
 
     @Override

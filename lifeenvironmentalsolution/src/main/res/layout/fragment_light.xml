@@ -203,21 +203,21 @@
                             style="@style/Widget.MaterialComponents.Chip.Choice"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Warm" />
+                            android:text="@string/warm" />
 
                         <com.google.android.material.chip.Chip
                             android:id="@+id/chip_neutral"
                             style="@style/Widget.MaterialComponents.Chip.Choice"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Neutral" />
+                            android:text="@string/neutral" />
 
                         <com.google.android.material.chip.Chip
                             android:id="@+id/chip_cool"
                             style="@style/Widget.MaterialComponents.Chip.Choice"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Cool" />
+                            android:text="@string/cool" />
                     </com.google.android.material.chip.ChipGroup>
 
                 <View android:layout_width="match_parent" android:layout_height="1dp" android:background="?android:attr/listDivider" android:layout_marginTop="16dp" android:layout_marginBottom="16dp"/>

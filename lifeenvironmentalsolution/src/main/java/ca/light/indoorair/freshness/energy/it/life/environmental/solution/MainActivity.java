@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
@@ -71,6 +72,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
 
     private static final String PREFS_NAME = "MyPrefsFile";
     private static final String THEME_KEY = "ThemeKey";
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -78,6 +80,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
         setupWindowInsets();
         setupToolbar();
 
@@ -366,7 +369,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         boolean isDarkMode = sharedPreferences.getBoolean(THEME_KEY, false);
         int color = ContextCompat.getColor(this, isDarkMode ? android.R.color.white : R.color.black);
 
-        // The main menu text should be black when not in dark mode.
+        // The main menu text should be black when not in dark mode
         for (int i = 0; i < menu.size(); i++) {
             applyMenuItemColor(menu.getItem(i), color);
         }
@@ -444,7 +447,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
                 startActivity(new Intent(MainActivity.this, LoginActivity.class));
                 finish();
             } else {
-                Toast.makeText(MainActivity.this, "Sign out failed.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, R.string.sign_out_failed , Toast.LENGTH_SHORT).show();
             }
         });
     }

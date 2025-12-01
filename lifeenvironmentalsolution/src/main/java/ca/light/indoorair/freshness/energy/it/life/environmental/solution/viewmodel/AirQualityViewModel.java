@@ -2,7 +2,6 @@ package ca.light.indoorair.freshness.energy.it.life.environmental.solution.viewm
 
 import android.app.Application;
 import android.content.SharedPreferences;
-
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
@@ -19,6 +18,7 @@ import java.util.Locale;
 
 import ca.light.indoorair.freshness.energy.it.life.environmental.solution.R;
 import ca.light.indoorair.freshness.energy.it.life.environmental.solution.data.AirQualityRepository;
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.util.NotificationHelper; // Import your helper
 
 public class AirQualityViewModel extends AndroidViewModel {
 
@@ -31,22 +31,22 @@ public class AirQualityViewModel extends AndroidViewModel {
     private final AirQualityRepository airQualityRepository;
     private final SharedPreferences sharedPreferences;
 
-    // LiveData for UI state
+    // State to prevent spamming notifications every second
+    private boolean isAlertActive = false;
+    private long lastAlertTime = 0;
+    private static final long ALERT_COOLDOWN_MS = 15 * 60 * 1000; // 15 minutes cooldown
+
+    // LiveData
     private final MutableLiveData<Integer> _airQualityValue = new MutableLiveData<>();
     public final LiveData<Integer> airQualityValue = _airQualityValue;
-
     private final MutableLiveData<String> _airQualityLevel = new MutableLiveData<>();
     public final LiveData<String> airQualityLevel = _airQualityLevel;
-
     private final MutableLiveData<String> _lastUpdatedTime = new MutableLiveData<>();
     public final LiveData<String> lastUpdatedTime = _lastUpdatedTime;
-
     private final MutableLiveData<Integer> _statusColor = new MutableLiveData<>();
     public final LiveData<Integer> statusColor = _statusColor;
-
     private final MutableLiveData<Boolean> _isRefreshing = new MutableLiveData<>(false);
     public final LiveData<Boolean> isRefreshing = _isRefreshing;
-
     private final MutableLiveData<String> _error = new MutableLiveData<>();
     public final LiveData<String> error = _error;
 
@@ -73,7 +73,6 @@ public class AirQualityViewModel extends AndroidViewModel {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 processDataSnapshot(dataSnapshot);
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 _error.setValue("Firebase Error: " + databaseError.getMessage());
@@ -84,9 +83,7 @@ public class AirQualityViewModel extends AndroidViewModel {
     }
 
     public void manualRefresh() {
-        if (_isRefreshing.getValue() != null && _isRefreshing.getValue()) {
-            return;
-        }
+        if (_isRefreshing.getValue() != null && Boolean.TRUE.equals(_isRefreshing.getValue())) return;
         _isRefreshing.setValue(true);
         airQualityRepository.manualRefresh(currentRoom).addOnCompleteListener(task -> {
             if (task.isSuccessful() && task.getResult() != null) {
@@ -108,12 +105,43 @@ public class AirQualityViewModel extends AndroidViewModel {
                 Long eco2Value = latestReading.child("eCO2").getValue(Long.class);
                 String co2Description = latestReading.child("co2_description").getValue(String.class);
                 String timestamp = latestReading.child("timestamp").getValue(String.class);
+
                 updateUI(eco2Value, co2Description, timestamp);
+
+
+                if (eco2Value != null) {
+                    checkAlertThreshold(eco2Value.intValue());
+                }
             } else {
                 updateUI(null, null, null);
             }
         } else {
             updateUI(null, null, null);
+        }
+    }
+
+
+    private void checkAlertThreshold(int currentValue) {
+        int alertThreshold = getIntSetting(KEY_ALERT_LEVEL, 2000); // Default 2000 if not set
+
+        if (currentValue > alertThreshold) {
+            long now = System.currentTimeMillis();
+
+
+            if (!isAlertActive || (now - lastAlertTime > ALERT_COOLDOWN_MS)) {
+                String message = "High CO2 detected in " + currentRoom + ": " + currentValue + " PPM";
+
+
+                NotificationHelper.sendAlert(getApplication(), currentRoom, message);
+
+                isAlertActive = true;
+                lastAlertTime = now;
+            }
+        } else {
+
+            if (currentValue < (alertThreshold - 100)) {
+                isAlertActive = false;
+            }
         }
     }
 
@@ -160,6 +188,10 @@ public class AirQualityViewModel extends AndroidViewModel {
 
     public void saveIntSetting(String key, int value) {
         sharedPreferences.edit().putInt(key, value).apply();
+
+        if (KEY_ALERT_LEVEL.equals(key)) {
+
+        }
     }
 
     public void saveBooleanSetting(String key, boolean value) {
