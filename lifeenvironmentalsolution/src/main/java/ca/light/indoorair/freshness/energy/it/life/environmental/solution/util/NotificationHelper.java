@@ -1,4 +1,4 @@
-package ca.light.indoorair.freshness.energy.it.life.environmental.solution.utils;
+package ca.light.indoorair.freshness.energy.it.life.environmental.solution.util;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -13,11 +13,13 @@ import ca.light.indoorair.freshness.energy.it.life.environmental.solution.data.N
 
 public class NotificationHelper {
 
-    private static final String CHANNEL_ID = "presence_alerts";
-    private static final String CHANNEL_NAME = "Presence Alerts";
+
+    private static final String CHANNEL_ID = "smart_building_alerts";
+    private static final String CHANNEL_NAME = "Smart Building Alerts";
     private static final int NOTIFICATION_ID = 1001;
 
-    public static void sendPresenceAlert(Context context, String roomName, String message) {
+
+    public static void sendAlert(Context context, String roomName, String message) {
         NotificationManager notificationManager =
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -27,7 +29,7 @@ public class NotificationHelper {
                     CHANNEL_NAME,
                     NotificationManager.IMPORTANCE_HIGH
             );
-            channel.setDescription("Alerts for room occupancy");
+            channel.setDescription("Alerts for occupancy, air quality, and energy");
             notificationManager.createNotificationChannel(channel);
         }
 
@@ -39,8 +41,14 @@ public class NotificationHelper {
                 PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT
         );
 
+
+        int iconRes = R.drawable.sensor_occupied;
+        if (message.toLowerCase().contains("co2") || message.toLowerCase().contains("air")) {
+
+        }
+
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
-                .setSmallIcon(R.drawable.sensor_occupied) // Ensure this drawable exists
+                .setSmallIcon(iconRes)
                 .setContentTitle("Alert: " + roomName)
                 .setContentText(message)
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
@@ -48,10 +56,11 @@ public class NotificationHelper {
                 .setAutoCancel(true)
                 .setContentIntent(pendingIntent);
 
-        // 1. Show System Notification
-        notificationManager.notify(NOTIFICATION_ID, builder.build());
 
-        // 2. Save to In-App History via Repository
+        int uniqueId = (int) System.currentTimeMillis();
+        notificationManager.notify(uniqueId, builder.build());
+
+
         NotificationRepository.getInstance().addNotification(message);
     }
 }
