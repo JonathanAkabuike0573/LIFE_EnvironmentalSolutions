@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -131,6 +132,17 @@ public class DashBoardFragment extends Fragment {
 
         // Load greeting
         loadGreeting(new FirebaseUserDataProvider());
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Log that the user is viewing the Presence Screen
+        FirebaseAnalytics mFirebaseAnalytics = FirebaseAnalytics.getInstance(requireContext());
+        Bundle bundle = new Bundle();
+        bundle.putString(FirebaseAnalytics.Param.SCREEN_NAME, "Presence Screen");
+        bundle.putString(FirebaseAnalytics.Param.SCREEN_CLASS, "PresenceFragment");
+        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW, bundle);
     }
 
 

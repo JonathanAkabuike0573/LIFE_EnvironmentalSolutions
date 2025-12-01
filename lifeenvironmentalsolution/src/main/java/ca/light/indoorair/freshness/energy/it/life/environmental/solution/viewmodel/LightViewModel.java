@@ -24,7 +24,7 @@ public class LightViewModel extends AndroidViewModel {
     private final LightRepository lightRepository;
     private final SharedPreferences sharedPreferences;
 
-    // LiveData
+
     private final MutableLiveData<Integer> _lux = new MutableLiveData<>(0);
     public final LiveData<Integer> lux = _lux;
 
@@ -120,7 +120,7 @@ public class LightViewModel extends AndroidViewModel {
         _powerOn.setValue(enabled);
         lightRepository.setPowerOn(enabled);
 
-        // RESET SLIDER TO 0 when turning OFF
+
         if (!enabled) {
             _sliderPosition.setValue(0f);
         }
