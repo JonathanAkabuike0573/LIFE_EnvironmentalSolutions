@@ -364,7 +364,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         boolean isDarkMode = sharedPreferences.getBoolean(THEME_KEY, false);
         int color = ContextCompat.getColor(this, isDarkMode ? android.R.color.white : R.color.black);
 
-        // The main menu text should be black when not in dark mode.
+        // The main menu text should be black when not in dark mode
         for (int i = 0; i < menu.size(); i++) {
             applyMenuItemColor(menu.getItem(i), color);
         }
@@ -423,7 +423,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
                 startActivity(new Intent(MainActivity.this, LoginActivity.class));
                 finish();
             } else {
-                Toast.makeText(MainActivity.this, "Sign out failed.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, R.string.sign_out_failed , Toast.LENGTH_SHORT).show();
             }
         });
     }

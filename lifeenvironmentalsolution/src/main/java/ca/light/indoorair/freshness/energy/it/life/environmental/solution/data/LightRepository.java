@@ -25,12 +25,17 @@ public class LightRepository {
     private android.os.Handler simulationHandler;
     private boolean isSimulating = false;
 
-    private void setupFirebaseReference(String roomName) {
+
+    private DatabaseReference getRefForRoom(String roomName) {
         if ("Main Office".equals(roomName)) {
-            lightSensorDbRef = FirebaseDatabase.getInstance().getReference("sensorData").child("light");
+            return FirebaseDatabase.getInstance().getReference("sensorData").child("light");
         } else {
-            lightSensorDbRef = FirebaseDatabase.getInstance().getReference("rooms").child(roomName).child("light");
+            return FirebaseDatabase.getInstance().getReference("rooms").child(roomName).child("light");
         }
+    }
+
+    private void setupFirebaseReference(String roomName) {
+        lightSensorDbRef = getRefForRoom(roomName);
     }
 
     public void startListening(String roomName, ValueEventListener listener) {
@@ -49,32 +54,41 @@ public class LightRepository {
         stopSimulation();
     }
 
+
     public void setPowerOn(boolean enabled) {
         powerOn = enabled;
 
         if (lightSensorDbRef != null) {
-            Map<String, Object> updates = new HashMap<>();
-            updates.put("powerOn", enabled);
-
-
-            if (!enabled) {
-                autoBrightnessEnabled = false;
-                updates.put("autoBrightness", false);
-                updates.put("lux", 0);
-                updates.put("sliderBrightness", 0);
-            }
-
-            lightSensorDbRef.updateChildren(updates);
+            performLightUpdate(lightSensorDbRef, enabled);
         }
-
-
         stopSimulation();
     }
 
 
+    public void setPowerOn(String roomName, boolean enabled) {
+
+        DatabaseReference tempRef = getRefForRoom(roomName);
+        performLightUpdate(tempRef, enabled);
+    }
+
+
+    private void performLightUpdate(DatabaseReference ref, boolean enabled) {
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("powerOn", enabled);
+
+        if (!enabled) {
+
+            autoBrightnessEnabled = false;
+            updates.put("autoBrightness", false);
+            updates.put("lux", 0);
+            updates.put("sliderBrightness", 0);
+        }
+
+        ref.updateChildren(updates);
+    }
+
     public void setAutoBrightness(boolean enabled) {
         if (!powerOn) return;
-
         autoBrightnessEnabled = enabled;
         if (lightSensorDbRef != null) {
             lightSensorDbRef.child("autoBrightness").setValue(enabled);
@@ -90,12 +104,10 @@ public class LightRepository {
 
     public void setSliderBrightness(int sliderValue) {
         if (!powerOn) return;
-
         sliderBrightnessValue = sliderValue;
         if (lightSensorDbRef != null) {
             lightSensorDbRef.child("sliderBrightness").setValue(sliderValue);
         }
-
         if (!autoBrightnessEnabled) {
             restartSimulation();
         }
@@ -127,7 +139,6 @@ public class LightRepository {
         @Override
         public void run() {
             if (!powerOn || !isSimulating) {
-
                 if (lightSensorDbRef != null) {
                     lightSensorDbRef.child("lux").setValue(0);
                 }
@@ -136,7 +147,6 @@ public class LightRepository {
             }
 
             int luxValue;
-
             if (autoBrightnessEnabled) {
                 luxValue = 50 + random.nextInt(1950);
             } else {
@@ -158,5 +168,4 @@ public class LightRepository {
             }
         }
     };
-
 }
