@@ -97,11 +97,11 @@ public class AirQualityFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        // Log that the user is viewing the Presence Screen
+        // Log that the user is viewing the Air Quality Screen
         FirebaseAnalytics mFirebaseAnalytics = FirebaseAnalytics.getInstance(requireContext());
         Bundle bundle = new Bundle();
-        bundle.putString(FirebaseAnalytics.Param.SCREEN_NAME, "Presence Screen");
-        bundle.putString(FirebaseAnalytics.Param.SCREEN_CLASS, "PresenceFragment");
+        bundle.putString(FirebaseAnalytics.Param.SCREEN_NAME, "Air Quality Screen");
+        bundle.putString(FirebaseAnalytics.Param.SCREEN_CLASS, "AirQualityFragment");
         mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW, bundle);
     }
 
