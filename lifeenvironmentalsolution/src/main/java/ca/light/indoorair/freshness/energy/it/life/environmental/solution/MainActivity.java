@@ -427,7 +427,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
 
 
 
-    private void setCurrentFragment(Fragment fragment, boolean addToBackStack) {
+    public void setCurrentFragment(Fragment fragment, boolean addToBackStack) {
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.replace(R.id.main, fragment);
         if (addToBackStack) {
