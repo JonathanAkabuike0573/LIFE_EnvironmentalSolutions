@@ -246,6 +246,42 @@ CENG-322-OCC,  Software Project -->
     <string name="loading_data_for">"Loading data for: "</string>
     <string name="sign_out_failed">Sign out failed.</string>
 
+    <!-- Bug Report Strings -->
+    <string name="bug_report_title">Report a Bug</string>
+    <string name="bug_report_intro">Please describe the issue you encountered.</string>
+    <string name="bug_field_summary_hint">Summary</string>
+    <string name="bug_field_steps_hint">Steps to reproduce</string>
+    <string name="bug_field_expected_hint">Expected behavior</string>
+    <string name="bug_field_actual_hint">Actual behavior</string>
+    <string name="bug_field_extra_hint">Additional information</string>
+    <string name="bug_screenshot_section">Screenshots</string>
+    <string name="bug_add_screenshot">Add Screenshot</string>
+    <string name="bug_screenshot_none">No screenshots added</string>
+    <string name="bug_submit">Submit Bug Report</string>
+
+    <!-- Help & Support Strings -->
+    <string name="help_title">Help &amp; Support</string>
+    <string name="help_subtitle">Frequently Asked Questions and Tips</string>
+    <string name="help_section_quick_tips">Quick Tips</string>
+    <string name="help_tip_1">Ensure your sensors are connected.</string>
+    <string name="help_tip_2">Check your internet connection.</string>
+    <string name="help_tip_3">Update the app to the latest version.</string>
+    <string name="help_section_troubleshooting">Troubleshooting</string>
+    <string name="help_trouble_1">If the app crashes, try restarting it.</string>
+    <string name="help_trouble_2">If data is not syncing, clear the cache.</string>
+    <string name="help_trouble_3">For device connection issues, reset the sensor.</string>
+    <string name="help_section_more_support">More Support</string>
+    <string name="help_quick_start">Quick Start Guide</string>
+    <string name="help_contact_support">Contact Support</string>
+    <string name="help">Help</string>
+    <string name="bug_screenshot_selected">bug_screenshot_selected</string>
+    <string name="bug_error_empty">bug_error_empty</string>
+    <string name="help_support_email">help_support_email</string>
+    <string name="help_bug_email_subject">help_bug_email_subject</string>
+    <string name="bug_submitted_to_email">bug_submitted_to_email</string>
+    <string name="help_no_email_app">help_no_email_app</string>
+    <string name="help_support_email_subject">help_support_email_subject</string>
+
     <string-array name="auto_off_time_options">
         <item>1 minute</item>
         <item>2 minutes</item>
