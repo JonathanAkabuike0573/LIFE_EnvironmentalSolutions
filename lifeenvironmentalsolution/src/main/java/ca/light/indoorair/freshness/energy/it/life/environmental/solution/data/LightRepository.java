@@ -1,7 +1,6 @@
 package ca.light.indoorair.freshness.energy.it.life.environmental.solution.data;
 
 import androidx.annotation.NonNull;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -19,6 +18,13 @@ public class LightRepository {
     private final Random random = new Random();
     private static final int SIMULATION_INTERVAL = 4000;
 
+    // Simulation state
+    private boolean autoBrightnessEnabled = true;
+    private boolean powerOn = true;
+    private int sliderBrightnessValue = 50;
+    private android.os.Handler simulationHandler;
+    private boolean isSimulating = false;
+
     private void setupFirebaseReference(String roomName) {
         if ("Main Office".equals(roomName)) {
             lightSensorDbRef = FirebaseDatabase.getInstance().getReference("sensorData").child("light");
@@ -32,7 +38,7 @@ public class LightRepository {
         setupFirebaseReference(roomName);
         lightValueEventListener = listener;
         lightSensorDbRef.addValueEventListener(listener);
-        startSimulation();
+        startSmartSimulation();
     }
 
     public void stopListening() {
@@ -40,6 +46,40 @@ public class LightRepository {
             lightSensorDbRef.removeEventListener(lightValueEventListener);
             lightValueEventListener = null;
         }
+        stopSimulation();
+    }
+
+    public void setPowerOn(boolean enabled) {
+        powerOn = enabled;
+
+        if (lightSensorDbRef != null) {
+            Map<String, Object> updates = new HashMap<>();
+            updates.put("powerOn", enabled);
+
+
+            if (!enabled) {
+                autoBrightnessEnabled = false;
+                updates.put("autoBrightness", false);
+                updates.put("lux", 0);
+                updates.put("sliderBrightness", 0);
+            }
+
+            lightSensorDbRef.updateChildren(updates);
+        }
+
+
+        stopSimulation();
+    }
+
+
+    public void setAutoBrightness(boolean enabled) {
+        if (!powerOn) return;
+
+        autoBrightnessEnabled = enabled;
+        if (lightSensorDbRef != null) {
+            lightSensorDbRef.child("autoBrightness").setValue(enabled);
+        }
+        restartSimulation();
     }
 
     public void setBrightness(String brightness) {
@@ -48,25 +88,75 @@ public class LightRepository {
         }
     }
 
-    public void setAutoBrightness(boolean enabled) {
+    public void setSliderBrightness(int sliderValue) {
+        if (!powerOn) return;
+
+        sliderBrightnessValue = sliderValue;
         if (lightSensorDbRef != null) {
-            lightSensorDbRef.child("autoBrightness").setValue(enabled);
+            lightSensorDbRef.child("sliderBrightness").setValue(sliderValue);
+        }
+
+        if (!autoBrightnessEnabled) {
+            restartSimulation();
         }
     }
 
-    private void startSimulation() {
-        new android.os.Handler(android.os.Looper.getMainLooper()).post(new Runnable() {
-            @Override
-            public void run() {
-                int currentLux = 50 + random.nextInt(1950);
-                Map<String, Object> sensorData = new HashMap<>();
-                sensorData.put("lux", currentLux);
-                sensorData.put("timestamp", System.currentTimeMillis());
-                lightSensorDbRef.updateChildren(sensorData);
-
-                new android.os.Handler(android.os.Looper.getMainLooper())
-                        .postDelayed(this, SIMULATION_INTERVAL);
-            }
-        });
+    private void restartSimulation() {
+        stopSimulation();
+        if (powerOn) {
+            startSmartSimulation();
+        }
     }
+
+    private void startSmartSimulation() {
+        if (isSimulating || !powerOn) return;
+        isSimulating = true;
+        simulationHandler = new android.os.Handler(android.os.Looper.getMainLooper());
+        simulationHandler.post(smartSimulationRunnable);
+    }
+
+    private void stopSimulation() {
+        isSimulating = false;
+        if (simulationHandler != null) {
+            simulationHandler.removeCallbacks(smartSimulationRunnable);
+            simulationHandler = null;
+        }
+    }
+
+    private final Runnable smartSimulationRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (!powerOn || !isSimulating) {
+
+                if (lightSensorDbRef != null) {
+                    lightSensorDbRef.child("lux").setValue(0);
+                }
+                stopSimulation();
+                return;
+            }
+
+            int luxValue;
+
+            if (autoBrightnessEnabled) {
+                luxValue = 50 + random.nextInt(1950);
+            } else {
+                int baseLux = (int) ((sliderBrightnessValue / 100.0) * 2000);
+                int fluctuation = (int) (baseLux * 0.1 * (random.nextFloat() - 0.5));
+                luxValue = Math.max(0, Math.min(2000, baseLux + fluctuation));
+            }
+
+            Map<String, Object> sensorData = new HashMap<>();
+            sensorData.put("lux", luxValue);
+            sensorData.put("timestamp", System.currentTimeMillis());
+
+            if (lightSensorDbRef != null) {
+                lightSensorDbRef.updateChildren(sensorData);
+            }
+
+            if (powerOn && isSimulating) {
+                simulationHandler.postDelayed(this, SIMULATION_INTERVAL);
+            }
+        }
+    };
+
 }

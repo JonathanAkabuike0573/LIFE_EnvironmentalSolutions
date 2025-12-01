@@ -148,6 +148,17 @@
                 android:padding="20dp">
 
                 <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/light_switch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Power"
+                android:checked="true"
+                android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"/>
+
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="?android:attr/listDivider" android:layout_marginTop="16dp" android:layout_marginBottom="16dp"/>
+
+
+                <com.google.android.material.switchmaterial.SwitchMaterial
                     android:id="@+id/power_on"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -238,12 +249,6 @@
                         android:layout_height="wrap_content"
                         android:text="@string/relax" />
 
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/chip_nightlight"
-                        style="@style/Widget.MaterialComponents.Chip.Choice"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/nightlight" />
 
                 </com.google.android.material.chip.ChipGroup>
 
