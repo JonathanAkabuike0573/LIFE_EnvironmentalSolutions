@@ -31,12 +31,13 @@ public class LightFragment extends Fragment {
     private View statusIndicator;
     private CardView lightLevelCard;
     private ChipGroup lightBrightnessChipGroup, lightPresetsChipGroup;
-    private SwitchMaterial autoBrightnessSwitch;
+    private SwitchMaterial autoBrightnessSwitch, powerOnSwitch;
     private Slider brightnessSlider;
 
     // ViewModels
     private LightViewModel viewModel;
     private SharedRoomViewModel sharedRoomViewModel;
+
 
     public LightFragment() {}
 
@@ -49,7 +50,7 @@ public class LightFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        viewModel = new ViewModelProvider(this).get(LightViewModel.class);
+        viewModel = new ViewModelProvider(requireActivity()).get(LightViewModel.class);  // Activity scope
         sharedRoomViewModel = new ViewModelProvider(requireActivity()).get(SharedRoomViewModel.class);
 
         initializeViews(view);
@@ -70,6 +71,7 @@ public class LightFragment extends Fragment {
         autoBrightnessSwitch = view.findViewById(R.id.power_on);
         brightnessSlider = view.findViewById(R.id.slider_brightness);
         lightPresetsChipGroup = view.findViewById(R.id.chip_group_presets);
+        powerOnSwitch = view.findViewById(R.id.light_switch);
     }
 
     private void setupRoomSync() {
@@ -111,6 +113,15 @@ public class LightFragment extends Fragment {
             });
         }
 
+        if (powerOnSwitch != null) {
+            powerOnSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                if (buttonView.isPressed()) {
+                    viewModel.setPowerOn(isChecked);
+                    safeToast(isChecked ? "Light turned on" : "Light turned off");
+                }
+            });
+        }
+
 
         if (autoBrightnessSwitch != null) {
             autoBrightnessSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -123,6 +134,7 @@ public class LightFragment extends Fragment {
                 }
             });
         }
+
 
 
         if (brightnessSlider != null) {
@@ -179,6 +191,42 @@ public class LightFragment extends Fragment {
         viewModel.autoBrightness.observe(getViewLifecycleOwner(), enabled -> {
             if (enabled != null) updateAutoBrightnessState(enabled);
         });
+
+        viewModel.powerOn.observe(getViewLifecycleOwner(), isOn -> {
+            if (isOn != null) {
+                if (powerOnSwitch != null) {
+                    powerOnSwitch.setChecked(isOn);
+                }
+
+
+                boolean controlsEnabled = isOn;
+
+
+                if (brightnessSlider != null) {
+                    brightnessSlider.setEnabled(controlsEnabled && !viewModel.autoBrightness.getValue());
+                }
+
+
+                if (lightBrightnessChipGroup != null) {
+                    lightBrightnessChipGroup.setEnabled(controlsEnabled);
+                }
+
+
+                if (autoBrightnessSwitch != null) {
+                    autoBrightnessSwitch.setEnabled(controlsEnabled);
+                }
+
+
+                if (lightPresetsChipGroup != null) {
+                    lightPresetsChipGroup.setEnabled(controlsEnabled);
+                }
+            }
+        });
+
+
+        viewModel.autoBrightness.observe(getViewLifecycleOwner(), enabled -> {
+            if (enabled != null) updateAutoBrightnessState(enabled);
+        });
     }
 
     private void updateBrightnessSelection(String brightness) {
@@ -191,8 +239,12 @@ public class LightFragment extends Fragment {
     }
 
     private void updateAutoBrightnessState(boolean enabled) {
-        if (autoBrightnessSwitch != null) autoBrightnessSwitch.setChecked(enabled);
-        if (brightnessSlider != null) brightnessSlider.setEnabled(!enabled);
+        if (autoBrightnessSwitch != null) {
+            autoBrightnessSwitch.setChecked(enabled);
+        }
+        if (brightnessSlider != null && viewModel.powerOn.getValue() == true) {
+            brightnessSlider.setEnabled(!enabled);
+        }
     }
 
     private void safeToast(String message) {

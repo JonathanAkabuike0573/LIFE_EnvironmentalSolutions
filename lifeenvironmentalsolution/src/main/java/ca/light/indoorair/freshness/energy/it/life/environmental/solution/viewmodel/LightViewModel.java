@@ -40,17 +40,22 @@ public class LightViewModel extends AndroidViewModel {
     private final MutableLiveData<Integer> _cardGlowColor = new MutableLiveData<>(R.color.card_glow_neutral);
     public final LiveData<Integer> cardGlowColor = _cardGlowColor;
 
+
+    private final MutableLiveData<Boolean> _powerOn = new MutableLiveData<>(false);
+    public final LiveData<Boolean> powerOn = _powerOn;
+
+
     private final MutableLiveData<String> _brightness = new MutableLiveData<>("Neutral");
     public final LiveData<String> brightness = _brightness;
 
     private final MutableLiveData<Boolean> _autoBrightness = new MutableLiveData<>(true);
     public final LiveData<Boolean> autoBrightness = _autoBrightness;
 
-    // SLIDER SYNC
+
     private final MutableLiveData<Float> _sliderPosition = new MutableLiveData<>(50f);
     public final LiveData<Float> sliderPosition = _sliderPosition;
 
-    // Thresholds
+
     private static final int LUX_DIM_THRESHOLD = 200;
     private static final int LUX_NORMAL_THRESHOLD = 1000;
 
@@ -66,11 +71,22 @@ public class LightViewModel extends AndroidViewModel {
         loadSettings();
     }
 
+
+
     private void startListening() {
         lightRepository.startListening(currentRoom, new com.google.firebase.database.ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
+
+                    Boolean powerOnValue = dataSnapshot.child("powerOn").getValue(Boolean.class);
+                    if (powerOnValue != null) {
+
+                        _powerOn.postValue(powerOnValue);
+                    }
+
+
+
                     Integer luxValue = dataSnapshot.child("lux").getValue(Integer.class);
                     String brightnessValue = dataSnapshot.child("brightness").getValue(String.class);
                     Boolean autoBrightnessValue = dataSnapshot.child("autoBrightness").getValue(Boolean.class);
@@ -99,6 +115,19 @@ public class LightViewModel extends AndroidViewModel {
         });
     }
 
+
+    public void setPowerOn(boolean enabled) {
+        _powerOn.setValue(enabled);
+        lightRepository.setPowerOn(enabled);
+
+        // RESET SLIDER TO 0 when turning OFF
+        if (!enabled) {
+            _sliderPosition.setValue(0f);
+        }
+    }
+
+
+
     public void setBrightness(String brightness) {
         lightRepository.setBrightness(brightness);
     }
@@ -109,20 +138,20 @@ public class LightViewModel extends AndroidViewModel {
 
     public void setSliderBrightness(int sliderValue) {
         lightRepository.setSliderBrightness(sliderValue);
-        _sliderPosition.setValue((float) sliderValue);  // SYNC SLIDER UI
+        _sliderPosition.setValue((float) sliderValue);
     }
 
-    // PERFECT PRESETS
+
     public void setPreset(String preset) {
         switch (preset.toLowerCase()) {
             case "focus":
                 setBrightness("Neutral");
-                setSliderBrightness(80);      // Slider → 80%
+                setSliderBrightness(80);
                 setAutoBrightness(false);
                 break;
             case "relax":
                 setBrightness("Cool");
-                setSliderBrightness(40);      // Slider → 40%
+                setSliderBrightness(40);
                 setAutoBrightness(false);
                 break;
         }
@@ -160,7 +189,7 @@ public class LightViewModel extends AndroidViewModel {
     private void loadSettings() {
         boolean autoEnabled = sharedPreferences.getBoolean("auto_brightness_enabled", true);
         _autoBrightness.setValue(autoEnabled);
-        _sliderPosition.setValue(50f);  // Default slider position
+        _sliderPosition.setValue(50f);
     }
 
     @Override
