@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import ca.light.indoorair.freshness.energy.it.life.environmental.solution.utils.NotificationHelper;
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.util.NotificationHelper;
 
 public class PresenceRepository {
 
@@ -172,7 +172,7 @@ public class PresenceRepository {
 
                                 if (isWithinAlertTimeWindow()) {
                                     String msg = (currentRoom != null ? currentRoom : "Room") + " became occupied after hours.";
-                                    NotificationHelper.sendPresenceAlert(appContext, currentRoom, msg);
+                                    NotificationHelper.sendAlert(appContext, currentRoom, msg);
                                     if (timerCallback != null) {
                                         timerCallback.onTimerEvent("Alert sent: Occupancy detected after hours!");
                                     }
