@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import android.content.Context;
 import android.util.Log;
 import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.TaskCompletionSource;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -96,13 +97,46 @@ public class PresenceRepository {
 
 
     public Task<Void> manualOverride(String status) {
+        final TaskCompletionSource<Void> tcs = new TaskCompletionSource<>();
         String timestamp = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault()).format(new Date());
-        Map<String, Object> firebaseData = new HashMap<>();
+        final Map<String, Object> firebaseData = new HashMap<>();
         firebaseData.put("room_status", status.toLowerCase());
         firebaseData.put("manual_override", true);
         firebaseData.put("timestamp", timestamp);
 
-        return presenceRef.push().setValue(firebaseData);
+        DatabaseReference roomRef = getRoomRef(currentRoom);
+
+        roomRef.limitToLast(1).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        Double tempC = snapshot.child("current_temperature_c").getValue(Double.class);
+                        Double tempF = snapshot.child("current_temperature_f").getValue(Double.class);
+                        String comfort = snapshot.child("comfort_level").getValue(String.class);
+
+                        if (tempC != null) {
+                            firebaseData.put("current_temperature_c", tempC);
+                        }
+                        if (tempF != null) {
+                            firebaseData.put("current_temperature_f", tempF);
+                        }
+                        if (comfort != null) {
+                            firebaseData.put("comfort_level", comfort);
+                        }
+                    }
+                }
+                roomRef.push().setValue(firebaseData)
+                    .addOnSuccessListener(aVoid -> tcs.setResult(null))
+                    .addOnFailureListener(e -> tcs.setException(e));
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                tcs.setException(databaseError.toException());
+            }
+        });
+        return tcs.getTask();
     }
 
 
