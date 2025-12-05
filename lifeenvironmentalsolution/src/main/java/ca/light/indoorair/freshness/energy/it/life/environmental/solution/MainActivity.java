@@ -15,6 +15,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import androidx.activity.OnBackPressedCallback;
@@ -59,13 +61,14 @@ import ca.light.indoorair.freshness.energy.it.life.environmental.solution.ui.Set
 import ca.light.indoorair.freshness.energy.it.life.environmental.solution.ui.HelpFragment;
 
 
-// Implement OnBackStackChangedListener to react to navigation changes
+
 public class MainActivity extends AppCompatActivity implements FragmentManager.OnBackStackChangedListener {
 
     private FragmentManager fragmentManager;
     private FirebaseAuth auth;
     private Toolbar toolbar;
     private DrawerLayout drawerLayout;
+    private Snackbar offlineSnackbar;
     private NavigationView navigationView;
     private ActionBarDrawerToggle toggle;
     private BottomNavigationView bottomNavigationView;
@@ -91,6 +94,8 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
 
         setupTheme();
         setupNavigation();
+
+        setupOfflineMonitor();
 
         if (savedInstanceState == null) {
             // Use new setCurrentFragment method
@@ -124,6 +129,44 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
 
         boolean isDarkMode = sharedPreferences.getBoolean(THEME_KEY, false);
         AppCompatDelegate.setDefaultNightMode(isDarkMode ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO);
+    }
+
+    private void setupOfflineMonitor() {
+        DatabaseReference connectedRef = FirebaseDatabase.getInstance().getReference(".info/connected");
+        connectedRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                // Check if Firebase is connected
+                boolean connected = Boolean.TRUE.equals(snapshot.getValue(Boolean.class));
+
+                if (!connected) {
+
+                    if (offlineSnackbar == null || !offlineSnackbar.isShown()) {
+                        View rootView = findViewById(R.id.main);
+                        offlineSnackbar = Snackbar.make(rootView, "Offline Mode: Data may be outdated", Snackbar.LENGTH_INDEFINITE);
+
+                        // Make it red to grab attention
+                        offlineSnackbar.setBackgroundTint(ContextCompat.getColor(MainActivity.this, android.R.color.holo_red_dark));
+                        offlineSnackbar.setTextColor(ContextCompat.getColor(MainActivity.this, android.R.color.white));
+
+                        // Make sure it floats ABOVE your bottom navigation bar
+                        offlineSnackbar.setAnchorView(bottomNavigationView);
+
+                        offlineSnackbar.show();
+                    }
+                } else {
+                    // We are ONLINE: Hide the alert if it's visible
+                    if (offlineSnackbar != null && offlineSnackbar.isShown()) {
+                        offlineSnackbar.dismiss();
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                // No action needed
+            }
+        });
     }
 
     private void setupNavigation() {
