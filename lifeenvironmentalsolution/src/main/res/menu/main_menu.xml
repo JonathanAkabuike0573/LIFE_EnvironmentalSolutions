@@ -1,36 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    >
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
         android:id="@+id/action_notification"
         android:title="@string/notification"
         android:icon="@drawable/notification_icon"
-
         app:showAsAction="always" />
 
     <item
         android:id="@+id/action_options"
         android:title="@string/options"
         android:icon="@drawable/more_options_icon"
-        app:showAsAction="always" >
-        <menu android:background="@android:color/background_dark">
+        app:showAsAction="always">
+
+        <menu>
+
+            <!-- 🔹 NEW: Help item -->
+            <item
+                android:id="@+id/action_help"
+                android:title="@string/help"
+                app:showAsAction="never" />
 
             <item
                 android:id="@+id/action_aboutus"
                 android:title="@string/about_us"
                 app:showAsAction="ifRoom" />
+
             <item
                 android:id="@+id/action_togglemode"
                 android:title="@string/theme"
                 app:showAsAction="ifRoom" />
 
-
-
         </menu>
     </item>
-
-
 
 </menu>
