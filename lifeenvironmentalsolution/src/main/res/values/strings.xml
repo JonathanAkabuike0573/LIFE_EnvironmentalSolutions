@@ -247,6 +247,18 @@ CENG-322-OCC,  Software Project -->
     <string name="sign_out_failed">Sign out failed.</string>
     <string name="failed_to_start_global_presence_monitoring">Failed to start global presence monitoring</string>
     <string name="offline_mode_data_may_be_outdated">Offline Mode: Data may be outdated</string>
+    <string name="user">User</string>
+    <string name="error">"Error: "</string>
+    <string name="off">Off</string>
+    <string name="locked">Locked</string>
+    <string name="select_items_to_display">Select Items to Display</string>
+    <string name="no_email_app_found_email_support_lifeenvironmentalsolution_com">No email app found. Email: support@lifeenvironmentalsolution.com</string>
+    <string name="file_android_asset_aboutpage_html">file:///android_asset/aboutpage.html</string>
+    <string name="comfort_level_unknown">Comfort level unknown</string>
+    <string name="no_data">No data</string>
+    <string name="temperature_units_set_to_celsius">Temperature units set to Celsius</string>
+    <string name="temperature_units_set_to_fahrenheit">Temperature units set to Fahrenheit</string>
+    <string name="notification_permission_denied">Notification permission denied</string>
 
     <string-array name="auto_off_time_options">
         <item>1 minute</item>

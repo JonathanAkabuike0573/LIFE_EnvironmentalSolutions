@@ -1,11 +1,11 @@
 package ca.light.indoorair.freshness.energy.it.life.environmental.solution;
 
-public class FakeUserDataProvider implements UserDataProvider {
+public class TestUserDataProvider implements UserDataProvider {
     private final boolean shouldSucceed;
     private final String nameToReturn;
 
 
-    public FakeUserDataProvider(boolean shouldSucceed, String nameToReturn) {
+    public TestUserDataProvider(boolean shouldSucceed, String nameToReturn) {
         this.shouldSucceed = shouldSucceed;
         this.nameToReturn = nameToReturn;
     }
