@@ -209,17 +209,6 @@ public class PresenceViewModel extends AndroidViewModel {
         _totalDetections.setValue(0);
     }
 
-    public void manualOverride(String status) {
-        setPresenceDetectionEnabled(false);
-        String manualTime = new SimpleDateFormat("HH:mm", Locale.getDefault()).format(new Date());
-        presenceRepository.manualOverride(status).addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                _presenceStatus.setValue(status.toLowerCase());
-                _lastUpdatedTime.setValue("Manual Override (" + manualTime + ")");
-            }
-        });
-    }
-
     private String safeGetString(DataSnapshot child) { try { return child.getValue(String.class); } catch (Exception e) { return null; } }
     private Long safeGetLong(DataSnapshot child) { try { return child.getValue(Long.class); } catch (Exception e) { return null; } }
 

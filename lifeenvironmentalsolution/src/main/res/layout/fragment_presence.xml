@@ -211,40 +211,6 @@
 
                 <View android:layout_width="match_parent" android:layout_height="1dp" android:background="?android:attr/listDivider" android:layout_marginTop="16dp" android:layout_marginBottom="16dp"/>
 
-                <!-- Manual Override -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/manual_override"
-                    android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"/>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:orientation="horizontal">
-
-                    <Button
-                        android:id="@+id/button_mark_occupied"
-                        style="?attr/materialButtonOutlinedStyle"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="8dp"
-                        android:text="@string/mark_occupied"/>
-
-                    <Button
-                        android:id="@+id/button_mark_empty"
-                        style="?attr/materialButtonOutlinedStyle"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:text="@string/mark_empty"/>
-                </LinearLayout>
-
-                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="?android:attr/listDivider" android:layout_marginTop="16dp" android:layout_marginBottom="16dp"/>
-
                 <!-- Activity Log -->
                 <TextView
                     android:layout_width="wrap_content"
@@ -279,7 +245,7 @@
             android:id="@+id/daily_activity_card"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_margin="16dp"
+            android:layout_margin="16.dp"
             app:cardCornerRadius="12dp"
             app:cardElevation="8dp"
             app:layout_constraintTop_toBottomOf="@id/presence_controls_card"

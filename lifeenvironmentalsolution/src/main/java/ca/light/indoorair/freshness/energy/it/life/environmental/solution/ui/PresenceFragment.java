@@ -8,7 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -43,7 +42,6 @@ public class PresenceFragment extends Fragment {
     private ImageView presenceIcon;
     private View statusIndicator;
     private SwitchMaterial presenceDetectionSwitch;
-    private Button markOccupiedButton, markEmptyButton;
     private CheckBox autoLightsOffCheckbox, alertAfterHoursCheckbox;
     private Spinner autoOffTimeSpinner;
     private LinearLayout timeRangePickerContainer;
@@ -101,8 +99,6 @@ public class PresenceFragment extends Fragment {
         presenceDetectionSwitch = view.findViewById(R.id.switch_presence_detection);
         sessionDurationText = view.findViewById(R.id.session_duration_text);
         totalDetectionsText = view.findViewById(R.id.total_detections_text);
-        markOccupiedButton = view.findViewById(R.id.button_mark_occupied);
-        markEmptyButton = view.findViewById(R.id.button_mark_empty);
         autoLightsOffCheckbox = view.findViewById(R.id.checkbox_auto_lights_off);
         labelAutoOffTime = view.findViewById(R.id.label_auto_off_time);
         autoOffTimeSpinner = view.findViewById(R.id.spinner_auto_off_time);
@@ -186,14 +182,6 @@ public class PresenceFragment extends Fragment {
 
         if (startTimeInput != null) startTimeInput.setOnClickListener(v -> showTimePicker(true));
         if (endTimeInput != null) endTimeInput.setOnClickListener(v -> showTimePicker(false));
-
-
-        if (markOccupiedButton != null && viewModel != null) {
-            markOccupiedButton.setOnClickListener(v -> viewModel.manualOverride("Occupied"));
-        }
-        if (markEmptyButton != null && viewModel != null) {
-            markEmptyButton.setOnClickListener(v -> viewModel.manualOverride("Empty"));
-        }
     }
 
     private void observeViewModel() {
