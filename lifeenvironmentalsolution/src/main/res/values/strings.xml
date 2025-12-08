@@ -259,15 +259,15 @@ CENG-322-OCC,  Software Project -->
     <string name="temperature_units_set_to_celsius">Temperature units set to Celsius</string>
     <string name="temperature_units_set_to_fahrenheit">Temperature units set to Fahrenheit</string>
     <string name="notification_permission_denied">Notification permission denied</string>
-    <string name="do_you_want_an_email_copy_of_receipt">Do you want an email copy of receipt?</string>
-    <string name="continue_and_pay_0_00">Continue and Pay $0.00</string>
-    <string name="cancel_upgrade">Cancel Upgrade</string>
-    <string name="cvv_security_code">CVV/Security Code</string>
-    <string name="expiry_mm_yy">Expiry (MM/YY)</string>
-    <string name="card_number_or_account_id">Card Number or Account ID</string>
-    <string name="name_on_card_account">Name on Card/Account</string>
-    <string name="select_payment_type">Select Payment Type:</string>
-    <string name="select_an_upgrade_option">Select an UPGRADE option:</string>
+<!--    <string name="do_you_want_an_email_copy_of_receipt">Do you want an email copy of receipt?</string>-->
+<!--    <string name="continue_and_pay_0_00">Continue and Pay $0.00</string>-->
+<!--    <string name="cancel_upgrade">Cancel Upgrade</string>-->
+<!--    <string name="cvv_security_code">CVV/Security Code</string>-->
+<!--    <string name="expiry_mm_yy">Expiry (MM/YY)</string>-->
+<!--    <string name="card_number_or_account_id">Card Number or Account ID</string>-->
+
+
+
     <string name="payment_center">Payment Center</string>
     <string name="your_upgrade_is_now_active_thank_you_for_your_purchase">Your upgrade is now active. Thank you for your purchase!</string>
     <string name="payment_successful">Payment Successful! 🎉</string>
