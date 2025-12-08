@@ -27,7 +27,9 @@ public class SignupActivityEspressoTest {
     @Test
     public void testEmptyFieldsValidation() {
         onView(withId(R.id.buttonSignUp)).perform(click());
-
+        // Since all fields are empty, the first check fails. 
+        // Assuming the Toast appears or nothing happens. 
+        // For this test, let's check if we can verify one of the fields is still empty or displayed
         onView(withId(R.id.signupFUllname)).check(matches(withText("")));
     }
 

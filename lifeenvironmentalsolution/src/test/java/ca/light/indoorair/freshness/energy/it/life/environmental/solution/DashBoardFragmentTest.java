@@ -98,7 +98,7 @@ public class DashBoardFragmentTest {
     @Test
     public void testLoadGreeting_Success() {
         TestableDashBoardFragment fragment = new TestableDashBoardFragment();
-        TestUserDataProvider provider = new TestUserDataProvider(true, "Kieran Sharma");
+        FakeUserDataProvider provider = new FakeUserDataProvider(true, "Kieran Sharma");
         fragment.loadGreeting(provider);
         assertEquals("Kieran", fragment.getLastGreetingName());
     }
@@ -106,7 +106,7 @@ public class DashBoardFragmentTest {
     @Test
     public void testLoadGreeting_Failure() {
         TestableDashBoardFragment fragment = new TestableDashBoardFragment();
-        TestUserDataProvider provider = new TestUserDataProvider(false, null);
+        FakeUserDataProvider provider = new FakeUserDataProvider(false, null);
         fragment.loadGreeting(provider);
         assertEquals("User", fragment.getLastGreetingName());
     }
@@ -114,7 +114,7 @@ public class DashBoardFragmentTest {
     @Test
     public void testLoadGreeting_EmptyName() {
         TestableDashBoardFragment fragment = new TestableDashBoardFragment();
-        TestUserDataProvider provider = new TestUserDataProvider(true, "");
+        FakeUserDataProvider provider = new FakeUserDataProvider(true, "");
         fragment.loadGreeting(provider);
         assertEquals("User", fragment.getLastGreetingName());
     }
@@ -160,7 +160,7 @@ public class DashBoardFragmentTest {
         // Ensure names like "Mary-Jane Watson" are split correctly on the SPACE, not the hyphen
         TestableDashBoardFragment fragment = new TestableDashBoardFragment();
         // Simulate user data with a hyphenated first name
-        TestUserDataProvider provider = new TestUserDataProvider(true, "Mary-Jane Watson");
+        FakeUserDataProvider provider = new FakeUserDataProvider(true, "Mary-Jane Watson");
 
         fragment.loadGreeting(provider);
 
