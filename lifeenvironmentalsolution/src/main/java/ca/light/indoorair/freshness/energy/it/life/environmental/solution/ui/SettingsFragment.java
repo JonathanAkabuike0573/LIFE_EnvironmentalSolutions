@@ -1,5 +1,3 @@
-// C:/Users/jonat/AndroidStudioProjects/LIFE_EnvironmentalSolution/lifeenvironmentalsolution/src/main/java/ca/light/indoorair/freshness/energy/it/life/environmental/solution/SettingsFragment.java
-
 //Mohamed Ali  N01440760, Jonathan Akabuike N01510573, Kieran Sharma N01548225, Farhan Habibza N01610299
 //CENG-322-OCC,  Software Project
 package ca.light.indoorair.freshness.energy.it.life.environmental.solution.ui;
@@ -15,6 +13,9 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -28,33 +29,22 @@ import com.google.android.material.materialswitch.MaterialSwitch;
 
 import ca.light.indoorair.freshness.energy.it.life.environmental.solution.R;
 
-// Removed unused imports for profile management
-// import android.widget.RelativeLayout;
-// import androidx.appcompat.app.AlertDialog;
-// import androidx.appcompat.app.AppCompatActivity;
-// import androidx.appcompat.widget.Toolbar;
-// import androidx.fragment.app.FragmentManager;
-// import androidx.fragment.app.FragmentTransaction;
-// import com.google.firebase.auth.FirebaseAuth;
-// import com.google.firebase.auth.FirebaseUser;
-// import android.widget.EditText;
 
 
 public class SettingsFragment extends Fragment {
 
-    // Define SharedPreferences constants
+
     public static final String PREFS_NAME = "MyPrefsFile";
     private static final String THEME_KEY = "ThemeKey";
     private static final String PORTRAIT_LOCK_KEY = "portrait_lock";
+    private static final String UNITS_KEY = "units";
     private static final String SMART_NOTIFICATION_KEY = "smart_notification";
     private static final String MORNING_REPORT_KEY = "morning_report";
     private static final String EVENING_REPORT_KEY = "evening_report";
 
-    // REMOVED: private RelativeLayout profileManagement;
-    // REMOVED: private RelativeLayout changePasswordLayout;
 
     private SharedPreferences sharedPreferences;
-    // REMOVED: private FirebaseAuth mAuth; // This can be removed if not used elsewhere in this fragment
+
 
     private MaterialSwitch switchRequestingPermission;
     private final ActivityResultLauncher<String> requestPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
@@ -67,13 +57,13 @@ public class SettingsFragment extends Fragment {
                 }
             }
         } else {
-            Toast.makeText(getContext(), "Notification permission denied", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), R.string.notification_permission_denied, Toast.LENGTH_SHORT).show();
         }
         switchRequestingPermission = null;
     });
 
     public SettingsFragment() {
-        // Required empty public constructor
+
     }
 
     @Override
@@ -81,8 +71,7 @@ public class SettingsFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_settings, container, false);
 
-        // REMOVED: All code related to profileManagement and changePasswordLayout
-        // The onClickListeners have been removed.
+
 
         return view;
     }
@@ -94,16 +83,13 @@ public class SettingsFragment extends Fragment {
 
         setupThemeSwitch(view);
         setupPortraitSwitch(view);
+        setupUnitsSpinner(view);
         setupNotificationSwitch(view.findViewById(R.id.sw_smart_notification), SMART_NOTIFICATION_KEY, "Smart notifications enabled", "Smart notifications disabled");
         setupNotificationSwitch(view.findViewById(R.id.sw_morning_report), MORNING_REPORT_KEY, "Morning report enabled", "Morning report disabled");
         setupNotificationSwitch(view.findViewById(R.id.sw_evening_reports), EVENING_REPORT_KEY, "Evening report enabled", "Evening report disabled");
     }
 
-    // setupThemeSwitch, setupPortraitSwitch, and setupNotificationSwitch methods remain unchanged.
-    // ...
 
-    // REMOVED: showChangePasswordDialog() and changePassword() methods.
-    // These should be moved to your AccountFragment.
 
     private void setupThemeSwitch(View view) {
         MaterialSwitch themeSwitch = view.findViewById(R.id.sw_dark_mode);
@@ -129,6 +115,51 @@ public class SettingsFragment extends Fragment {
                 activity.setRequestedOrientation(isChecked ? ActivityInfo.SCREEN_ORIENTATION_PORTRAIT : ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
             }
         });
+    }
+
+    private void setupUnitsSpinner(View view) {
+        Spinner unitsSpinner = view.findViewById(R.id.spinner_units);
+
+
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(requireContext(),
+                R.array.units_array, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        unitsSpinner.setAdapter(adapter);
+
+
+        String currentUnit = sharedPreferences.getString(UNITS_KEY, "Metric (°C)");
+        int spinnerPosition = adapter.getPosition(currentUnit);
+        if (spinnerPosition >= 0) {
+            unitsSpinner.setSelection(spinnerPosition);
+        }
+
+
+        unitsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String selectedUnit = (String) parent.getItemAtPosition(position);
+                sharedPreferences.edit().putString(UNITS_KEY, selectedUnit).apply();
+
+
+                if (selectedUnit.equals("Metric (°C)")) {
+                    Toast.makeText(getContext(), R.string.temperature_units_set_to_celsius , Toast.LENGTH_SHORT).show();
+                } else if (selectedUnit.equals("Imperial (°F)")) {
+                    Toast.makeText(getContext(), R.string.temperature_units_set_to_fahrenheit , Toast.LENGTH_SHORT).show();
+                }
+
+
+                notifyUnitChange(selectedUnit);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
+    }
+
+    private void notifyUnitChange(String newUnit) {
+
+        sharedPreferences.edit().putString("last_unit_change", newUnit).apply();
+        sharedPreferences.edit().putLong("unit_change_timestamp", System.currentTimeMillis()).apply();
     }
 
     private void setupNotificationSwitch(MaterialSwitch switchView, String key, String enabledMessage, String disabledMessage) {

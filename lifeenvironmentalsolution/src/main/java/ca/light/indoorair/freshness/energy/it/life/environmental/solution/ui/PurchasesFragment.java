@@ -1,14 +1,9 @@
 package ca.light.indoorair.freshness.energy.it.life.environmental.solution.ui;
 
-import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.appcompat.app.AlertDialog;
-import androidx.preference.PreferenceManager;
-import android.content.SharedPreferences;
+import android.content.Context;
 import android.content.DialogInterface;
-import android.view.LayoutInflater;
+import android.content.SharedPreferences;
+import android.os.Bundle;import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -19,91 +14,88 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.Fragment;
+import androidx.preference.PreferenceManager;
+
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.HashMap;
-import java.util.Map;
-import java.text.NumberFormat;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
+
 import ca.light.indoorair.freshness.energy.it.life.environmental.solution.R;
+// Import your validation class
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.validation.InputValidation;
 
 public class PurchasesFragment extends Fragment {
+
+    // SharedPreferences Keys
+    private static final String KEY_PURCHASED_PLAN_NAME = "purchased_plan_name";
+    private static final String KEY_PURCHASED_DEVICES = "purchased_devices";
 
     // UI Components
     private Spinner upgradesSpinner;
     private Spinner paymentTypeSpinner;
-    private TextView subtotalTextView;
-    private TextView taxTextView;
-    private TextView totalTextView;
+    private TextView subtotalTextView, taxTextView, totalTextView;
     private Button confirmAndPayButton;
-    private TextView cancelSubscriptionLink;
-
-    // UI Components for Payment Details
+    private TextView cancelSubscriptionLink, currentPlanTextView, receiptLink;
     private LinearLayout paymentDetailsLayout;
-    private EditText cardNameEditText;
-    private EditText cardNumberEditText;
+    private EditText cardNameEditText, cardNumberEditText, expiryEditText, cvvEditText;
 
     // Data and Constants
-    private static final double TAX_RATE = 0.13; // 13% tax rate
+    private static final double TAX_RATE = 0.13;
     private double currentSubtotal = 0.0;
     private String selectedPaymentMethod = "";
-
-    // *** Plan Limits Map ***
+    private String currentActivePlan = null;
     private final Map<String, Integer> planDeviceLimits = new HashMap<>();
-
-    // Map to store upgrade names and their base prices
     private final Map<String, Double> upgradePrices = new HashMap<>();
-
-    // *** MODIFIED: Only listing the devices that cost money ***
-    private final List<String> deviceOptions = Arrays.asList(
-            "Thermostat", "Air Conditioner", "Smart TV"
-    );
-
-    // Store the devices currently selected by the user so we can save them later
+    private final List<String> deviceOptions = Arrays.asList("Thermostat", "Air Conditioner", "Smart TV", "Smart Light", "Presence Sensor", "Air Quality Monitor");
+    private final List<String> bankOptions = Arrays.asList("CIBC", "TD", "RBC", "Scotiabank", "BMO");
     private List<String> finalSelectedDevices = new ArrayList<>();
 
-    private final List<String> bankOptions = Arrays.asList(
-            "CIBC", "TD", "RBC", "Scotiabank", "BMO"
-    );
+    public PurchasesFragment() { /* Required empty public constructor */ }
 
-    // This list will hold the options *displayed* in the spinner
-    private List<String> currentUpgradeDisplayOptions;
-    private ArrayAdapter<String> upgradeAdapter;
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        initializePlans();
+    }
 
-
-    public PurchasesFragment() {
-        // Initialize upgrade prices
+    private void initializePlans() {
         upgradePrices.put("Basic Plan (Monthly)", 9.99);
         upgradePrices.put("Pro Plan (Quarterly)", 24.99);
         upgradePrices.put("Premium (Annual)", 79.99);
 
-        // Initialize plan device limits
+        // Define device limits for each plan
         planDeviceLimits.put("Basic Plan (Monthly)", 2);
         planDeviceLimits.put("Pro Plan (Quarterly)", 4);
         planDeviceLimits.put("Premium (Annual)", 6);
     }
 
-    public static PurchasesFragment newInstance() {
-        PurchasesFragment fragment = new PurchasesFragment();
-        Bundle args = new Bundle();
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_purchases, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        initializeViews(view);
+        loadAndDisplayCurrentPlan();
+        setupSpinners();
+        setupClickListeners();
+    }
 
-        // Initialize UI components
+    private void initializeViews(@NonNull View view) {
         upgradesSpinner = view.findViewById(R.id.spinner_upgrades);
         paymentTypeSpinner = view.findViewById(R.id.spinner_payment_type);
         subtotalTextView = view.findViewById(R.id.text_subtotal);
@@ -111,298 +103,253 @@ public class PurchasesFragment extends Fragment {
         totalTextView = view.findViewById(R.id.text_total);
         confirmAndPayButton = view.findViewById(R.id.button_confirm_and_pay);
         cancelSubscriptionLink = view.findViewById(R.id.text_cancel_subscription_link);
-
-        // Initialize Payment Detail components
+        currentPlanTextView = view.findViewById(R.id.text_current_plan);
         paymentDetailsLayout = view.findViewById(R.id.layout_payment_details);
+        receiptLink = view.findViewById(R.id.text_view_receipts_link);
+
+        // Initialize EditTexts for validation
         cardNameEditText = view.findViewById(R.id.edit_text_card_name);
         cardNumberEditText = view.findViewById(R.id.edit_text_card_number);
-
-        setupSpinners();
-        setupClickListeners(view);
+        expiryEditText = view.findViewById(R.id.edit_text_expiry);
+        cvvEditText = view.findViewById(R.id.edit_text_cvv);
     }
 
-    /**
-     * Extracts the original map key by stripping the appended price and the selected devices.
-     */
-    private String getOriginalKey(String selectedItemText) {
-        int priceStart = selectedItemText.lastIndexOf(" ($");
-        String baseText = (priceStart > 0) ? selectedItemText.substring(0, priceStart) : selectedItemText;
+    private void loadAndDisplayCurrentPlan() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(requireContext());
+        currentActivePlan = prefs.getString(KEY_PURCHASED_PLAN_NAME, null);
 
-        int deviceStart = baseText.lastIndexOf(" (");
-        if (deviceStart > 0) {
-            if (baseText.substring(deviceStart).contains("device(s) selected")) {
-                return baseText.substring(0, deviceStart);
-            }
+        if (currentActivePlan != null) {
+            Set<String> purchasedDevices = prefs.getStringSet(KEY_PURCHASED_DEVICES, new HashSet<>());
+            String devicesText = purchasedDevices.isEmpty() ? getString(R.string.no_extra_devices) : getString(R.string.devices) + String.join(", ", purchasedDevices);
+            currentPlanTextView.setText(getString(R.string.current_plan) + currentActivePlan + "\n" + devicesText);
+            currentPlanTextView.setVisibility(View.VISIBLE);
+            cancelSubscriptionLink.setVisibility(View.VISIBLE);
+        } else {
+            currentPlanTextView.setVisibility(View.GONE);
+            cancelSubscriptionLink.setVisibility(View.GONE);
         }
-        return baseText;
+    }
+
+    private boolean isPlanPurchased(String planName) {
+        return planName.equals(currentActivePlan);
     }
 
     private void setupSpinners() {
-        // 1. Upgrades Spinner
-        currentUpgradeDisplayOptions = upgradePrices.keySet().stream()
+        // Upgrades Spinner
+        List<String> currentUpgradeDisplayOptions = new ArrayList<>();
+        currentUpgradeDisplayOptions.add(getString(R.string.select_an_upgrade));
+        currentUpgradeDisplayOptions.addAll(upgradePrices.keySet().stream()
                 .map(key -> key + " ($" + String.format(Locale.getDefault(), "%.2f", upgradePrices.get(key)) + ")")
-                .collect(ArrayList::new, List::add, List::addAll);
-
-        upgradeAdapter = new ArrayAdapter<>(getContext(),
-                android.R.layout.simple_spinner_dropdown_item, currentUpgradeDisplayOptions);
+                .collect(Collectors.toList()));
+        ArrayAdapter<String> upgradeAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_dropdown_item, currentUpgradeDisplayOptions);
         upgradesSpinner.setAdapter(upgradeAdapter);
-
-        final int defaultSelectionIndex = 0;
-
-        upgradesSpinner.post(() -> {
-            upgradesSpinner.setSelection(defaultSelectionIndex);
-            double initialPrice = upgradePrices.get(getOriginalKey(currentUpgradeDisplayOptions.get(defaultSelectionIndex)));
-            currentSubtotal = initialPrice;
-            updatePriceDisplay(currentSubtotal);
-        });
+        upgradesSpinner.setSelection(0, false);
 
         upgradesSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            private boolean isInitialLoad = true;
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                String selectedItemText = parent.getItemAtPosition(position).toString();
-                String originalKey = getOriginalKey(selectedItemText);
-
-                if (isInitialLoad && position == defaultSelectionIndex) {
-                    isInitialLoad = false;
-                    double initialPrice = upgradePrices.getOrDefault(originalKey, 0.00);
-                    currentSubtotal = initialPrice;
+                if (position == 0) {
+                    currentSubtotal = 0.0;
                     updatePriceDisplay(currentSubtotal);
                     return;
                 }
+                String selectedItemText = parent.getItemAtPosition(position).toString();
+                String originalKey = getOriginalKey(selectedItemText);
 
-                double planPrice = upgradePrices.getOrDefault(originalKey, 0.00);
-                int maxDevices = planDeviceLimits.getOrDefault(originalKey, 0);
-
-                if (planPrice > 0.00) {
-                    currentSubtotal = planPrice;
-                    showDeviceSelectionDialog(originalKey, position, maxDevices);
-                } else {
-                    currentSubtotal = 0.00;
-                    updatePriceDisplay(currentSubtotal);
+                if (isPlanPurchased(originalKey)) {
+                    Toast.makeText(getContext(), R.string.you_have_already_purchased_this_plan , Toast.LENGTH_LONG).show();
+                    upgradesSpinner.setSelection(0);
+                    return;
                 }
-            }
 
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) { }
+                currentSubtotal = upgradePrices.getOrDefault(originalKey, 0.00);
+                updatePriceDisplay(currentSubtotal);
+                // Get the device limit for the selected plan
+                int maxDevices = planDeviceLimits.getOrDefault(originalKey, 0);
+                showDeviceSelectionDialog(originalKey, maxDevices);
+            }
+            @Override public void onNothingSelected(AdapterView<?> parent) {}
         });
 
-        // 2. Payment Type Spinner
-        String[] paymentTypes = {"Select Payment Type", "Visa/Mastercard", "Amex", "PayPal", "Google Pay"};
-        ArrayAdapter<String> paymentAdapter = new ArrayAdapter<>(getContext(),
-                android.R.layout.simple_spinner_dropdown_item, paymentTypes);
+        // Payment Type Spinner
+        String[] paymentTypes = {"Select Payment Type...", "Visa/Mastercard", "Amex", "PayPal", "Google Pay"};
+        ArrayAdapter<String> paymentAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_dropdown_item, paymentTypes);
         paymentTypeSpinner.setAdapter(paymentAdapter);
-
-        paymentTypeSpinner.setSelection(0);
 
         paymentTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 selectedPaymentMethod = parent.getItemAtPosition(position).toString();
-
-                if (selectedPaymentMethod.equals("Visa/Mastercard")) {
+                if (position == 0) {
+                    paymentDetailsLayout.setVisibility(View.GONE);
+                } else if (selectedPaymentMethod.equals(getString(R.string.visa_mastercard))) {
                     showBankSelectionDialog();
-                    paymentDetailsLayout.setVisibility(View.GONE);
-                } else if (position > 0) {
-                    paymentDetailsLayout.setVisibility(View.VISIBLE);
                 } else {
-                    paymentDetailsLayout.setVisibility(View.GONE);
+                    paymentDetailsLayout.setVisibility(View.VISIBLE);
                 }
             }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) { }
+            @Override public void onNothingSelected(AdapterView<?> parent) {}
         });
     }
 
-    private void showDeviceSelectionDialog(String originalPlanName, int originalPosition, int maxDevices) {
-        if (getContext() == null) return;
+    private void setupClickListeners() {
+        confirmAndPayButton.setOnClickListener(v -> {
+            if (!isFormValid()) {
+                return;
+            }
+            savePurchase();
+            showPaymentSuccessfulDialog();
+        });
 
-        final CharSequence[] items = deviceOptions.toArray(new CharSequence[0]);
-        final boolean[] checkedItems = new boolean[deviceOptions.size()];
-        final List<String> selectedDevices = new ArrayList<>();
-
-        new AlertDialog.Builder(getContext())
-                .setTitle(originalPlanName + " Devices") // <<< MODIFIED: Removed " (Max " + maxDevices + ")"
-                .setMultiChoiceItems(items, checkedItems, new DialogInterface.OnMultiChoiceClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-                        if (isChecked) {
-                            if (selectedDevices.size() >= maxDevices) {
-                                checkedItems[which] = false;
-                                ((AlertDialog) dialog).getListView().setItemChecked(which, false);
-                                showMaxDeviceReachedDialog(maxDevices);
-                            } else {
-                                selectedDevices.add(deviceOptions.get(which));
-                            }
-                        } else {
-                            selectedDevices.remove(deviceOptions.get(which));
-                        }
-                    }
-                })
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // *** SAVE SELECTION TO CLASS VARIABLE ***
-                        finalSelectedDevices = new ArrayList<>(selectedDevices);
-
-                        updateUpgradeSpinnerDisplay(originalPlanName, selectedDevices, originalPosition);
-                        dialog.dismiss();
-                    }
-                })
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        upgradesSpinner.setSelection(originalPosition);
-                        dialog.dismiss();
-                    }
-                })
-                .setCancelable(true)
-                .show();
+        cancelSubscriptionLink.setOnClickListener(v -> showCancelDialog());
+        receiptLink.setOnClickListener(v -> showEmailReceiptDialog());
     }
 
-    private void showMaxDeviceReachedDialog(int maxDevices) {
-        if (getContext() == null) return;
-        new AlertDialog.Builder(getContext())
-                .setTitle("Device Limit Reached")
-                .setMessage("Can't select more devices. The limit for this plan is **" + maxDevices + "** devices.")
-                .setPositiveButton("OK", null)
-                .show();
+    private boolean isFormValid() {
+        if (currentSubtotal <= 0.00) {
+            Toast.makeText(getContext(), R.string.please_select_a_valid_upgrade_option , Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        if (paymentTypeSpinner.getSelectedItemPosition() == 0) {
+            Toast.makeText(getContext(), R.string.please_select_a_payment_method , Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        // If payment details are visible, validate them
+        if (paymentDetailsLayout.getVisibility() == View.VISIBLE) {
+            String cardName = cardNameEditText.getText().toString();
+            String cardNumber = cardNumberEditText.getText().toString();
+            String expiry = expiryEditText.getText().toString();
+            String cvv = cvvEditText.getText().toString();
+
+            if (!InputValidation.isValidCardHolderName(cardName)) {
+                cardNameEditText.setError(getString(R.string.please_enter_a_valid_name1));
+                return false;
+            }
+            if (!InputValidation.isValidCardNumber(cardNumber)) {
+                cardNumberEditText.setError(getString(R.string.invalid_card_number));
+                return false;
+            }
+            if (!InputValidation.isValidExpiryDate(expiry)) {
+                expiryEditText.setError(getString(R.string.invalid_expiry_date_mm_yy));
+                return false;
+            }
+            if (!InputValidation.isValidCvv(cvv)) {
+                cvvEditText.setError(getString(R.string.invalid_cvv));
+                return false;
+            }
+        }
+        return true;
     }
 
-    private void showBankSelectionDialog() {
-        if (getContext() == null) return;
-
-        final CharSequence[] banks = bankOptions.toArray(new CharSequence[0]);
-
-        new AlertDialog.Builder(getContext())
-                .setTitle("Select Your Issuing Bank")
-                .setItems(banks, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        String selectedBank = bankOptions.get(which);
-                        selectedPaymentMethod = "Visa/Mastercard (" + selectedBank + ")";
-                        paymentDetailsLayout.setVisibility(View.VISIBLE);
-                        Toast.makeText(getContext(),
-                                selectedBank + " Card selected. Enter details below.",
-                                Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        paymentTypeSpinner.setSelection(0);
-                        paymentDetailsLayout.setVisibility(View.GONE);
-                        selectedPaymentMethod = "";
-                    }
-                })
-                .setCancelable(false)
-                .show();
+    private void savePurchase() {
+        if (upgradesSpinner.getSelectedItemPosition() == 0) return;
+        String selectedPlan = getOriginalKey(upgradesSpinner.getSelectedItem().toString());
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(requireContext());
+        prefs.edit()
+                .putString(KEY_PURCHASED_PLAN_NAME, selectedPlan)
+                .putStringSet(KEY_PURCHASED_DEVICES, new HashSet<>(finalSelectedDevices))
+                .apply();
+        loadAndDisplayCurrentPlan();
     }
 
-    private void updateUpgradeSpinnerDisplay(String originalPlanName, List<String> selectedDevices, int positionToSet) {
-        if (upgradeAdapter == null) return;
+    private void cancelPurchase() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(requireContext());
+        prefs.edit()
+                .remove(KEY_PURCHASED_PLAN_NAME)
+                .remove(KEY_PURCHASED_DEVICES)
+                .apply();
+        loadAndDisplayCurrentPlan();
+        upgradesSpinner.setSelection(0);
+        Toast.makeText(getContext(), R.string.your_upgrade_has_been_canceled, Toast.LENGTH_LONG).show();
+    }
 
-        String deviceSummary = selectedDevices.isEmpty()
-                ? ""
-                : " (" + selectedDevices.size() + " device(s) selected)";
-
-        String priceText = upgradePrices.get(originalPlanName) > 0
-                ? " ($" + String.format(Locale.getDefault(), "%.2f", upgradePrices.get(originalPlanName)) + ")"
-                : "";
-
-        String newDisplayText = originalPlanName + deviceSummary + priceText;
-
-        currentUpgradeDisplayOptions.set(positionToSet, newDisplayText);
-        upgradeAdapter.notifyDataSetChanged();
-        upgradesSpinner.setSelection(positionToSet);
-        updatePriceDisplay(currentSubtotal);
+    private String getOriginalKey(String selectedItemText) {
+        int priceStart = selectedItemText.lastIndexOf(" ($");
+        return (priceStart > 0) ? selectedItemText.substring(0, priceStart) : selectedItemText;
     }
 
     private void updatePriceDisplay(double subtotal) {
         double tax = subtotal * TAX_RATE;
         double total = subtotal + tax;
+        NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(Locale.US);
+        subtotalTextView.setText(getString(R.string.subtotal) + currencyFormat.format(subtotal));
+        taxTextView.setText(String.format(Locale.US, getString(R.string.tax_0f_s), TAX_RATE * 100, currencyFormat.format(tax)));
+        totalTextView.setText(getString(R.string.total) + currencyFormat.format(total));
+        confirmAndPayButton.setText(getString(R.string.continue_and_pay) + currencyFormat.format(total));
+    }
 
-        NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(Locale.getDefault());
 
-        subtotalTextView.setText("Subtotal: " + currencyFormat.format(subtotal));
-        taxTextView.setText("Tax (" + String.format(Locale.getDefault(), "%.0f%%", TAX_RATE * 100) + "): " + currencyFormat.format(tax));
-        totalTextView.setText("Total: " + currencyFormat.format(total));
 
-        confirmAndPayButton.setText("Continue and Pay " + currencyFormat.format(total));
+    private void showDeviceSelectionDialog(String originalPlanName, int maxDevices) {
+        final CharSequence[] items = deviceOptions.toArray(new CharSequence[0]);
+        final boolean[] checkedItems = new boolean[deviceOptions.size()];
+        final List<String> selectedDevices = new ArrayList<>();
+
+        new AlertDialog.Builder(requireContext())
+                .setTitle(originalPlanName + getString(R.string.devices_select_up_to) + maxDevices + ")")
+                .setMultiChoiceItems(items, checkedItems, (dialog, which, isChecked) -> {
+                    if (isChecked) {
+                        if (selectedDevices.size() >= maxDevices) {
+
+                            ((AlertDialog) dialog).getListView().setItemChecked(which, false);
+                            Toast.makeText(getContext(), getString(R.string.device_limit_of) + maxDevices + getString(R.string.reached), Toast.LENGTH_SHORT).show();
+                        } else {
+                            selectedDevices.add(deviceOptions.get(which));
+                        }
+                    } else {
+                        selectedDevices.remove(deviceOptions.get(which));
+                    }
+                })
+                .setPositiveButton(R.string.ok , (dialog, which) -> {
+                    finalSelectedDevices = new ArrayList<>(selectedDevices);
+                    dialog.dismiss();
+                })
+                .setNegativeButton(getString(R.string.cancel), (dialog, which) -> {
+                    upgradesSpinner.setSelection(0);
+                    dialog.dismiss();
+                })
+                .show();
+    }
+
+    private void showBankSelectionDialog() {
+        new AlertDialog.Builder(requireContext())
+                .setTitle(R.string.select_your_issuing_bank)
+                .setItems(bankOptions.toArray(new CharSequence[0]), (dialog, which) -> {
+                    String selectedBank = bankOptions.get(which);
+                    selectedPaymentMethod = getString(R.string.visa_mastercard) + selectedBank + ")";
+                    paymentDetailsLayout.setVisibility(View.VISIBLE);
+                    Toast.makeText(getContext(), selectedBank + getString(R.string.card_selected_enter_details_below), Toast.LENGTH_SHORT).show();
+                })
+                .setNegativeButton(getString(R.string.cancel), (dialog, which) -> paymentTypeSpinner.setSelection(0))
+                .show();
     }
 
     private void showCancelDialog() {
-        if (getContext() == null) return;
-
-        new AlertDialog.Builder(getContext())
-                .setTitle("Cancel Upgrade")
-                .setMessage("Do you want to cancel your upgrade?")
-                .setPositiveButton("Yes, Cancel", (dialog, which) ->
-                        Toast.makeText(getContext(), "Your Upgrade will be canceled in 10 business days.", Toast.LENGTH_LONG).show())
-                .setNegativeButton("No, Keep It", (dialog, which) ->
-                        Toast.makeText(getContext(), "Upgrade maintained.", Toast.LENGTH_SHORT).show())
+        new AlertDialog.Builder(requireContext())
+                .setTitle(R.string.cancel_upgrade)
+                .setMessage(R.string.are_you_sure_you_want_to_cancel_your_current_active_plan)
+                .setPositiveButton(R.string.yes_cancel , (dialog, which) -> cancelPurchase())
+                .setNegativeButton(R.string.no_keep_it , null)
                 .setIcon(R.drawable.logolife)
                 .show();
     }
 
     private void showEmailReceiptDialog() {
-        if (getContext() == null) return;
-
-        new AlertDialog.Builder(getContext())
-                .setTitle("Email Receipt")
-                .setMessage("Do you want an email copy of your receipt?")
-                .setPositiveButton("Yes, Email It", (dialog, which) ->
-                        Toast.makeText(getContext(), "Receipt copy will be emailed shortly.", Toast.LENGTH_SHORT).show())
-                .setNegativeButton("No, Thanks", null)
+        new AlertDialog.Builder(requireContext())
+                .setTitle(R.string.email_receipt)
+                .setMessage(R.string.do_you_want_an_email_copy_of_your_receipt)
+                .setPositiveButton(R.string.yes_email_it, (dialog, which) -> Toast.makeText(getContext(), R.string.receipt_will_be_emailed_shortly, Toast.LENGTH_SHORT).show())
+                .setNegativeButton(R.string.no_thanks , null)
                 .setIcon(R.drawable.logolife)
                 .show();
     }
 
     private void showPaymentSuccessfulDialog() {
-        if (getContext() == null) return;
-
-        new AlertDialog.Builder(getContext())
-                .setTitle("Payment Successful! 🎉")
-                .setMessage("Your payment was processed successfully. Thank you for your purchase!")
+        new AlertDialog.Builder(requireContext())
+                .setTitle(R.string.payment_successful)
+                .setMessage(R.string.your_upgrade_is_now_active_thank_you_for_your_purchase)
                 .setPositiveButton("OK", null)
                 .setIcon(R.drawable.logolife)
                 .show();
-    }
-
-    private void setupClickListeners(@NonNull View view) {
-
-        confirmAndPayButton.setOnClickListener(v -> {
-            if (currentSubtotal <= 0.00) {
-                Toast.makeText(getContext(), "Please select a valid upgrade option to continue.", Toast.LENGTH_LONG).show();
-                return;
-            }
-            if (paymentTypeSpinner.getSelectedItemPosition() == 0) {
-                Toast.makeText(getContext(), "Please select a payment type to continue.", Toast.LENGTH_LONG).show();
-                return;
-            }
-
-
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
-            SharedPreferences.Editor editor = prefs.edit();
-
-
-            editor.putBoolean("has_paid_subscription", true);
-
-            editor.putStringSet("allowed_devices", new HashSet<>(finalSelectedDevices));
-            editor.apply();
-
-            Toast.makeText(getContext(), "Payment Processed! Access granted.", Toast.LENGTH_LONG).show();
-            showPaymentSuccessfulDialog();
-        });
-
-        TextView viewReceiptsLink = view.findViewById(R.id.text_view_receipts_link);
-        if (viewReceiptsLink != null) {
-            viewReceiptsLink.setOnClickListener(v -> showEmailReceiptDialog());
-        }
-
-        if (cancelSubscriptionLink != null) {
-            cancelSubscriptionLink.setOnClickListener(v -> showCancelDialog());
-        }
     }
 }

@@ -1,5 +1,6 @@
 package ca.light.indoorair.freshness.energy.it.life.environmental.solution;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -116,7 +117,7 @@ public class DashBoardFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext());
+        sharedPreferences = requireActivity().getSharedPreferences("MyPrefsFile", Context.MODE_PRIVATE);
 
         dashboardViewModel = new ViewModelProvider(requireActivity()).get(DashboardViewModel.class);
         sharedRoomViewModel = new ViewModelProvider(requireActivity()).get(SharedRoomViewModel.class);
@@ -140,6 +141,15 @@ public class DashBoardFragment extends Fragment {
         bundle.putString(FirebaseAnalytics.Param.SCREEN_CLASS, "DashBoardFragment");
         mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW, bundle);
 
+
+        if (dashboardViewModel != null) {
+            Double tempC = dashboardViewModel.getTemperatureC().getValue();
+            Double tempF = dashboardViewModel.getTemperatureF().getValue();
+            String comfort = dashboardViewModel.getComfortLevel().getValue();
+            if (tempC != null || tempF != null) {
+                updateWeatherCard(tempC, tempF, comfort);
+            }
+        }
 
         updateVisibleItems();
     }
@@ -259,14 +269,14 @@ public class DashBoardFragment extends Fragment {
         if (temperatureText == null || comfortLevelText == null) return;
 
         if (sharedPreferences == null && getContext() != null) {
-            sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+            sharedPreferences = requireActivity().getSharedPreferences("MyPrefsFile", Context.MODE_PRIVATE);
         }
 
         String unit = sharedPreferences != null ? sharedPreferences.getString("units", "Metric (°C)") : "Metric (°C)";
 
         if (tempC == null && tempF == null) {
             temperatureText.setText("--°");
-            comfortLevelText.setText(comfortLevel != null ? comfortLevel : "No data");
+            comfortLevelText.setText(comfortLevel != null ? comfortLevel : getString(R.string.no_data));
             return;
         }
 
@@ -287,7 +297,7 @@ public class DashBoardFragment extends Fragment {
         if (comfortLevel != null) {
             comfortLevelText.setText(comfortLevel.replace("_", " "));
         } else {
-            comfortLevelText.setText("Comfort level unknown");
+            comfortLevelText.setText(R.string.comfort_level_unknown );
         }
     }
 
@@ -301,7 +311,7 @@ public class DashBoardFragment extends Fragment {
         }
 
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-        builder.setTitle("Select Items to Display");
+        builder.setTitle(getString(R.string.select_items_to_display));
         builder.setMultiChoiceItems(itemNames, checkedItems, (dialog, which, isChecked) -> {
             checkedItems[which] = isChecked;
         });
@@ -329,12 +339,12 @@ public class DashBoardFragment extends Fragment {
 
 
                 if (!dashboardViewModel.isDeviceUnlocked(currentItem.getName())) {
-                    currentItem.setStatus("Locked");
+                    currentItem.setStatus(getString(R.string.locked));
                     currentItem.setDeviceOn(false);
                 } else {
 
-                    if ("Locked".equals(currentItem.getStatus())) {
-                        currentItem.setStatus("Off");
+                    if (getString(R.string.locked).equals(currentItem.getStatus())) {
+                        currentItem.setStatus(getString(R.string.off));
                     }
                 }
 
@@ -345,7 +355,18 @@ public class DashBoardFragment extends Fragment {
     }
 
     private void setupPreferenceListener() {
-        preferenceChangeListener = (sharedPreferences, key) -> {};
+        preferenceChangeListener = (sharedPreferences, key) -> {
+
+            if ("units".equals(key)) {
+
+                if (dashboardViewModel != null && dashboardViewModel.getTemperatureC().getValue() != null) {
+                    Double tempC = dashboardViewModel.getTemperatureC().getValue();
+                    Double tempF = dashboardViewModel.getTemperatureF().getValue();
+                    String comfort = dashboardViewModel.getComfortLevel().getValue();
+                    updateWeatherCard(tempC, tempF, comfort);
+                }
+            }
+        };
         if (sharedPreferences != null) {
             sharedPreferences.registerOnSharedPreferenceChangeListener(preferenceChangeListener);
         }
@@ -376,22 +397,21 @@ public class DashBoardFragment extends Fragment {
         return Calendar.getInstance();
     }
 
-    // 1. Add this helper method (It allows us to override it in tests)
     protected String getResourceString(int id) {
-        if (getContext() == null) return ""; // Safety check
+        if (getContext() == null) return "";
         return getString(id);
     }
 
-    // 2. Update this method to use the helper instead of getString directly
+
     String generateGreetingMessage(String name, Calendar calendar) {
         int hourOfDay = calendar.get(Calendar.HOUR_OF_DAY);
         String greeting;
         if (hourOfDay >= 0 && hourOfDay < 12) {
-            greeting = getResourceString(R.string.good_morning); // Changed here
+            greeting = getResourceString(R.string.good_morning);
         } else if (hourOfDay >= 12 && hourOfDay < 18) {
-            greeting = getResourceString(R.string.good_afternoon); // Changed here
+            greeting = getResourceString(R.string.good_afternoon);
         } else {
-            greeting = getResourceString(R.string.good_evening); // Changed here
+            greeting = getResourceString(R.string.good_evening);
         }
         return greeting + ", " + name;
     }
@@ -405,7 +425,7 @@ public class DashBoardFragment extends Fragment {
         }
     }
 
-    public void setDataProvider(FakeUserDataProvider provider) {
+    public void setDataProvider(UserDataProvider provider) {
         this.dataProvider = provider;
     }
 

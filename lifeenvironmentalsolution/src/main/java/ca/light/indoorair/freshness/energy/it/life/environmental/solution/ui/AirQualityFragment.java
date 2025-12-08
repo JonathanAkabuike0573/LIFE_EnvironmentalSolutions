@@ -63,19 +63,17 @@ public class AirQualityFragment extends Fragment {
         initializeViews(view);
         viewModel = new ViewModelProvider(this).get(AirQualityViewModel.class);
 
-
         SharedRoomViewModel sharedRoomViewModel = new ViewModelProvider(requireActivity()).get(SharedRoomViewModel.class);
 
+        // Connect the repository to SharedRoomViewModel for global monitoring
+        sharedRoomViewModel.setAirQualityRepository(viewModel.getAirQualityRepository());
 
         sharedRoomViewModel.getCurrentRoom().observe(getViewLifecycleOwner(), roomName -> {
             if (roomName != null && !roomName.isEmpty()) {
                 currentRoom = roomName;
                 roomNameText.setText(roomName);
-
-
                 viewModel.init(roomName);
-
-
+                // Note: Removed service start for simpler implementation
                 Toast.makeText(getContext(), "Switched to: " + roomName, Toast.LENGTH_SHORT).show();
             }
         });

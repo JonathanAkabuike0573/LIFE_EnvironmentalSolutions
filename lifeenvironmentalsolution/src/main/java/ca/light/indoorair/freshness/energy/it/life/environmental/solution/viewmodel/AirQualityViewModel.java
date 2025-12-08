@@ -52,15 +52,24 @@ public class AirQualityViewModel extends AndroidViewModel {
 
     private ValueEventListener sensorListener;
     private String currentRoom;
+    private final Application applicationContext;
 
     public AirQualityViewModel(@NonNull Application application) {
         super(application);
+        this.applicationContext = application;
         airQualityRepository = new AirQualityRepository();
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(application);
+
+        // Initialize repository for global notifications
+        airQualityRepository.initialize(application);
     }
 
     public void init(String roomName) {
         this.currentRoom = roomName;
+
+        // Update global monitoring to track this room
+        airQualityRepository.updateGlobalMonitoredRoom(roomName);
+
         listenForSensorData(roomName);
     }
 
@@ -108,8 +117,11 @@ public class AirQualityViewModel extends AndroidViewModel {
 
                 updateUI(eco2Value, co2Description, timestamp);
 
-
+                // Use global notification checking from repository
+                // This ensures notifications work regardless of which fragment is active
                 if (eco2Value != null) {
+                    airQualityRepository.checkAirQualityForNotifications(dataSnapshot, currentRoom);
+                    // Keep local checking for backward compatibility
                     checkAlertThreshold(eco2Value.intValue());
                 }
             } else {
@@ -204,6 +216,13 @@ public class AirQualityViewModel extends AndroidViewModel {
 
     public boolean getBooleanSetting(String key, boolean defaultValue) {
         return sharedPreferences.getBoolean(key, defaultValue);
+    }
+
+    /**
+     * Get the air quality repository for global monitoring setup
+     */
+    public AirQualityRepository getAirQualityRepository() {
+        return airQualityRepository;
     }
 
     @Override
