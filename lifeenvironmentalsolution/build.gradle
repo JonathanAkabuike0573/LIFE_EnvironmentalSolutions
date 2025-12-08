@@ -50,10 +50,9 @@ dependencies {
     implementation libs.recyclerview
     implementation libs.preference
     testImplementation libs.junit
-    testImplementation 'org.robolectric:robolectric:4.11.1'
-    testImplementation libs.core
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core
+    androidTestImplementation "androidx.fragment:fragment-testing:1.7.1"
 
     // Import the BoM for the Firebase platform
     implementation(platform("com.google.firebase:firebase-bom:34.3.0"))
@@ -71,4 +70,8 @@ dependencies {
     implementation platform('com.google.firebase:firebase-bom:32.7.0')
 
     implementation 'com.google.firebase:firebase-analytics'
+
+    androidTestImplementation "org.robolectric:robolectric:4.16"
+
+    androidTestImplementation "androidx.test:core:1.5.0"
 }

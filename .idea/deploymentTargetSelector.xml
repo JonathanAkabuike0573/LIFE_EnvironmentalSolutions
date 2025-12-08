@@ -13,10 +13,19 @@
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="useAppContext()">
+      <SelectionState runConfigName="SignupActivityEspressoTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="testEmptyFieldsValidation()">
+      <SelectionState runConfigName="autoBrightness_enabled_disablesSlider()">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="LightFragmentTest">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="powerSwitch_click_showsToast()">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="feedbackSubmission_showsConfirmationToast()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>
