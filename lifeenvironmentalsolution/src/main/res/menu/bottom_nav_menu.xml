@@ -13,10 +13,6 @@
         android:icon="@drawable/airicon"
         android:title="@string/air_quality" />
     <item
-        android:id="@+id/bi_directional"
-        android:icon="@drawable/power"
-        android:title="@string/Energy" />
-    <item
         android:id="@+id/light"
         android:icon="@drawable/smartlighticon"
         android:title="@string/light" />

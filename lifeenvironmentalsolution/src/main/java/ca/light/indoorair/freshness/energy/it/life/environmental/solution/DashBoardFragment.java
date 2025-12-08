@@ -40,7 +40,8 @@ import ca.light.indoorair.freshness.energy.it.life.environmental.solution.viewmo
 
 public class DashBoardFragment extends Fragment {
 
-    public Object dataProvider;
+    public UserDataProvider dataProvider;
+
 
     // UI Elements
     private TextView userGreeting, temperatureText, comfortLevelText;
@@ -405,7 +406,7 @@ public class DashBoardFragment extends Fragment {
         }
     }
 
-    public void setDataProvider(FakeUserDataProvider provider) {
+    public void setDataProvider(UserDataProvider provider) {
         this.dataProvider = provider;
     }
 

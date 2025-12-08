@@ -91,6 +91,7 @@ public class PresenceFragment extends Fragment {
         bundle.putString(FirebaseAnalytics.Param.SCREEN_CLASS, "PresenceFragment");
         mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW, bundle);
     }
+    
     private void initializeViews(View view) {
         presenceStatusText = view.findViewById(R.id.presence_status_text);
         lastUpdatedTimeText = view.findViewById(R.id.last_updated_time);

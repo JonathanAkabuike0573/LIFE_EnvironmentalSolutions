@@ -75,7 +75,6 @@ public class PresenceViewModel extends AndroidViewModel {
     public void init(String roomName) {
         this.currentRoom = roomName;
 
-
         presenceRepository.setTimerCallback(message -> {
             _timerEventMessage.postValue(message);
         });

@@ -245,6 +245,8 @@ CENG-322-OCC,  Software Project -->
     <string name="error_loading_rooms">Error loading rooms</string>
     <string name="loading_data_for">"Loading data for: "</string>
     <string name="sign_out_failed">Sign out failed.</string>
+    <string name="failed_to_start_global_presence_monitoring">Failed to start global presence monitoring</string>
+    <string name="offline_mode_data_may_be_outdated">Offline Mode: Data may be outdated</string>
 
     <string-array name="auto_off_time_options">
         <item>1 minute</item>
