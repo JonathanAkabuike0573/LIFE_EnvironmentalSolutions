@@ -95,51 +95,6 @@ public class PresenceRepository {
         getRoomRef(roomName).removeEventListener(listener);
     }
 
-
-    public Task<Void> manualOverride(String status) {
-        final TaskCompletionSource<Void> tcs = new TaskCompletionSource<>();
-        String timestamp = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault()).format(new Date());
-        final Map<String, Object> firebaseData = new HashMap<>();
-        firebaseData.put("room_status", status.toLowerCase());
-        firebaseData.put("manual_override", true);
-        firebaseData.put("timestamp", timestamp);
-
-        DatabaseReference roomRef = getRoomRef(currentRoom);
-
-        roomRef.limitToLast(1).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                        Double tempC = snapshot.child("current_temperature_c").getValue(Double.class);
-                        Double tempF = snapshot.child("current_temperature_f").getValue(Double.class);
-                        String comfort = snapshot.child("comfort_level").getValue(String.class);
-
-                        if (tempC != null) {
-                            firebaseData.put("current_temperature_c", tempC);
-                        }
-                        if (tempF != null) {
-                            firebaseData.put("current_temperature_f", tempF);
-                        }
-                        if (comfort != null) {
-                            firebaseData.put("comfort_level", comfort);
-                        }
-                    }
-                }
-                roomRef.push().setValue(firebaseData)
-                    .addOnSuccessListener(aVoid -> tcs.setResult(null))
-                    .addOnFailureListener(e -> tcs.setException(e));
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                tcs.setException(databaseError.toException());
-            }
-        });
-        return tcs.getTask();
-    }
-
-
     public void setAutoLightsOff(String roomName, boolean enabled, int timeoutMinutes) {
         autoLightsOffActive = enabled;
         currentTimeoutMinutes = timeoutMinutes;
@@ -193,17 +148,28 @@ public class PresenceRepository {
                             lastPresenceStatus = isOccupied;
 
                             if (!isOccupied) {
-
+                                // ROOM BECAME VACANT
+                                // Start vacancy timer if auto-lights-off is enabled and light is on
                                 if (autoLightsOffActive && isLightOn) {
                                     startVacancyTimer(currentTimeoutMinutes);
+                                    Log.d("PresenceRepo", "Vacancy detected: Starting countdown (auto-lights-off active)");
                                 } else {
                                     Log.d("PresenceRepo", "Room vacant but timer condition not met.");
                                 }
                             } else {
-
+                                // ROOM BECAME OCCUPIED
                                 cancelVacancyTimer();
 
+                                // AUTOMATIC LIGHT ON: Turn on lights if they're off when room becomes occupied
+                                if (!isLightOn) {
+                                    Log.d("PresenceRepo", "Room occupied but lights are off: Turning lights ON automatically");
+                                    lightRepository.setPowerOn(currentRoom, true);
+                                    if (timerCallback != null) {
+                                        timerCallback.onTimerEvent("Lights automatically turned ON - Room occupied");
+                                    }
+                                }
 
+                                // Alert after hours if enabled
                                 if (isWithinAlertTimeWindow()) {
                                     String msg = (currentRoom != null ? currentRoom : "Room") + " became occupied after hours.";
                                     NotificationHelper.sendAlert(appContext, currentRoom, msg);

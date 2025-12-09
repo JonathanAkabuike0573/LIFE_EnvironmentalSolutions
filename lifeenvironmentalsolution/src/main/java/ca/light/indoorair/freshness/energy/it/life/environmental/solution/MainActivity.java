@@ -10,6 +10,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -48,10 +49,11 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import ca.light.indoorair.freshness.energy.it.life.environmental.solution.auth.HelperClass;
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.data.PresenceRepository;
+import ca.light.indoorair.freshness.energy.it.life.environmental.solution.viewmodel.SharedRoomViewModel;
 import ca.light.indoorair.freshness.energy.it.life.environmental.solution.ui.AboutUsFragment;
 import ca.light.indoorair.freshness.energy.it.life.environmental.solution.ui.AccountFragment;
 import ca.light.indoorair.freshness.energy.it.life.environmental.solution.ui.AirQualityFragment;
-import ca.light.indoorair.freshness.energy.it.life.environmental.solution.ui.EnergyFragment;
 import ca.light.indoorair.freshness.energy.it.life.environmental.solution.ui.FeedBackPage;
 import ca.light.indoorair.freshness.energy.it.life.environmental.solution.ui.LightFragment;
 import ca.light.indoorair.freshness.energy.it.life.environmental.solution.ui.NotificationFragment;
@@ -97,6 +99,33 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         setupNavigation();
 
         setupOfflineMonitor();
+
+        // Initialize global smart lighting system early so it works from app start
+        SharedRoomViewModel sharedRoomViewModel = new SharedRoomViewModel();
+        PresenceRepository presenceRepository = new PresenceRepository(this);
+
+        // Start listening for presence updates for the default room
+        String defaultRoom = sharedRoomViewModel.getCurrentRoom().getValue();
+        if (defaultRoom != null) {
+            // Set up a listener for presence updates (this will trigger smart lighting logic)
+            ValueEventListener presenceListener = new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    // This will be handled by the PresenceRepository's smart lighting logic
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                    Log.e("MainActivity", getString(R.string.failed_to_start_global_presence_monitoring), error.toException());
+                }
+            };
+
+            presenceRepository.startListening(presenceListener, defaultRoom);
+
+            // Enable auto-lights-off with default 5 minute timeout
+            // This will start the smart lighting automation globally
+            presenceRepository.setAutoLightsOff(defaultRoom, true, 5);
+        }
 
         if (savedInstanceState == null) {
             // Use new setCurrentFragment method
@@ -144,7 +173,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
 
                     if (offlineSnackbar == null || !offlineSnackbar.isShown()) {
                         View rootView = findViewById(R.id.main);
-                        offlineSnackbar = Snackbar.make(rootView, "Offline Mode: Data may be outdated", Snackbar.LENGTH_INDEFINITE);
+                        offlineSnackbar = Snackbar.make(rootView, R.string.offline_mode_data_may_be_outdated, Snackbar.LENGTH_INDEFINITE);
 
                         // Make it red to grab attention
                         offlineSnackbar.setBackgroundTint(ContextCompat.getColor(MainActivity.this, android.R.color.holo_red_dark));
@@ -258,9 +287,6 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
         } else if (itemId == R.id.air_quality) {
             setCurrentFragment(new AirQualityFragment(), false);
             getSupportActionBar().setTitle(R.string.air_quality);
-        } else if (itemId == R.id.bi_directional) {
-            setCurrentFragment(new EnergyFragment(), false);
-            getSupportActionBar().setTitle("Energy");
         } else if (itemId == R.id.light) {
             setCurrentFragment(new LightFragment(), false);
             getSupportActionBar().setTitle(R.string.light);
@@ -325,11 +351,7 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
                 bottomNavigationView.setSelectedItemId(R.id.presence);
                 getSupportActionBar().setTitle(R.string.presence);
                 break;
-            case "Thermostat":
-                fragment = new EnergyFragment();
-                bottomNavigationView.setSelectedItemId(R.id.bi_directional);
-                getSupportActionBar().setTitle("Energy");
-                break;
+
         }
 
         if (fragment != null) {
@@ -348,8 +370,6 @@ public class MainActivity extends AppCompatActivity implements FragmentManager.O
             bottomNavigationView.setSelectedItemId(R.id.dashboard);
         } else if (currentFragment instanceof AirQualityFragment) {
             bottomNavigationView.setSelectedItemId(R.id.air_quality);
-        } else if (currentFragment instanceof EnergyFragment) {
-            bottomNavigationView.setSelectedItemId(R.id.bi_directional);
         } else if (currentFragment instanceof LightFragment) {
             bottomNavigationView.setSelectedItemId(R.id.light);
         } else if (currentFragment instanceof PresenceFragment) {

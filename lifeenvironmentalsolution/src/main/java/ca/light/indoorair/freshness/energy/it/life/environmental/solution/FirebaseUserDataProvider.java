@@ -37,7 +37,7 @@ public class FirebaseUserDataProvider implements UserDataProvider {
                 if (snapshot.exists()) {
                     HelperClass userProfile = snapshot.getValue(HelperClass.class);
                     if (userProfile != null) {
-                        // Success: Pass the user's name back through the callback.
+
                         callback.onDataReceived(userProfile.getName());
                     } else {
                         callback.onError("User profile data is malformed.");
@@ -49,7 +49,7 @@ public class FirebaseUserDataProvider implements UserDataProvider {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                // Failure: Pass the error message back through the callback.
+
                 callback.onError(error.getMessage());
             }
         });
