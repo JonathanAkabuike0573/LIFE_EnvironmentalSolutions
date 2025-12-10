@@ -96,6 +96,7 @@ Qwiic/STEMMA QT Connector:
 │ GND V+ SDA SCL │
 └─────────────────┘
 
+
 **Raspberry Pi GPIO Pin Layout (Top View)**
 
 ┌───────────────┐
@@ -106,7 +107,7 @@ SCL │ 5 ● ● 6 │ GND
 GND │ 9 ● ●10 │
 │ ... │
 └───────────────┘
-
+undefined
 
 ### Option 2: Direct GPIO Connection (Manual Wiring)
 
