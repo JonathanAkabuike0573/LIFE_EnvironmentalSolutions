@@ -107,7 +107,6 @@ SCL │ 5 ● ● 6 │ GND
 GND │ 9 ● ●10 │
 │ ... │
 └───────────────┘
-undefined
 
 ### Option 2: Direct GPIO Connection (Manual Wiring)
 
