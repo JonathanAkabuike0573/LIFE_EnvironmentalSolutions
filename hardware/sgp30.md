@@ -1,6 +1,6 @@
 # sgp30 c02 reading sensor - Complete Hardware Setup Guide
 ![Photo](https://github.com/PrototypeZone/ceng317/blob/main/hardware/projects/media/sgp30.jpg)
-> **Complete instructions for building your own AK9753-based human presence monitoring system with Raspberry Pi, Firebase integration, and Android app connectivity**
+> **Complete instructions for building your own sgp30 c02 reading sensor monitoring system with Raspberry Pi, Firebase integration, and Android app connectivity**
 
 ## Table of Contents
 
