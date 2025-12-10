@@ -91,11 +91,10 @@ The easiest method is to use the Adafruit STEMMA QT / SparkFun Qwiic ecosystem (
 **Qwiic/STEMMA QT Cable Pinout Reference**
 
 Qwiic/STEMMA QT Connector:
-┌─────────────────┐
+┌──────────────────────────┐
 │ BLK RED BLU YEL │
 │ GND V+ SDA SCL │
-└─────────────────┘
-
+└──────────────────────────┘
 
 **Raspberry Pi GPIO Pin Layout (Top View)**
 
@@ -107,6 +106,7 @@ SCL │ 5 ● ● 6 │ GND
 GND │ 9 ● ●10 │
 │ ... │
 └───────────────┘
+
 
 ### Option 2: Direct GPIO Connection (Manual Wiring)
 
