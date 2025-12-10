@@ -200,6 +200,3 @@ eCO2: 450 ppm (Excellent - fresh air) | TVOC: 23 ppb (Excellent - very clean air
 | `OSError: [Errno 121]` | I2C bus conflict, reboot + check wiring |
 
 ---
-
-**✅ SAVE AS `sgp30-complete-guide.md` - Your exact working setup documented!**
-
