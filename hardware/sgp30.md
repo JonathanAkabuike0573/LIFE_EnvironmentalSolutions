@@ -1,202 +1,143 @@
-# SGP30 CO₂/eCO₂ & TVOC Air Quality Sensor - Complete Setup Guide
+# SGP30 CO₂/eCO₂ & TVOC Air Quality Sensor - Complete Hardware Setup Guide
 
-![SGP30 Sensor](https://github.com/PrototypeZone/ceng317/blob/main/hardware/projects/media/sgp30.jpg)
+![Photo](https://github.com/PrototypeZone/ceng317/blob/main/hardware/projects/media/sgp30.jpg)
 
-> **Your working Raspberry Pi + Firebase + Adafruit SGP30 code - Complete documentation with your exact setup**
+> **Complete instructions for building your own SGP30-based indoor air quality monitoring system with Raspberry Pi, Firebase integration, and optional Android app connectivity**
 
 ## Table of Contents
 
-1. [Project Overview](#project-overview)
-2. [Your Working Code](#your-working-code)
-3. [Hardware Wiring](#hardware-wiring)
-4. [Raspberry Pi Setup](#raspberry-pi-setup)
-5. [Firebase Configuration](#firebase-configuration)
-6. [Running Your Code](#running-your-code)
-7. [Data Structure](#data-structure)
-8. [Troubleshooting](#troubleshooting)
+1.  [Project Overview](#project-overview)
+2.  [Bill of Materials (BOM)](#bill-of-materials-bom)
+3.  [Hardware Assembly](#hardware-assembly)
+4.  [Raspberry Pi Setup](#raspberry-pi-setup)
+5.  [Firebase Configuration](#firebase-configuration)
+6.  [Python Code Setup](#python-code-setup)
+7.  [Android App Integration](#android-app-integration)
+8.  [PCB Design (Optional)](#pcb-design-optional)
+9.  [3D Printed Case (Optional)](#3d-printed-case-optional)
+10. [Troubleshooting](#troubleshooting)
 
 ## Project Overview
 
-**Your exact SGP30 air quality monitoring system** using:
-- **Adafruit SGP30 library** (`adafruit_sgp30`)
-- **CircuitPython I2C** (`board`, `busio`)
-- **Firebase Realtime Database** (`life-environmentalsolution`)
-- **Real-time eCO2 (ppm) + TVOC (ppb) + descriptive quality levels**
+This project creates a complete indoor air quality monitoring system using the **Adafruit SGP30** gas sensor to measure **equivalent CO₂ (eCO₂)** in ppm and **TVOC** in ppb.  
+Readings are taken on a Raspberry Pi with Python (CircuitPython libraries), pushed to a **Firebase Realtime Database**, and can be displayed on an Android app or web dashboard.
 
-**Data Flow**: SGP30 → Raspberry Pi → Firebase → Android App
+**System Architecture**
 
-graph LR
-SGP30[Adafruit SGP30
-I2C 0x58] --> Pi[RPi + CircuitPython]
-Pi --> Firebase[life-environmentalsolution
-Realtime DB]
-Firebase --> App[Android App]
+flowchart LR;
+SGP30_Sensor--->Raspberry_Pi_(Python)--->Firebase_Database--->Android_App;
 
 
-## Your Working Code
+(I2C) (WiFi) (Cloud) (Mobile)
 
-**`sgp30_monitor.py`** - Your exact tested code:
+## Bill of Materials (BOM)
 
-import time
-import board
-import busio
-import adafruit_sgp30
-import firebase_admin
-from firebase_admin import credentials, db
-from datetime import datetime
+**Electronics Components**
 
-Initialize Firebase - YOUR EXACT CONFIG
-cred = credentials.Certificate("/home/pi/CENG317/Test/life-environmentalsolution-firebase-adminsdk-fbsvc-1b81d17b94.json")
-firebase_admin.initialize_app(cred, {
-"databaseURL": "https://life-environmentalsolution-default-rtdb.firebaseio.com/"
-})
-ref = db.reference("sgp30_readings")
+Based on your DigiKey orders (same accessories as previous projects, but with the SGP30 CO₂/eCO₂ & TVOC Air Quality Sensor):
 
-Create I2C connection
-i2c = busio.I2C(board.SCL, board.SDA)
-sgp30 = adafruit_sgp30.Adafruit_SGP30(i2c)
+|     |                      |                      |                                               |                  |         |
+|-----|----------------------|----------------------|-----------------------------------------------|------------------|---------|
+| Qty | Part Number (DigiKey)| Manufacturer         | Description                                   | Unit Price (CAD) | Total   |
+| 1   | **1528-2531-ND**     | Adafruit Industries  | **SGP30 CO₂/eCO₂ & TVOC Air Quality Sensor**  | ~$27.81          | ~$27.81 |
+| 1   | 1528-1783-ND         | Adafruit Industries  | Stacking Header for Raspberry Pi (2x20 GPIO)  | $4.30            | $4.30   |
+| 1   | 455-1721-ND          | JST Sales America    | JST Connector Header RA 4POS 2mm (S4B-PH-K-S) | $0.22            | $0.22   |
+| 1   | 1568-22726-ND        | SparkFun Electronics | Flexible Qwiic Cable - Female Jumper (4-pin)  | $2.84            | $2.84   |
+| 1   | 1528-4528-ND         | Adafruit Industries  | 4-Pin STEMMA/GROVE to Qwiic Cable (400mm)     | $2.84            | $2.84   |
+| 1   | 1528-5385-ND         | Adafruit Industries  | STEMMA QT/Qwiic Cable 400mm                   | $2.19            | $2.19   |
+| 4   | 732-10422-ND         | Wurth Electronics    | M2.5x16mm Hex Standoffs (Steel)               | $1.02            | $4.08   |
+| 4   | 145-50M025045I016-ND | Essentra Components  | M2.5x0.45 Machine Screws (Flat Phil)          | $0.22            | $0.88   |
 
-print("SGP30 Air Quality Sensor Example")
-print("----------------------------------")
+**Subtotal:** ~$42.00 CAD (approx)
 
-sgp30.iaq_init()
+**Additional Required Items (Not in orders)**
 
-print("Waiting 15 seconds for sensor to stabilize...")
-for i in range(15):
-print(f"{15 - i}s", end="\r")
-time.sleep(1)
+|                  |                                                                         |             |
+|------------------|-------------------------------------------------------------------------|-------------|
+| Item             | Description                                                             | Est. Price  |
+| **Raspberry Pi** | Raspberry Pi 4 Model B (2GB or 4GB recommended)                         | $45–55 USD  |
+| **MicroSD Card** | 32GB or larger, Class 10                                                | $10–15 USD  |
+| **Power Supply** | Official Raspberry Pi USB‑C Power Supply (5V 3A)                        | $8–10 USD   |
+| **Jumper Wires** | Male‑to‑Female jumper wires (if not using Qwiic/STEMMA directly)        | $5–8 USD    |
 
-elapsed_sec = 0
+**Total Project Cost:** ~$120–140 USD
 
-while True:
-eCO2, TVOC = sgp30.iaq_measure()
+## Hardware Assembly
 
-# Your eCO2 quality levels
-if eCO2 <= 600:
-    co2_desc = "Excellent - fresh air"
-elif eCO2 <= 1000:
-    co2_desc = "Good - normal indoor air"
-elif eCO2 <= 1500:
-    co2_desc = "Moderate - consider more ventilation"
-elif eCO2 <= 2000:
-    co2_desc = "Poor - air feels stuffy"
-else:
-    co2_desc = "Very Poor - ventilation needed!"
+**Option 1: Using Qwiic/STEMMA System (Recommended – No Soldering)**
 
-# Your TVOC quality levels
-if TVOC <= 65:
-    tvoc_desc = "Excellent - very clean air"
-elif TVOC <= 220:
-    tvoc_desc = "Good - typical indoor air"
-elif TVOC <= 660:
-    tvoc_desc = "Moderate - some pollutants detected"
-elif TVOC <= 2200:
-    tvoc_desc = "Poor - noticeable chemical emissions"
-else:
-    tvoc_desc = "Very Poor - strong pollution or odor"
+The easiest method is to use the Adafruit STEMMA QT / SparkFun Qwiic ecosystem (plug‑and‑play).
 
-print(f"eCO2: {eCO2} ppm ({co2_desc}) | TVOC: {TVOC} ppb ({tvoc_desc})")
+**Step 1: Install Stacking Header on Raspberry Pi**
 
-# Firebase data structure
-timestamp = datetime.now().isoformat()
-data = {
-    "timestamp": timestamp,
-    "eCO2": eCO2,
-    "TVOC": TVOC,
-    "co2_description": co2_desc,
-    "tvoc_description": tvoc_desc
-}
+1. If your Raspberry Pi does not have GPIO headers pre‑installed, solder the **2x20 stacking header** onto the GPIO pins.  
+2. This allows you to plug the SGP30 breakout while keeping other GPIO pins accessible.
 
-# Send to Firebase
-ref.push(data)
+**Step 2: Connect SGP30 with STEMMA QT/Qwiic Cable**
 
-elapsed_sec += 2
-time.sleep(2)
+1. Take the **STEMMA QT/Qwiic cable** (1528‑5385‑ND).  
+2. Connect one end to the **STEMMA/Qwiic connector** on the SGP30 breakout board.  
+3. Connect the other end to the Raspberry Pi GPIO pins (using a Qwiic‑to‑female cable or a Qwiic HAT):
 
-# Baseline every 30s
-if elapsed_sec % 30 == 0:
-    baseline_eCO2, baseline_TVOC = sgp30.get_iaq_baseline()
-    print(f"---- Baseline: eCO2: 0x{baseline_eCO2:04x}, TVOC: 0x{baseline_TVOC:04x}")
+   - **Black wire (GND)** → Pin 9 (Ground)  
+   - **Red wire (V+)** → Pin 1 (3.3V)  
+   - **Blue wire (SDA)** → Pin 3 (GPIO 2 – I²C SDA)  
+   - **Yellow wire (SCL)** → Pin 5 (GPIO 3 – I²C SCL)
+
+**Qwiic/STEMMA QT Cable Pinout Reference**
+
+Qwiic/STEMMA QT Connector:
+┌─────────────────┐
+│ BLK RED BLU YEL │
+│ GND V+ SDA SCL │
+└─────────────────┘
+
+**Raspberry Pi GPIO Pin Layout (Top View)**
+
+┌───────────────┐
+3V3 │ 1 ● ● 2 │ 5V
+SDA │ 3 ● ● 4 │ 5V
+SCL │ 5 ● ● 6 │ GND
+│ 7 ● ● 8 │
+GND │ 9 ● ●10 │
+│ ... │
+└───────────────┘
 
 
-## Hardware Wiring
+**Option 2: Direct GPIO Connection (Manual Wiring)**
 
-**Adafruit SGP30 → Raspberry Pi GPIO**:
+If you do not have Qwiic/STEMMA cables:
 
-| SGP30 Pin | RPi Pin | Function |
-|-----------|---------|----------|
-| **VCC**   | 1 (3.3V) | Power   |
-| **GND**   | 9        | Ground  |
-| **SDA**   | 3 (GPIO2)| I²C Data|
-| **SCL**   | 5 (GPIO3)| I²C Clock|
+1. Use **female‑to‑female jumper wires**.  
+2. Connect SGP30 breakout pins directly to Raspberry Pi GPIO:
 
-**Verify**: `sudo i2cdetect -y 1` → Should show `58`
+| SGP30 Pin | Wire Color | Raspberry Pi Pin | Function  |
+|-----------|------------|------------------|-----------|
+| **VCC**   | Red        | Pin 1 (3.3V)     | Power     |
+| **GND**   | Black      | Pin 9 (Ground)   | Ground    |
+| **SDA**   | Blue       | Pin 3 (GPIO 2)   | I²C Data  |
+| **SCL**   | Yellow     | Pin 5 (GPIO 3)   | I²C Clock |
+
+**Important Hardware Notes**
+
+⚠️ **Critical Warnings:**
+
+1. Use **3.3V** logic on the Raspberry Pi; the SGP30 breakout accepts 3.3–5V on VCC but I²C lines are 3.3V when used with the Pi.  
+2. Keep the sensor exposed to room air (do not seal it in an airtight box) for accurate gas measurements.  
+3. Avoid touching the sensor area with fingers, as oils or contaminants can affect readings.
+
+**SGP30 I²C Address**
+
+- Default I²C address: `0x58` (fixed on the SGP30).  
+
+To verify the sensor is connected:
+
+sudo i2cdetect -y 1
+
+
+You should see **58** in the grid.
 
 ## Raspberry Pi Setup
 
-Enable I2C & SPI
-sudo raspi-config # Interface Options → I2C → Enable
-sudo reboot
+**Step 1: Install Raspberry Pi OS**
 
-Install CircuitPython libs
-sudo apt update
-sudo apt install -y python3-pip i2c-tools
-pip3 install adafruit-circuitpython-sgp30 firebase-admin
-
-
-## Firebase Configuration
-
-**Your exact paths**:
-- **Service Account**: `/home/pi/CENG317/Test/life-environmentalsolution-firebase-adminsdk-fbsvc-1b81d17b94.json`
-- **Database URL**: `https://life-environmentalsolution-default-rtdb.firebaseio.com/`
-- **Path**: `sgp30_readings`
-
-## Running Your Code
-
-cd /home/pi/CENG317/Test/
-python3 sgp30_monitor.py
-
-
-**Expected Output**:
-SGP30 Air Quality Sensor Example
-Waiting 15 seconds for sensor to stabilize...
-eCO2: 450 ppm (Excellent - fresh air) | TVOC: 23 ppb (Excellent - very clean air)
----- Baseline: eCO2: 0x0280, TVOC: 0x0098
-
-
-## Data Structure
-
-**Firebase Realtime Database** (`sgp30_readings`):
-
-{
-"sgp30_readings": {
-"-Nxxxxx": {
-"timestamp": "2025-12-09T22:51:00.123456",
-"eCO2": 450,
-"TVOC": 23,
-"co2_description": "Excellent - fresh air",
-"tvoc_description": "Excellent - very clean air"
-}
-}
-}
-
-
-## Android App Integration
-
-**Listen to**: `sgp30_readings` path
-**Display**:
-- Live eCO2/TVOC gauges
-- Quality descriptions (Excellent/Good/Moderate/Poor/Very Poor)
-- Color-coded status indicators
-
-## Troubleshooting
-
-| Issue | Solution |
-|-------|----------|
-| `No module 'adafruit_sgp30'` | `pip3 install adafruit-circuitpython-sgp30` |
-| No `58` on `i2cdetect` | Check 3.3V power, SDA/SCL wiring |
-| Firebase auth error | Verify JSON file path exists |
-| Always 400ppm/0ppb | Wait full 15s warmup, breathe near sensor |
-| `OSError: [Errno 121]` | I2C bus conflict, reboot + check wiring |
-
----
