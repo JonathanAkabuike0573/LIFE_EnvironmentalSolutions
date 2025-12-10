@@ -25,10 +25,8 @@ This project creates a complete indoor air quality monitoring system using the *
 Readings are taken on a Raspberry Pi with Python (CircuitPython libraries), pushed to a **Firebase Realtime Database**, and can be displayed on an Android app or web dashboard.
 
 **System Architecture**
-
 flowchart LR;
 SGP30_Sensor--->Raspberry_Pi_(Python)--->Firebase_Database--->Android_App;
-
 
 (I²C) (WiFi) (Cloud) (Mobile)
 
@@ -109,6 +107,7 @@ GND │ 9 ● ●10 │
 │ ... │
 └───────────────┘
 
+
 ### Option 2: Direct GPIO Connection (Manual Wiring)
 
 If you do not have Qwiic/STEMMA cables:
@@ -136,6 +135,7 @@ If you do not have Qwiic/STEMMA cables:
 - Default I²C address: `0x58` (fixed on the SGP30).  
 
 To verify the sensor is connected:
+
 sudo i2cdetect -y 1
 
 
@@ -154,8 +154,10 @@ You should see **58** in the grid.
 ### Step 2: Initial System Configuration
 
 Connect via SSH or local terminal and run:
+
 sudo apt update
 sudo apt upgrade -y
+
 
 Install required system packages:
 sudo apt install -y python3-pip python3-dev git i2c-tools
@@ -165,6 +167,7 @@ sudo apt install -y python3-pip python3-dev git i2c-tools
 1. Run `sudo raspi-config`.  
 2. Go to **Interface Options** → **I2C** → enable.  
 3. Reboot:
+sudo reboot
 
 
 ---
@@ -186,7 +189,6 @@ sudo apt install -y python3-pip python3-dev git i2c-tools
 4. Go to **Project Settings → Service Accounts**, click **Generate new private key**, and save the JSON file to your Pi, e.g.:
 /home/pi/CENG317/Test/life-environmentalsolution-firebase-adminsdk-fbsvc-1b81d17b94.json
 
-
 5. Note your **database URL**, for example:
 https://life-environmentalsolution-default-rtdb.firebaseio.com/
 
@@ -197,6 +199,7 @@ https://life-environmentalsolution-default-rtdb.firebaseio.com/
 
 ### Step 1: Install Python Libraries
 pip3 install adafruit-circuitpython-sgp30 firebase-admin
+
 
 ### Step 2: Create the Python Script
 
@@ -219,8 +222,7 @@ firebase_admin.initialize_app(cred, {
 ref = db.reference("sgp30_readings")
 
 Create I2C connection
-i2c = busio
-I2C(board.SCL, board.SDA)
+i2c = busio.I2C(board.SCL, board.SDA)
 sgp30 = adafruit_sgp30.Adafruit_SGP30(i2c)
 
 print("SGP30 Air Quality Sensor Example")
@@ -230,122 +232,132 @@ sgp30.iaq_init()
 
 print("Waiting 15 seconds for sensor to stabilize...")
 for i in range(15):
-    print(f"{15 - i}s", end="\r")
-    time.sleep(1)
+print(f"{15 - i}s", end="\r")
+time.sleep(1)
 
 elapsed_sec = 0
 
 while True:
-    eCO2, TVOC = sgp30.iaq_measure()
+eCO2, TVOC = sgp30.iaq_measure()
 
-    # Interpret eCO2 levels (in ppm)
-    if eCO2 <= 600:
-        co2_desc = "Excellent - fresh air"
-    elif eCO2 <= 1000:
-        co2_desc = "Good - normal indoor air"
-    elif eCO2 <= 1500:
-        co2_desc = "Moderate - consider more ventilation"
-    elif eCO2 <= 2000:
-        co2_desc = "Poor - air feels stuffy"
-    else:
-        co2_desc = "Very Poor - ventilation needed!"
+# Interpret eCO2 levels (in ppm)
+if eCO2 <= 600:
+    co2_desc = "Excellent - fresh air"
+elif eCO2 <= 1000:
+    co2_desc = "Good - normal indoor air"
+elif eCO2 <= 1500:
+    co2_desc = "Moderate - consider more ventilation"
+elif eCO2 <= 2000:
+    co2_desc = "Poor - air feels stuffy"
+else:
+    co2_desc = "Very Poor - ventilation needed!"
 
-    # Interpret TVOC levels (in ppb)
-    if TVOC <= 65:
-        tvoc_desc = "Excellent - very clean air"
-    elif TVOC <= 220:
-        tvoc_desc = "Good - typical indoor air"
-    elif TVOC <= 660:
-        tvoc_desc = "Moderate - some pollutants detected"
-    elif TVOC <= 2200:
-        tvoc_desc = "Poor - noticeable chemical emissions"
-    else:
-        tvoc_desc = "Very Poor - strong pollution or odor"
+# Interpret TVOC levels (in ppb)
+if TVOC <= 65:
+    tvoc_desc = "Excellent - very clean air"
+elif TVOC <= 220:
+    tvoc_desc = "Good - typical indoor air"
+elif TVOC <= 660:
+    tvoc_desc = "Moderate - some pollutants detected"
+elif TVOC <= 2200:
+    tvoc_desc = "Poor - noticeable chemical emissions"
+else:
+    tvoc_desc = "Very Poor - strong pollution or odor"
 
-    print(f"eCO2: {eCO2} ppm ({co2_desc}) | TVOC: {TVOC} ppb ({tvoc_desc})")
+print(f"eCO2: {eCO2} ppm ({co2_desc}) | TVOC: {TVOC} ppb ({tvoc_desc})")
 
-    # Prepare data
-    timestamp = datetime.now().isoformat()
-    data = {
-        "timestamp": timestamp,
-        "eCO2": eCO2,
-        "TVOC": TVOC,
-        "co2_description": co2_desc,
-        "tvoc_description": tvoc_desc
-    }
+# Prepare data
+timestamp = datetime.now().isoformat()
+data = {
+    "timestamp": timestamp,
+    "eCO2": eCO2,
+    "TVOC": TVOC,
+    "co2_description": co2_desc,
+    "tvoc_description": tvoc_desc
+}
 
-    # Send data to Firebase
-    ref.push(data)
+# Send data to Firebase
+ref.push(data)
 
-    elapsed_sec += 2
-    time.sleep(2)
+elapsed_sec += 2
+time.sleep(2)
 
-    # Show baseline every 30 seconds (optional)
-    if elapsed_sec % 30 == 0:
-        baseline_eCO2, baseline_TVOC = sgp30.get_iaq_baseline()
-        print(f"---- Baseline values: eCO2: 0x{baseline_eCO2:04x}, TVOC: 0x{baseline_TVOC:04x}")
+# Show baseline every 30 seconds (optional)
+if elapsed_sec % 30 == 0:
+    baseline_eCO2, baseline_TVOC = sgp30.get_iaq_baseline()
+    print(f"---- Baseline values: eCO2: 0x{baseline_eCO2:04x}, TVOC: 0x{baseline_TVOC:04x}")
 
-Step 3: Run the Script
+
+
+### Step 3: Run the Script
+
 From the folder where your script lives:
 cd /home/pi/CENG317/Test/
 python3 sgp30_monitor.py
 
-You should see live eCO₂/TVOC readings printed every 2 seconds and new entries appearing under sgp30_readings in Firebase.
 
-Android App Integration
+You should see live eCO₂/TVOC readings printed every 2 seconds and new entries appearing under `sgp30_readings` in Firebase.
+
+---
+
+## Android App Integration
+
 The Android app (or any client) will listen to the Firebase Realtime Database.
 
-Data Structure (Firebase)
+**Data Structure (Firebase)**
 
-A typical node under sgp30_readings looks like:
+A typical node under `sgp30_readings` looks like:
+
+
 {
-  "timestamp": "2025-12-09T22:51:00.123456",
-  "eCO2": 450,
-  "TVOC": 23,
-  "co2_description": "Excellent - fresh air",
-  "tvoc_description": "Excellent - very clean air"
+"timestamp": "2025-12-09T22:51:00.123456",
+"eCO2": 450,
+"TVOC": 23,
+"co2_description": "Excellent - fresh air",
+"tvoc_description": "Excellent - very clean air"
 }
 
-App Logic (Java/Kotlin or Flutter, etc.)
 
-Connect to Firebase Realtime Database.
+**App Logic (Java/Kotlin or Flutter, etc.)**
 
-Attach a listener to the sgp30_readings path.
+- Connect to Firebase Realtime Database.  
+- Attach a listener to the `sgp30_readings` path.  
+- Display:
+  - Live **eCO₂ (ppm)** and **TVOC (ppb)** values.  
+  - The description strings as a color‑coded status (e.g., green for Excellent/Good, yellow for Moderate, red for Poor/Very Poor).
 
-Display:
+---
 
-Live eCO₂ (ppm) and TVOC (ppb) values.
+## PCB Design (Optional)
 
-The description strings as a color‑coded status (e.g., green for Excellent/Good, yellow for Moderate, red for Poor/Very Poor).
-
-PCB Design (Optional)
 If you want a custom PCB:
 
-Break out the SGP30 footprint or header for the Adafruit SGP30 breakout.
+- Break out the SGP30 footprint or header for the Adafruit SGP30 breakout.  
+- Route VCC, GND, SDA, and SCL to a 40‑pin Raspberry Pi compatible header.  
+- Add mounting holes that match your standoffs and enclosure.
 
-Route VCC, GND, SDA, and SCL to a 40‑pin Raspberry Pi compatible header.
+---
 
-Add mounting holes that match your standoffs and enclosure.
+## 3D Printed Case (Optional)
 
-
-3D Printed Case (Optional)
 You can design a case that:
 
-Holds the Raspberry Pi and SGP30 board securely.
+- Holds the Raspberry Pi and SGP30 board securely.  
+- Provides vent openings around the sensor so air can circulate freely.  
+- Exposes USB, HDMI, and power ports as needed.
 
-Provides vent openings around the sensor so air can circulate freely.
-
-Exposes USB, HDMI, and power ports as needed.
+---
 
 ## Troubleshooting
 
-| Issue                                   | Solution                                                                                     |
-|-----------------------------------------|----------------------------------------------------------------------------------------------|
-| **No module `adafruit_sgp30`**          | Install the library with `pip3 install adafruit-circuitpython-sgp30`.                        |
-| **Sensor not found (no 0x58 in i2cdetect)** | Check wiring (SDA/SCL swapped?). Ensure I²C is enabled in `raspi-config`. Confirm 3.3V and GND. |
-| **Firebase auth or permission error**   | Verify the service account `.json` path and `databaseURL` string. Check that Pi has internet.|
-| **Always 400 ppm eCO₂ / 0 ppb TVOC**    | Let the sensor warm up at least 15 seconds and keep it powered continuously while testing.   |
-| **`OSError: [Errno 121]` on I²C**       | Indicates I²C bus error. Reboot the Pi, recheck SDA/SCL/VCC/GND, and ensure only one device at 0x58. |
+| Issue                                          | Solution                                                                                     |
+|-----------------------------------------------|----------------------------------------------------------------------------------------------|
+| **No module `adafruit_sgp30`**                | Install the library with `pip3 install adafruit-circuitpython-sgp30`.                        |
+| **Sensor not found (no 0x58 in `i2cdetect`)** | Check wiring (SDA/SCL swapped?). Ensure I²C is enabled in `raspi-config`. Confirm 3.3V and GND. |
+| **Firebase auth or permission error**         | Verify the service account `.json` path and `databaseURL` string. Check that Pi has internet.|
+| **Always 400 ppm eCO₂ / 0 ppb TVOC**          | Let the sensor warm up at least 15 seconds and keep it powered continuously while testing.   |
+| **`OSError: [Errno 121]` on I²C**             | Indicates I²C bus error. Reboot the Pi, recheck SDA/SCL/VCC/GND, and ensure only one device at 0x58. |
 
+---
 
 
