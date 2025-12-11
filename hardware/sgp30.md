@@ -201,7 +201,7 @@ pip3 install adafruit-circuitpython-sgp30 firebase-admin
 
 
 ### Step 2: Create the Python Script
-You can find the SGP30 Python script [here](hardware/sgp30.py).
+You can find the SGP30 Python script [here](/sgp30.py).
 
 Create `sgp30_monitor.py` with your working code:
 import time
