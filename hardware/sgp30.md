@@ -212,6 +212,7 @@ from firebase_admin import credentials, db
 from datetime import datetime
 
 Initialize Firebase
+```
 cred = credentials.Certificate(
 "/home/pi/CENG317/Test/life-environmentalsolution-firebase-adminsdk-fbsvc-1b81d17b94.json"
 )
@@ -219,7 +220,7 @@ firebase_admin.initialize_app(cred, {
 "databaseURL": "https://life-environmentalsolution-default-rtdb.firebaseio.com/"
 })
 ref = db.reference("sgp30_readings")
-
+```
 Create I2C connection
 i2c = busio.I2C(board.SCL, board.SDA)
 sgp30 = adafruit_sgp30.Adafruit_SGP30(i2c)
