@@ -19,6 +19,7 @@ import ca.light.indoorair.freshness.energy.it.life.environmental.solution.valida
 
 // No longer importing com.google.firebase.auth.FirebaseAuthProvider
 // No longer importing static androidx.core.app.PendingIntentCompat.getActivity
+// testing out new branch
 
 public class LoginActivity extends AppCompatActivity {
 
