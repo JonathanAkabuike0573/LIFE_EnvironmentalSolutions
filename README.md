@@ -18,8 +18,14 @@ It demonstrates [A smart environmental monitoring system that improves indoor co
 
 - Light Intensity Monitoring – Monitors visible light levels across six wavelength bands for comfort and energy savings.
 
-## Project Screenshot:
-<img src="assets/logo.svg" alt="Life Logo" width="100" height="100"/>
+## Project Screenshots:
+| Dashboard | Air Quality | Light |
+|---|---|---|
+| <img src="assets/screenshots/s1.png" width="220"/> | <img src="assets/screenshots/s2.png" width="220"/> | <img src="assets/screenshots/s3.png" width="220"/> |
+
+| Presence | Navigation Menu | Profile |
+|---|---|---|
+| <img src="assets/screenshots/s4.png" width="220"/> | <img src="assets/screenshots/s5.png" width="220"/> | <img src="assets/screenshots/s6.png" width="220"/> |
 
 ## Project Link:
 [GitHub Repository](https://github.com/JonathanAkabuike0573/LIFE_EnvironmentalSolutions)  
